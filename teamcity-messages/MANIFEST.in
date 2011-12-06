@@ -1,0 +1,3 @@
+include *.txt
+include *.sh
+include examples/*.py
