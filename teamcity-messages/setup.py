@@ -1,7 +1,7 @@
 from setuptools import setup
 setup(
     name = "teamcity-messages",
-    version = "1.5",
+    version = "1.6",
     author = 'Leonid Shalupov',
     author_email = 'Leonid.Shalupov@jetbrains.com',
     description = 'A unittest extension to send test result messages '+
@@ -32,5 +32,4 @@ teamcity-nose package
     platforms = ["any"],
     
     packages = ["teamcity"],
-    data_files = [('examples', ['simple.py'])],
 )
