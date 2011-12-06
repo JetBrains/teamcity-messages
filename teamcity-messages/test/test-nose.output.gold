@@ -1,0 +1,31 @@
+
+##teamcity[testSuiteStarted name='test-nose']
+
+##teamcity[testSuiteStarted name='test-nose.TestTeamcityMessages']
+
+##teamcity[testStarted name='test-nose.TestTeamcityMessages.testAssert']
+
+##teamcity[testFailed message='Failure' name='test-nose.TestTeamcityMessages.testAssert' details='Traceback (most recent call last):|n  File "unittest.py", line LINE, in run|n    testMethod()|n  File "case.py", line LINE, in runTest|n    self.test(*self.arg)|n  File "test-nose.py", line LINE, in testAssert|n    assert False|nAssertionError|n']
+
+##teamcity[testFinished name='test-nose.TestTeamcityMessages.testAssert']
+
+##teamcity[testStarted name='test-nose.TestTeamcityMessages.testAssertEqual']
+
+##teamcity[testFailed message='Failure' name='test-nose.TestTeamcityMessages.testAssertEqual' details='Traceback (most recent call last):|n  File "unittest.py", line LINE, in run|n    testMethod()|n  File "case.py", line LINE, in runTest|n    self.test(*self.arg)|n  File "test-nose.py", line LINE, in testAssertEqual|n    assert 1 == 2|nAssertionError|n']
+
+##teamcity[testFinished name='test-nose.TestTeamcityMessages.testAssertEqual']
+
+##teamcity[testStarted name='test-nose.TestTeamcityMessages.testException']
+
+##teamcity[testFailed message='Error' name='test-nose.TestTeamcityMessages.testException' details='Traceback (most recent call last):|n  File "unittest.py", line LINE, in run|n    testMethod()|n  File "case.py", line LINE, in runTest|n    self.test(*self.arg)|n  File "test-nose.py", line LINE, in testException|n    raise Exception("some exception")|nException: some exception|n']
+
+##teamcity[testFinished name='test-nose.TestTeamcityMessages.testException']
+
+##teamcity[testStarted name='test-nose.TestTeamcityMessages.testPass']
+ok
+
+##teamcity[testFinished name='test-nose.TestTeamcityMessages.testPass']
+
+##teamcity[testSuiteFinished name='test-nose.TestTeamcityMessages']
+
+##teamcity[testSuiteFinished name='test-nose']

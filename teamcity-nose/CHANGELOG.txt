@@ -1,0 +1,8 @@
+Version 1.2 Tue Apr 27 2010
+  - Don't depend on specific nose version
+  
+Version 1.1 Thu Apr 10 2008
+  - Fixed README
+  
+Version 1.0 Tue Apr 08 2008
+  - initial release
