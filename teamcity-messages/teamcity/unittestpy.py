@@ -49,7 +49,7 @@ class TeamcityTestResult(TestResult):
     def stopTest(self, test):
         self.messages.testFinished(self.getTestName(test))
 
-class TeamcityTestRunner:
+class TeamcityTestRunner(object):
     def __init__(self, stream=sys.stderr):
         self.stream = stream
 
