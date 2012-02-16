@@ -1,6 +1,6 @@
 import sys
 
-class TeamcityServiceMessages:
+class TeamcityServiceMessages(object):
     quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
     
     def __init__(self, output=sys.stdout):
