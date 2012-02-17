@@ -1,7 +1,7 @@
 import traceback, types, sys, os
 from nose.plugins import Plugin
 
-from teamcity import underTeamcity
+from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestResult
 
 class TeamcityReport(TeamcityTestResult):
@@ -12,7 +12,7 @@ class TeamcityReport(TeamcityTestResult):
         super(TeamcityTestResult, self).__init__()
         
     def configure(self, options, conf):
-        self.enabled = underTeamcity()
+        self.enabled = is_running_under_teamcity()
 
     def options(self, parser, env=os.environ):
         pass

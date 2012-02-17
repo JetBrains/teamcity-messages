@@ -1,4 +1,4 @@
-from teamcity import underTeamcity
+from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestRunner
 
 import unittest
@@ -23,7 +23,7 @@ class TestTeamcityMessages(unittest.TestCase):
         raise Exception("some exception")
 
 if __name__ == '__main__':
-    if underTeamcity():
+    if is_running_under_teamcity():
         runner = TeamcityTestRunner()
     else:
         runner = unittest.TextTestRunner()
