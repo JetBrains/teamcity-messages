@@ -1,0 +1,66 @@
+============================= test session starts ==============================
+platform win32 -- Python 2.7.3 -- pytest-2.3.4
+plugins: teamcity-messages
+collected 5 items
+
+test-pytest.py 
+##teamcity[testSuiteStarted name='test-pytest.py']
+
+##teamcity[testStarted name='TestTeamcityMessages.testPass']
+.
+##teamcity[testFinished name='TestTeamcityMessages.testPass']
+
+##teamcity[testStarted name='TestTeamcityMessages.testAssertEqual']
+.
+##teamcity[testFinished name='TestTeamcityMessages.testAssertEqual']
+
+##teamcity[testStarted name='TestTeamcityMessages.testAssertEqualFails']
+F
+##teamcity[testFailed message='(|'test-pytest.py|', 8, |'TestTeamcityMessages.testAssertEqualFails|')' name='TestTeamcityMessages.testAssertEqualFails' details='self = <test-pytest.TestTeamcityMessages instance at 0x????????>       assert 1 == 2|nE       assert 1 == 2|n|ntest-pytest.py:10: AssertionError']
+
+##teamcity[testFinished name='TestTeamcityMessages.testAssertEqualFails']
+
+##teamcity[testStarted name='TestTeamcityMessages.testAssertFalse']
+F
+##teamcity[testFailed message='(|'test-pytest.py|', 11, |'TestTeamcityMessages.testAssertFalse|')' name='TestTeamcityMessages.testAssertFalse' details='self = <test-pytest.TestTeamcityMessages instance at 0x????????>       assert False|nE       assert False|n|ntest-pytest.py:13: AssertionError']
+
+##teamcity[testFinished name='TestTeamcityMessages.testAssertFalse']
+
+##teamcity[testStarted name='TestTeamcityMessages.testException']
+F
+##teamcity[testFailed message='(|'test-pytest.py|', 14, |'TestTeamcityMessages.testException|')' name='TestTeamcityMessages.testException' details='self = <test-pytest.TestTeamcityMessages instance at 0x????????>       raise Exception("some exception")|nE       Exception: some exception|n|ntest-pytest.py:16: Exception']
+
+##teamcity[testFinished name='TestTeamcityMessages.testException']
+
+##teamcity[testSuiteFinished name='test-pytest.py']
+
+
+=================================== FAILURES ===================================
+__________________ TestTeamcityMessages.testAssertEqualFails ___________________
+
+self = <test-pytest.TestTeamcityMessages instance at 0x????????>
+
+    def testAssertEqualFails(self):
+>       assert 1 == 2
+E       assert 1 == 2
+
+test-pytest.py:10: AssertionError
+_____________________ TestTeamcityMessages.testAssertFalse _____________________
+
+self = <test-pytest.TestTeamcityMessages instance at 0x????????>
+
+    def testAssertFalse(self):
+>       assert False
+E       assert False
+
+test-pytest.py:13: AssertionError
+______________________ TestTeamcityMessages.testException ______________________
+
+self = <test-pytest.TestTeamcityMessages instance at 0x????????>
+
+    def testException(self):
+>       raise Exception("some exception")
+E       Exception: some exception
+
+test-pytest.py:16: Exception
+====================== 3 failed, 2 passed in 0.02 seconds ======================

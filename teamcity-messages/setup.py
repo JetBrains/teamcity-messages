@@ -32,4 +32,11 @@ teamcity-nose package
     platforms = ["any"],
     
     packages = ["teamcity"],
+    
+    # the following makes a plugin available to py.test
+    entry_points = {
+        'pytest11': [
+            'name_of_plugin = teamcity.pytest_plugin',
+        ]
+    },    
 )
