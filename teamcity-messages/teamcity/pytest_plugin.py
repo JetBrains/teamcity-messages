@@ -64,8 +64,10 @@ class EchoTeamCityMessages(object):
         elif report.failed:
             if report.when == "call":
                 self.teamcity.testFailed(testname, str(report.location), str(report.longrepr))
+                self.teamcity.testFinished(testname) # report finished after the failure
         elif report.skipped:
             self.teamcity.testIgnored(testname, str(report.longrepr))
+            self.teamcity.testFinished(testname) # report finished after the skip
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
         if self.currentSuite:
