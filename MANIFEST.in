@@ -1,3 +1,4 @@
 include *.txt
-include *.sh
 include examples/*.py
+prune test
+exclude run-test.sh
