@@ -6,17 +6,16 @@ setup(
     author_email = 'Leonid.Shalupov@jetbrains.com',
     description = 'A unittest extension to send test result messages '+
         'to TeamCity continuous integration server',
-    long_description = """This packages provides unittest
+    long_description = """This packages provides unittest and nose
 addon for sending test result messages
 to TeamCity continuous integration server
 http://www.jetbrains.com/teamcity/
 
-See examples/simple.py for example how to
+unittest: see examples/simple.py for example how to
 write your own test file which reports messages
 under TeamCity and prints usual diagnostics without it.
 
-Under nose such reporting may be done automatically - just install
-teamcity-nose package
+nose: test status reporting enabled automatically under TeamCity build
 """,
     license = 'Apache 2.0',
     keywords = 'unittest teamcity test',
@@ -30,13 +29,16 @@ teamcity-nose package
         ],
     url = "http://pypi.python.org/pypi/teamcity-messages",
     platforms = ["any"],
-    
+
     packages = ["teamcity"],
-    
-    # the following makes a plugin available to py.test
+
     entry_points = {
+        'nose.plugins': [
+            'nose-teamcity = teamcity.nose_report:TeamcityReport'
+        ],
+
         'pytest11': [
             'name_of_plugin = teamcity.pytest_plugin',
-        ]
-    },    
+        ],
+    },
 )
