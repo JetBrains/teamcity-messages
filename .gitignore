@@ -3,3 +3,5 @@
 build
 dist
 teamcity_messages.egg-info
+*.pyc
+test/__pycache__
