@@ -17,7 +17,9 @@ unittest: see examples/simple.py for example how to
 write your own test file which reports messages
 under TeamCity and prints usual diagnostics without it.
 
-nose: test status reporting enabled automatically under TeamCity build
+nose: test status reporting enabled automatically under TeamCity build.
+
+py.test: run with --teamcity command line option.
 """,
     license='Apache 2.0',
     keywords='unittest teamcity test',
@@ -31,8 +33,6 @@ nose: test status reporting enabled automatically under TeamCity build
     ],
     url="http://pypi.python.org/pypi/teamcity-messages",
     platforms=["any"],
-
-    packages=["teamcity"],
 
     packages=["teamcity"],
 

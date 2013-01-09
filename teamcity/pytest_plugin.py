@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Aaron Buchanan
 Nov. 2012
@@ -14,21 +15,25 @@ import py
 
 from teamcity.messages import TeamcityServiceMessages
 
+
 def pytest_addoption(parser):
     group = parser.getgroup("terminal reporting", "reporting", after="general")
     group._addoption('--teamcity', action="count",
-               dest="teamcity", default=0, help="output teamcity messages")
+                     dest="teamcity", default=0, help="output teamcity messages")
+
 
 def pytest_configure(config):
-    if config.option.teamcity >=1:
+    if config.option.teamcity >= 1:
         config._teamcityReporting = EchoTeamCityMessages()
         config.pluginmanager.register(config._teamcityReporting)
+
 
 def pytest_unconfigure(config):
     teamcityReporiting = getattr(config, '_teamcityReporting', None)
     if teamcityReporiting:
         del config._teamcityReporting
         config.pluginmanager.unregister(teamcityReporiting)
+
 
 class EchoTeamCityMessages(object):
     def __init__(self, ):
@@ -45,7 +50,7 @@ class EchoTeamCityMessages(object):
         testname = testname.replace("::()::", ".")
         testname = testname.replace("::", ".")
         testname = testname.strip(".")
-        return ("".join([file, split]), testname)
+        return "".join([file, split]), testname
 
     def pytest_runtest_logstart(self, nodeid, location):
         file, testname = self.format_names(nodeid)
@@ -59,17 +64,16 @@ class EchoTeamCityMessages(object):
     def pytest_runtest_logreport(self, report):
         file, testname = self.format_names(report.nodeid)
         if report.passed:
-            if report.when == "call": # ignore setup/teardown
+            if report.when == "call":  # ignore setup/teardown
                 self.teamcity.testFinished(testname)
         elif report.failed:
             if report.when == "call":
                 self.teamcity.testFailed(testname, str(report.location), str(report.longrepr))
-                self.teamcity.testFinished(testname) # report finished after the failure
+                self.teamcity.testFinished(testname)  # report finished after the failure
         elif report.skipped:
             self.teamcity.testIgnored(testname, str(report.longrepr))
-            self.teamcity.testFinished(testname) # report finished after the skip
+            self.teamcity.testFinished(testname)  # report finished after the skip
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
         if self.currentSuite:
             self.teamcity.testSuiteFinished(self.currentSuite)
-
