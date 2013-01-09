@@ -28,11 +28,11 @@ nose: test status reporting enabled automatically under TeamCity build
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Software Development :: Testing'
-        ],
-    url = "http://pypi.python.org/pypi/teamcity-messages",
-    platforms = ["any"],
+    ],
+    url="http://pypi.python.org/pypi/teamcity-messages",
+    platforms=["any"],
 
-    packages = ["teamcity"],
+    packages=["teamcity"],
 
     packages=["teamcity"],
 
