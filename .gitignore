@@ -1,2 +1,5 @@
 .idea
 *.iml
+build
+dist
+teamcity_messages.egg-info
