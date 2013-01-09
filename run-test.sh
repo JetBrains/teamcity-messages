@@ -2,8 +2,6 @@
 
 set -e
 
-export TEAMCITY_PROJECT_NAME=project_name
-
 tmp=`mktemp -d`
 trap "rm -rf $tmp" EXIT
 
@@ -32,6 +30,10 @@ run() {
     [ -z "$prereq" ] || $prereq
 
     cd test
+
+    # Emulate running under TeamCity
+    export TEAMCITY_PROJECT_NAME=project_name
+
     $cmd 2>&1 | \
         sed 's#File "[^"]*/#File "#g' | \
         perl -pe 's/passed in \d+\.\d+ seconds/passed in X.XX seconds/g' | \
