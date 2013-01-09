@@ -1,7 +1,10 @@
-import traceback, types, sys, os
+# coding=utf-8
+import traceback
+import sys
 from unittest import TestResult
 
 from teamcity.messages import TeamcityServiceMessages
+
 
 # Added *k to some methods to get compatibility with nosetests
 class TeamcityTestResult(TestResult):
@@ -9,45 +12,46 @@ class TeamcityTestResult(TestResult):
         TestResult.__init__(self)
 
         self.output = stream
-        
+
         self.createMessages()
 
     def createMessages(self):
         self.messages = TeamcityServiceMessages(self.output)
-    
+
     def formatErr(self, err):
         exctype, value, tb = err
         return ''.join(traceback.format_exception(exctype, value, tb))
-    
+
     def getTestName(self, test):
         return test.shortDescription() or str(test)
 
     def addSuccess(self, test, *k):
         TestResult.addSuccess(self, test)
-        
+
         self.output.write("ok\n")
-        
+
     def addError(self, test, err, *k):
         TestResult.addError(self, test, err)
-        
+
         err = self.formatErr(err)
-        
+
         self.messages.testFailed(self.getTestName(test),
-            message='Error', details=err)
-            
+                                 message='Error', details=err)
+
     def addFailure(self, test, err, *k):
         TestResult.addFailure(self, test, err)
 
         err = self.formatErr(err)
-        
+
         self.messages.testFailed(self.getTestName(test),
-            message='Failure', details=err)
+                                 message='Failure', details=err)
 
     def startTest(self, test):
         self.messages.testStarted(self.getTestName(test))
-        
+
     def stopTest(self, test):
         self.messages.testFinished(self.getTestName(test))
+
 
 class TeamcityTestRunner(object):
     def __init__(self, stream=sys.stderr):
