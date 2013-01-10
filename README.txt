@@ -1,8 +1,8 @@
 TeamCity plugin for unittest
 ----------------------------
 
-This packages provides unittest
-addon for sending test result messages
+This packages provides unittest, nose and py.test
+addons for sending test result messages
 to TeamCity continuous integration server
 http://www.jetbrains.com/teamcity/
 
@@ -14,14 +14,22 @@ easy_install teamcity-messages
 or
 
 python setup.py install
-if you have extracted version or subversion checkout
+if you have extracted version or githib checkout
 
 Usage
 -----
 
-See examples/simple.py for example how to
+unittest: see examples/simple.py for example how to
 write your own test file which reports messages
 under TeamCity and prints usual diagnostics without it.
+
+unittest: see examples/simple.py for example how to
+write your own test file which reports messages
+under TeamCity and prints usual diagnostics without it.
+
+nose: test status reporting enabled automatically under TeamCity build.
+
+py.test: run with --teamcity command line option.
 
 See
 http://www.jetbrains.net/confluence/display/TCD3/Build+Script+Interaction+with+TeamCity
@@ -30,7 +38,8 @@ for more details
 Contact information
 -------------------
 
-http://www.jetbrains.com/support/teamcity
+Issue tracker: http://youtrack.jetbrains.com/issues/TW
+Support: http://www.jetbrains.com/support/teamcity
 
 License
 -------
