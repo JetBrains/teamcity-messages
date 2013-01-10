@@ -6,10 +6,10 @@ setup(
     version="1.6",
     author='Leonid Shalupov',
     author_email='Leonid.Shalupov@jetbrains.com',
-    description='A unittest extension to send test result messages ' +
-                'to TeamCity continuous integration server',
-    long_description="""This packages provides unittest and nose
-addon for sending test result messages
+    description='Send test results ' +
+                'to TeamCity continuous integration server from unittest, nose and py.test',
+    long_description="""This packages provides unittest, nose and py.test
+addons for sending test result messages
 to TeamCity continuous integration server
 http://www.jetbrains.com/teamcity/
 
@@ -22,9 +22,9 @@ nose: test status reporting enabled automatically under TeamCity build.
 py.test: run with --teamcity command line option.
 """,
     license='Apache 2.0',
-    keywords='unittest teamcity test',
+    keywords='unittest teamcity test nose py.test pytest',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',

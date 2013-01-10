@@ -12,6 +12,7 @@ prepare_nose() {
 prepare_pytest() {
     easy_install -q "$dcache/py-1.4.12.zip"
     easy_install -q "$dcache/pytest-2.3.4.zip"
+    rm -rf test/__pycache__
 }
 
 run() {
@@ -22,7 +23,7 @@ run() {
     venv="$tmp/$name"
 
     rm -rf "$venv"
-    virtualenv -q --never-download --no-site-packages "$venv"
+    virtualenv -q --never-download --distribute --no-site-packages "$venv"
 
     (
     . "$venv/bin/activate"
@@ -35,7 +36,7 @@ run() {
     export TEAMCITY_PROJECT_NAME=project_name
 
     $cmd 2>&1 | \
-        sed 's#File "[^"]*/#File "#g' | \
+        perl -pe 's/File "[^"]+"/File "FILE"/g' | \
         perl -pe 's/passed in \d+\.\d+ seconds/passed in X.XX seconds/g' | \
         perl -pe 's/^platform .+$/platform SPEC/' | \
         sed 's#instance at 0x.*>#instance at 0x????????>#' | \
@@ -56,7 +57,7 @@ python setup.py -q bdist_egg
 egg=$(echo $(pwd)/dist/*.egg)
 test -f "$egg"
 
-dcache="$(pwd)/eggs"
+dcache="$(pwd)/test_support"
 
 run unittest "" "python test-unittest.py"
 run nose "prepare_nose" "nosetests test-nose.py"

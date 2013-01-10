@@ -5,3 +5,5 @@ dist
 teamcity_messages.egg-info
 *.pyc
 test/__pycache__
+test/*.tmp
+test_support/distribute-*.egg
