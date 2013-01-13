@@ -1,31 +1,31 @@
 
 ##teamcity[testStarted name='testAssert (__main__.TestTeamcityMessages)']
 
-##teamcity[testFailed message='Failure' name='testAssert (__main__.TestTeamcityMessages)' details='Traceback (most recent call last):|n  File "FILE", line LINE, in run|n    testMethod()|n  File "FILE", line LINE, in testAssert|n    self.assert_(False)|n  File "FILE", line LINE, in failUnless|n    if not expr: raise self.failureException, msg|nAssertionError|n']
+##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssert (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFinished name='testAssert (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testAssertEqual (__main__.TestTeamcityMessages)']
 
-##teamcity[testFailed message='Failure' name='testAssertEqual (__main__.TestTeamcityMessages)' details='Traceback (most recent call last):|n  File "FILE", line LINE, in run|n    testMethod()|n  File "FILE", line LINE, in testAssertEqual|n    self.assertEqual("1", "2")|n  File "FILE", line LINE, in failUnlessEqual|n    (msg or |'%r != %r|' % (first, second))|nAssertionError: |'1|' != |'2|'|n']
+##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssertEqual (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFinished name='testAssertEqual (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
 
-##teamcity[testFailed message='Failure' name='testAssertEqualMsg (__main__.TestTeamcityMessages)' details='Traceback (most recent call last):|n  File "FILE", line LINE, in run|n    testMethod()|n  File "FILE", line LINE, in testAssertEqualMsg|n    self.assertEqual("1", "2", "message")|n  File "FILE", line LINE, in failUnlessEqual|n    (msg or |'%r != %r|' % (first, second))|nAssertionError: message|n']
+##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFinished name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testException (__main__.TestTeamcityMessages)']
 
-##teamcity[testFailed message='Error' name='testException (__main__.TestTeamcityMessages)' details='Traceback (most recent call last):|n  File "FILE", line LINE, in run|n    testMethod()|n  File "FILE", line LINE, in testException|n    raise Exception("some exception")|nException: some exception|n']
+##teamcity[testFailed details='TRACEBACK' message='Error' name='testException (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFinished name='testException (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testFail (__main__.TestTeamcityMessages)']
 
-##teamcity[testFailed message='Failure' name='testFail (__main__.TestTeamcityMessages)' details='Traceback (most recent call last):|n  File "FILE", line LINE, in run|n    testMethod()|n  File "FILE", line LINE, in testFail|n    self.fail("failed")|n  File "FILE", line LINE, in fail|n    raise self.failureException, msg|nAssertionError: failed|n']
+##teamcity[testFailed details='TRACEBACK' message='Failure' name='testFail (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFinished name='testFail (__main__.TestTeamcityMessages)']
 

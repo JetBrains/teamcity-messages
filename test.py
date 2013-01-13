@@ -25,10 +25,12 @@ FRAMEWORKS = [
 
 def normalize_output(s):
     s = s.replace("\r", "")
+    s = re.sub(r"'Traceback(\|'|[^'])+'", "'TRACEBACK'", s)
     s = re.sub(r"File \"[^\"]*\"", "File \"FILE\"", s)
     s = re.sub(r"passed in \d+\.\d+ seconds", "passed in X.XX seconds", s)
     s = re.sub(r"^platform .+$", "platform SPEC", s)
     s = re.sub(r"instance at 0x.*>", "instance at 0x????????>", s)
+    s = re.sub(r"object at 0x.*>", "instance at 0x????????>", s)
     s = re.sub(r"line \d+", "line LINE", s)
     return s
 
@@ -60,7 +62,7 @@ def runner():
 
     ok = True
     for fw in FRAMEWORKS:
-        print "* testing %s, %s" % (fw.name, fw.version)
+        sys.stdout.write("* testing %s, %s\n" % (fw.name, fw.version))
 
         success = run(fw, egg, temp)
         if not success:
@@ -79,11 +81,13 @@ def find_script(venv, name):
 
 
 def run(fw, egg, temp):
-    venv = join(temp, "venv")
+    venv = join(temp, "venv-" + fw.name)
     clean_directory(venv)
 
     from test_support import virtualenv
 
+    # virtualenv.logger = virtualenv.Logger([(virtualenv.Logger.DEBUG, sys.stdout)])
+    virtualenv.DISTRIBUTE_SETUP_PY = virtualenv.DISTRIBUTE_SETUP_PY.replace("0.6.28", "0.6.34")
     virtualenv.create_environment(venv, use_distribute=True,
                                   never_download=True, search_dirs=[eggs])
 
@@ -124,21 +128,23 @@ def in_venv(venv, framework, teamcity_messages_egg):
     import subprocess
 
     proc = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = "".join([normalize_output(x) for x in proc.stdout.readlines()])
+    output = "".join([normalize_output(x.decode()) for x in proc.stdout.readlines()])
     proc.wait()
 
     os.chdir(cwd)
 
-    expected_output_file = join("test", "test-" + framework.name + ".output.gold")
+    file_prefix = join("test", "test-" + framework.name + ".output")
+
+    expected_output_file = file_prefix + ".gold"
     expected_output = "".join(open(expected_output_file, "r").readlines()).replace("\r", "")
 
-    actual_output_file = join("test", "test-" + framework.name + ".output.tmp")
+    actual_output_file = file_prefix + ".tmp"
     if expected_output != output:
-        print "Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file
+        sys.stderr.write("Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
         open(actual_output_file, "w").write(output)
         return False
     else:
-        print "OK"
+        sys.stdout.write("OK\n")
         if os.path.isfile(actual_output_file):
             os.unlink(actual_output_file)
         return True

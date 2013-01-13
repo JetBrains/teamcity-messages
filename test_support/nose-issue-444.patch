@@ -1,0 +1,13 @@
+Fixes issue https://github.com/nose-devs/nose/issues/444
+--- nose-1.2.1.old\setup.py	Wed Sep 12 23:57:44 2012
++++ nose-1.2.1\setup.py	Sun Jan 13 22:09:26 2013
+@@ -60,7 +60,8 @@
+                 r"        load_entry_point(\1)()\n"
+                 "    )\n"
+                 )
+-            contents = bad_text.sub(good_text, contents)
++            if script_name.endswith(".py"):
++                contents = bad_text.sub(good_text, contents)
+             return self._write_script(script_name, contents, *arg, **kwarg)
+         easy_install._write_script = easy_install.write_script
+         easy_install.write_script = wrap_write_script
