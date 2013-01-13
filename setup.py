@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name="teamcity-messages",
-    version="1.6",
+    version="1.7",
     author='Leonid Shalupov',
     author_email='Leonid.Shalupov@jetbrains.com',
     description='Send test results ' +
@@ -29,6 +29,7 @@ py.test: run with --teamcity command line option.
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Testing'
     ],
     url="http://pypi.python.org/pypi/teamcity-messages",

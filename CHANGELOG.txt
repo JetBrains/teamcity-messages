@@ -1,5 +1,6 @@
 Version 1.7
   - py.test support (Aaron Buchanan)
+  - official Python 3 support
 
 Version 1.6 Tue Dec 06 2011
   - Bundle forgotten examples/simple.py
