@@ -28,4 +28,25 @@ ok
 
 ##teamcity[testSuiteFinished name='test-nose.TestTeamcityMessages']
 
+##teamcity[testSuiteStarted name='test-nose.test_cases']
+
+##teamcity[testStarted name='test-nose.test_cases(1,)']
+
+##teamcity[testFailed details='TRACEBACK' message='Failure' name='test-nose.test_cases(1,)']
+
+##teamcity[testFinished name='test-nose.test_cases(1,)']
+
+##teamcity[testStarted name='test-nose.test_cases(2,)']
+ok
+
+##teamcity[testFinished name='test-nose.test_cases(2,)']
+
+##teamcity[testStarted name='test-nose.test_cases(3,)']
+
+##teamcity[testFailed details='TRACEBACK' message='Failure' name='test-nose.test_cases(3,)']
+
+##teamcity[testFinished name='test-nose.test_cases(3,)']
+
+##teamcity[testSuiteFinished name='test-nose.test_cases']
+
 ##teamcity[testSuiteFinished name='test-nose']
