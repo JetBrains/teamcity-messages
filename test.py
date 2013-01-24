@@ -134,7 +134,7 @@ def in_venv(venv, framework):
 
     actual_output_file = file_prefix + ".tmp"
     if expected_output != output:
-        sys.stderr.write("Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
+        sys.stderr.write("ERROR Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
         open(actual_output_file, "w").write(output)
         return False
     else:
