@@ -43,11 +43,6 @@ def clean_directory(d):
 
 def build_egg():
     from distutils import core
-
-    from test_support.distribute_setup import use_setuptools
-
-    use_setuptools(to_dir=eggs, download_base="offline-mode")
-
     if os.path.isdir("dist"):
         shutil.rmtree("dist")
     dist = core.run_setup("setup.py", script_args=["-q", "bdist_egg"])
@@ -58,13 +53,11 @@ def runner():
     temp = tempfile.mkdtemp()
     atexit.register(shutil.rmtree, temp)
 
-    egg = build_egg()
-
     ok = True
     for fw in FRAMEWORKS:
         sys.stdout.write("* testing %s, %s\n" % (fw.name, fw.version))
 
-        success = run(fw, egg, temp)
+        success = run(fw, temp)
         if not success:
             ok = False
 
@@ -80,7 +73,7 @@ def find_script(venv, name):
     raise RuntimeError("No " + name + " found in " + venv)
 
 
-def run(fw, egg, temp):
+def run(fw, temp):
     venv = join(temp, "venv-" + fw.name)
     clean_directory(venv)
 
@@ -94,7 +87,7 @@ def run(fw, egg, temp):
     import subprocess
 
     python = find_script(venv, "python")
-    rc = subprocess.call([python, __file__, fw.name, fw.version, egg, venv])
+    rc = subprocess.call([python, __file__, fw.name, fw.version, venv])
 
     return rc == 0
 
@@ -111,7 +104,8 @@ def install_package(package):
     easy_install.main(["-q", "-Hnone", "-f", eggs, package])
 
 
-def in_venv(venv, framework, teamcity_messages_egg):
+def in_venv(venv, framework):
+    teamcity_messages_egg = build_egg()
     install_file(teamcity_messages_egg)
 
     if framework.version != "bundled":
@@ -156,11 +150,11 @@ def main(args):
     if len(args) == 0:
         success = runner()
     else:
-        (name, version, teamcity_messages_egg, venv) = args
+        (name, version, venv) = args
 
         for fw in FRAMEWORKS:
             if fw.name == name and fw.version == version:
-                success = in_venv(venv, fw, teamcity_messages_egg)
+                success = in_venv(venv, fw)
 
     sys.exit(0 if success else 1)
 
