@@ -1,4 +1,4 @@
-Version 1.7
+Version 1.7 Sun Feb 03 2013
   - py.test support (Aaron Buchanan)
   - official Python 3 support
 

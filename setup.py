@@ -22,7 +22,7 @@ nose: test status reporting enabled automatically under TeamCity build.
 py.test: run with --teamcity command line option.
 """,
     license='Apache 2.0',
-    keywords='unittest teamcity test nose py.test pytest',
+    keywords='unittest teamcity test nose py.test pytest jetbrains',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',

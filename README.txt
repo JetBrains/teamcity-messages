@@ -23,10 +23,6 @@ unittest: see examples/simple.py for example how to
 write your own test file which reports messages
 under TeamCity and prints usual diagnostics without it.
 
-unittest: see examples/simple.py for example how to
-write your own test file which reports messages
-under TeamCity and prints usual diagnostics without it.
-
 nose: test status reporting enabled automatically under TeamCity build.
 
 py.test: run with --teamcity command line option.
