@@ -32,7 +32,7 @@ py.test: run with --teamcity command line option.
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Testing'
     ],
-    url="http://pypi.python.org/pypi/teamcity-messages",
+    url="https://github.com/JetBrains/teamcity-python",
     platforms=["any"],
 
     packages=["teamcity"],

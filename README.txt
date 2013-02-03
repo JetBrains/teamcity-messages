@@ -34,8 +34,9 @@ for more details
 Contact information
 -------------------
 
-Issue tracker: http://youtrack.jetbrains.com/issues/TW
-Support: http://www.jetbrains.com/support/teamcity
+https://github.com/JetBrains/teamcity-python
+
+TeamCity support: http://www.jetbrains.com/support/teamcity
 
 License
 -------
