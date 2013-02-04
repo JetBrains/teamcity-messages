@@ -13,13 +13,13 @@ addons for sending test result messages
 to TeamCity continuous integration server
 http://www.jetbrains.com/teamcity/
 
-unittest: see examples/simple.py for example how to
+**unittest**: see examples/simple.py for example how to
 write your own test file which reports messages
 under TeamCity and prints usual diagnostics without it.
 
-nose: test status reporting enabled automatically under TeamCity build.
+**nose**: test status reporting enabled automatically under TeamCity build.
 
-py.test: run with --teamcity command line option.
+**py.test**: run with --teamcity command line option.
 """,
     license='Apache 2.0',
     keywords='unittest teamcity test nose py.test pytest jetbrains',
