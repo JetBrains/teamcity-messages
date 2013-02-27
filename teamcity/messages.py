@@ -26,8 +26,11 @@ class TeamcityServiceMessages(object):
     def testStarted(self, testName):
         self.message('testStarted', name=testName)
 
-    def testFinished(self, testName):
-        self.message('testFinished', name=testName)
+    def testFinished(self, testName, testDuration=None):
+        if testDuration:
+            self.message('testFinished', name=testName, duration=testDuration)
+        else:
+            self.message('testFinished', name=testName)
 
     def testIgnored(self, testName, message=''):
         self.message('testIgnored', name=testName, message=message)

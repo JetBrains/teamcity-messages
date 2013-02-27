@@ -3,33 +3,33 @@
 
 ##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssert (__main__.TestTeamcityMessages)']
 
-##teamcity[testFinished name='testAssert (__main__.TestTeamcityMessages)']
+##teamcity[testFinished duration='0' name='testAssert (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testAssertEqual (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssertEqual (__main__.TestTeamcityMessages)']
 
-##teamcity[testFinished name='testAssertEqual (__main__.TestTeamcityMessages)']
+##teamcity[testFinished duration='0' name='testAssertEqual (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
 
-##teamcity[testFinished name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+##teamcity[testFinished duration='0' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testException (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFailed details='TRACEBACK' message='Error' name='testException (__main__.TestTeamcityMessages)']
 
-##teamcity[testFinished name='testException (__main__.TestTeamcityMessages)']
+##teamcity[testFinished duration='0' name='testException (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testFail (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFailed details='TRACEBACK' message='Failure' name='testFail (__main__.TestTeamcityMessages)']
 
-##teamcity[testFinished name='testFail (__main__.TestTeamcityMessages)']
+##teamcity[testFinished duration='0' name='testFail (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted name='testPass (__main__.TestTeamcityMessages)']
 ok
 
-##teamcity[testFinished name='testPass (__main__.TestTeamcityMessages)']
+##teamcity[testFinished duration='0' name='testPass (__main__.TestTeamcityMessages)']
