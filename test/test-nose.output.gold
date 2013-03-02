@@ -42,6 +42,7 @@ ok
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_test_d']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
+stderr string
 
 ##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
 
