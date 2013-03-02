@@ -29,8 +29,8 @@ class TeamcityServiceMessages(object):
         self.message('testStarted', name=testName)
 
     def testFinished(self, testName, testDuration=None):
-        if testDuration:
-            self.message('testFinished', name=testName, duration=testDuration)
+        if testDuration is not None:
+            self.message('testFinished', name=testName, duration=str(int(testDuration.total_seconds() * 1000)))
         else:
             self.message('testFinished', name=testName)
 

@@ -13,7 +13,7 @@ class TeamcityTestResult(TestResult):
         TestResult.__init__(self)
 
         self.output = stream
-        self.test_started = None
+        self.test_started_datetime = None
 
         self.createMessages()
 
@@ -49,13 +49,12 @@ class TeamcityTestResult(TestResult):
                                  message='Failure', details=err)
 
     def startTest(self, test):
-        self.test_started = datetime.datetime.now()
+        self.test_started_datetime = datetime.datetime.now()
         self.messages.testStarted(self.getTestName(test))
 
     def stopTest(self, test):
-        dt = datetime.datetime.now() - self.test_started
-        test_duration = str(int(dt.total_seconds() * 1000))
-        self.messages.testFinished(self.getTestName(test), test_duration)
+        time_diff = datetime.datetime.now() - self.test_started_datetime
+        self.messages.testFinished(self.getTestName(test), time_diff)
 
 
 class TeamcityTestRunner(object):

@@ -8,29 +8,29 @@ test-pytest.py
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='TestTeamcityMessages.testPass']
 .
-##teamcity[testFinished timestamp='TIMESTAMP' name='TestTeamcityMessages.testPass']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='TestTeamcityMessages.testPass']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='TestTeamcityMessages.testAssertEqual']
 .
-##teamcity[testFinished timestamp='TIMESTAMP' name='TestTeamcityMessages.testAssertEqual']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='TestTeamcityMessages.testAssertEqual']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='TestTeamcityMessages.testAssertEqualFails']
 F
 ##teamcity[testFailed timestamp='TIMESTAMP' details='self = <test-pytest.TestTeamcityMessages instance at 0x????????>       assert 1 == 2|nE       assert 1 == 2|n|ntest-pytest.py:12: AssertionError' message='(|'test-pytest.py|', 10, |'TestTeamcityMessages.testAssertEqualFails|')' name='TestTeamcityMessages.testAssertEqualFails']
 
-##teamcity[testFinished timestamp='TIMESTAMP' name='TestTeamcityMessages.testAssertEqualFails']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='TestTeamcityMessages.testAssertEqualFails']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='TestTeamcityMessages.testAssertFalse']
 F
 ##teamcity[testFailed timestamp='TIMESTAMP' details='self = <test-pytest.TestTeamcityMessages instance at 0x????????>       assert False|nE       assert False|n|ntest-pytest.py:15: AssertionError' message='(|'test-pytest.py|', 13, |'TestTeamcityMessages.testAssertFalse|')' name='TestTeamcityMessages.testAssertFalse']
 
-##teamcity[testFinished timestamp='TIMESTAMP' name='TestTeamcityMessages.testAssertFalse']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='TestTeamcityMessages.testAssertFalse']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='TestTeamcityMessages.testException']
 F
 ##teamcity[testFailed timestamp='TIMESTAMP' details='self = <test-pytest.TestTeamcityMessages instance at 0x????????>       raise Exception("some exception")|nE       Exception: some exception|n|ntest-pytest.py:18: Exception' message='(|'test-pytest.py|', 16, |'TestTeamcityMessages.testException|')' name='TestTeamcityMessages.testException']
 
-##teamcity[testFinished timestamp='TIMESTAMP' name='TestTeamcityMessages.testException']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='TestTeamcityMessages.testException']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='test-pytest.py']
 
