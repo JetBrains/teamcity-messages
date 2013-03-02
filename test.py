@@ -26,6 +26,7 @@ FRAMEWORKS = [
 def normalize_output(s):
     s = s.replace("\r", "")
     s = re.sub(r"'Traceback(\|'|[^'])+'", "'TRACEBACK'", s)
+    s = re.sub(r"timestamp='\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d'", "timestamp='TIMESTAMP'", s)
     s = re.sub(r"File \"[^\"]*\"", "File \"FILE\"", s)
     s = re.sub(r"passed in \d+\.\d+ seconds", "passed in X.XX seconds", s)
     s = re.sub(r"^platform .+$", "platform SPEC", s)

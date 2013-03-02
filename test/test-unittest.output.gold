@@ -1,35 +1,50 @@
 
-##teamcity[testStarted name='testAssert (__main__.TestTeamcityMessages)']
-
-##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssert (__main__.TestTeamcityMessages)']
-
-##teamcity[testFinished name='testAssert (__main__.TestTeamcityMessages)']
-
-##teamcity[testStarted name='testAssertEqual (__main__.TestTeamcityMessages)']
-
-##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssertEqual (__main__.TestTeamcityMessages)']
-
-##teamcity[testFinished name='testAssertEqual (__main__.TestTeamcityMessages)']
-
-##teamcity[testStarted name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
-
-##teamcity[testFailed details='TRACEBACK' message='Failure' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
-
-##teamcity[testFinished name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
-
-##teamcity[testStarted name='testException (__main__.TestTeamcityMessages)']
-
-##teamcity[testFailed details='TRACEBACK' message='Error' name='testException (__main__.TestTeamcityMessages)']
-
-##teamcity[testFinished name='testException (__main__.TestTeamcityMessages)']
-
-##teamcity[testStarted name='testFail (__main__.TestTeamcityMessages)']
-
-##teamcity[testFailed details='TRACEBACK' message='Failure' name='testFail (__main__.TestTeamcityMessages)']
-
-##teamcity[testFinished name='testFail (__main__.TestTeamcityMessages)']
-
-##teamcity[testStarted name='testPass (__main__.TestTeamcityMessages)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_no_properties (__main__.TestMessages)']
 ok
 
-##teamcity[testFinished name='testPass (__main__.TestTeamcityMessages)']
+##teamcity[testFinished timestamp='TIMESTAMP' name='test_no_properties (__main__.TestMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_one_property (__main__.TestMessages)']
+ok
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='test_one_property (__main__.TestMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_three_properties (__main__.TestMessages)']
+ok
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='test_three_properties (__main__.TestMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testAssert (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testAssert (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='testAssert (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testAssertEqual (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testAssertEqual (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='testAssertEqual (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testException (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='testException (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='testException (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testFail (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testFail (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='testFail (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testPass (__main__.TestTeamcityMessages)']
+ok
+
+##teamcity[testFinished timestamp='TIMESTAMP' name='testPass (__main__.TestTeamcityMessages)']

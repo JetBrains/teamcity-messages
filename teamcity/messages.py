@@ -1,18 +1,20 @@
 # coding=utf-8
 import sys
+import datetime
 
 
 class TeamcityServiceMessages(object):
     quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
 
-    def __init__(self, output=sys.stdout):
+    def __init__(self, output=sys.stdout, now=datetime.datetime.now):
         self.output = output
+        self.now = now
 
     def escapeValue(self, value):
         return "".join([self.quote.get(x, x) for x in value])
 
     def message(self, messageName, **properties):
-        self.output.write("\n##teamcity[" + messageName)
+        self.output.write("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().isoformat()[:-3]))
         for k in sorted(properties.keys()):
             self.output.write(" %s='%s'" % (k, self.escapeValue(properties[k])))
         self.output.write("]\n")
