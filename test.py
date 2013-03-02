@@ -18,7 +18,7 @@ class Framework(object):
 
 FRAMEWORKS = [
     Framework("unittest", "bundled", ["python", "test-unittest.py"]),
-    Framework("nose", "1.2.1", ["nosetests", "test-nose.py"]),
+    Framework("nose", "1.2.1", ["nosetests", "-w", "nose_integration_tests"]),
     Framework("pytest", "2.3.4", ["py.test", "--teamcity", "test-pytest.py"]),
 ]
 

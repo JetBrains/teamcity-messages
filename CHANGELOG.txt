@@ -1,3 +1,4 @@
+  - extensive tests for nose integration (James Carpenter)
   - added timestamps to TeamCity service messages (James Carpenter)
 
 Version 1.7 Sun Feb 03 2013
