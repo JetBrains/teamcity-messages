@@ -138,6 +138,10 @@ def in_venv(venv, framework):
     if expected_output != output:
         sys.stderr.write("ERROR Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
         open(actual_output_file, "w").write(output)
+
+        DIFF="/usr/bin/diff"
+        if os.path.exists(DIFF):
+            subprocess.call([DIFF, "-u", expected_output_file, actual_output_file])
         return False
     else:
         sys.stdout.write("OK\n")
