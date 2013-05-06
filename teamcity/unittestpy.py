@@ -5,7 +5,9 @@ import datetime
 
 from teamcity.messages import TeamcityServiceMessages
 
-if sys.version_info[1] < 7:
+minor = sys.version_info[1]
+major = sys.version_info[0]
+if major < 3 and minor < 7:
     from unittest2 import TestResult
 else:
     from unittest import TestResult

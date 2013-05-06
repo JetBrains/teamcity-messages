@@ -3,7 +3,9 @@ import sys
 from setuptools import setup
 
 install_requires = []
-if sys.version_info[1] < 7:
+minor = sys.version_info[1]
+major = sys.version_info[0]
+if major < 3 and minor < 7:
     install_requires = ['unittest2']
 
 setup(
