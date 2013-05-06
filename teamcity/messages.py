@@ -34,7 +34,12 @@ class TeamcityServiceMessages(object):
 
     def testFinished(self, testName, testDuration=None):
         if testDuration is not None:
-            self.message('testFinished', name=testName, duration=str(int(testDuration.total_seconds() * 1000)))
+            #added for python 2.6 compatibility
+            #(see http://docs.python.org/2.6/library/datetime.html#datetime.timedelta)
+            #(see http://docs.python.org/2.7/library/datetime.html#datetime.timedelta)
+            duration_in_seconds = (testDuration.microseconds +
+                                   (testDuration.seconds + testDuration.days * 24 * 3600) * 10**6) / 10**6
+            self.message('testFinished', name=testName, duration=str(duration_in_seconds))
         else:
             self.message('testFinished', name=testName)
 
