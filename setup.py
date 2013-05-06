@@ -1,5 +1,10 @@
 # coding=utf-8
+import sys
 from setuptools import setup
+
+install_requires = []
+if sys.version_info[1] < 7:
+    install_requires = ['unittest2']
 
 setup(
     name="teamcity-messages",
@@ -34,7 +39,7 @@ under TeamCity and prints usual diagnostics without it.
     ],
     url="https://github.com/JetBrains/teamcity-python",
     platforms=["any"],
-
+    install_requires=install_requires,
     packages=["teamcity"],
 
     entry_points={
