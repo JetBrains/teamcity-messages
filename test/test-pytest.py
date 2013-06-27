@@ -6,7 +6,7 @@ class TestTeamcityMessages:
         pass
 
     def testAssertEqual(self):
-        assert (True == True)
+        assert (True is True)
 
     def testAssertEqualFails(self):
         assert 1 == 2
