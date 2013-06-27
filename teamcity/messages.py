@@ -14,7 +14,8 @@ class TeamcityServiceMessages(object):
         return "".join([self.quote.get(x, x) for x in value])
 
     def message(self, messageName, **properties):
-        self.output.write("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().isoformat()[:-3]))
+        self.output.write("\n##teamcity[%s timestamp='%s'"
+                          % (messageName, self.now().isoformat()[:-3]))
         for k in sorted(properties.keys()):
             value = properties[k]
             if value is None:
@@ -30,11 +31,13 @@ class TeamcityServiceMessages(object):
         self.message('testSuiteFinished', name=suiteName)
 
     def testStarted(self, testName, captureStandardOutput=None):
-        self.message('testStarted', name=testName, captureStandardOutput=captureStandardOutput)
+        self.message('testStarted', name=testName,
+                     captureStandardOutput=captureStandardOutput)
 
     def testFinished(self, testName, testDuration=None):
         if testDuration is not None:
-            self.message('testFinished', name=testName, duration=str(int(testDuration.total_seconds() * 1000)))
+            duration = str(int(testDuration.total_seconds() * 1000))
+            self.message('testFinished', name=testName, duration=duration)
         else:
             self.message('testFinished', name=testName)
 

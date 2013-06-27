@@ -5,6 +5,7 @@ import inspect
 from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestResult
 
+
 class TeamcityReport(TeamcityTestResult):
     name = 'teamcity-report'
     score = 2

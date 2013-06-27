@@ -7,7 +7,8 @@ setup(
     author='Leonid Shalupov',
     author_email='Leonid.Shalupov@jetbrains.com',
     description='Send test results ' +
-                'to TeamCity continuous integration server from unittest, nose and py.test',
+                'to TeamCity continuous integration server from unittest, ' +
+                'nose and py.test',
     long_description="""This packages provides unittest, nose and py.test
 addons for sending test result messages
 to TeamCity continuous integration server

@@ -26,7 +26,8 @@ FRAMEWORKS = [
 def normalize_output(s):
     s = s.replace("\r", "")
     s = re.sub(r"'Traceback(\|'|[^'])+'", "'TRACEBACK'", s)
-    s = re.sub(r"timestamp='\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d'", "timestamp='TIMESTAMP'", s)
+    s = re.sub(r"timestamp='\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d'",
+               "timestamp='TIMESTAMP'", s)
     s = re.sub(r"duration='\d+'", "duration='MS'", s)
     s = re.sub(r"File \"[^\"]*\"", "File \"FILE\"", s)
     s = re.sub(r"passed in \d+\.\d+ seconds", "passed in X.XX seconds", s)
@@ -82,7 +83,8 @@ def run(fw, temp):
     from test_support import virtualenv
 
     # virtualenv.logger = virtualenv.Logger([(virtualenv.Logger.DEBUG, sys.stdout)])
-    virtualenv.DISTRIBUTE_SETUP_PY = virtualenv.DISTRIBUTE_SETUP_PY.replace("0.6.28", "0.6.34")
+    virtualenv.DISTRIBUTE_SETUP_PY = \
+        virtualenv.DISTRIBUTE_SETUP_PY.replace("0.6.28", "0.6.34")
     virtualenv.create_environment(venv, use_distribute=True,
                                   never_download=True, search_dirs=[eggs])
 
@@ -123,8 +125,10 @@ def in_venv(venv, framework):
 
     import subprocess
 
-    proc = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = "".join([normalize_output(x.decode()) for x in proc.stdout.readlines()])
+    proc = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT)
+    output = "".join([normalize_output(x.decode())
+                      for x in proc.stdout.readlines()])
     proc.wait()
 
     os.chdir(cwd)
@@ -132,16 +136,20 @@ def in_venv(venv, framework):
     file_prefix = join("test", "test-" + framework.name + ".output")
 
     expected_output_file = file_prefix + ".gold"
-    expected_output = "".join(open(expected_output_file, "r").readlines()).replace("\r", "")
+    expected_output = "".join(open(expected_output_file, "r").readlines())\
+        .replace("\r", "")
 
     actual_output_file = file_prefix + ".tmp"
     if expected_output != output:
-        sys.stderr.write("ERROR Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
+        sys.stderr.write("ERROR Wrong output, check the differences between " +
+                         expected_output_file + " and " + actual_output_file +
+                         "\n")
         open(actual_output_file, "w").write(output)
 
-        DIFF="/usr/bin/diff"
+        DIFF = "/usr/bin/diff"
         if os.path.exists(DIFF):
-            subprocess.call([DIFF, "-u", expected_output_file, actual_output_file])
+            subprocess.call([DIFF, "-u", expected_output_file,
+                             actual_output_file])
         return False
     else:
         sys.stdout.write("OK\n")

@@ -6,11 +6,13 @@ import datetime
 
 from teamcity.messages import TeamcityServiceMessages
 
+
 def _is_string(obj):
     if sys.version_info >= (3, 0):
         return isinstance(obj, str)
     else:
         return isinstance(obj, basestring)
+
 
 # Added *k to some methods to get compatibility with nosetests
 class TeamcityTestResult(TestResult):
@@ -47,7 +49,8 @@ class TeamcityTestResult(TestResult):
 
         err = self.formatErr(err)
         if self.getTestName(test) != self.test_name:
-            sys.stderr.write("INTERNAL ERROR: addError(%s) outside of test\n" % self.getTestName(test))
+            sys.stderr.write("INTERNAL ERROR: addError(%s) outside of test\n"
+                             % self.getTestName(test))
             sys.stderr.write("Error: %s\n" % err)
             return
 
@@ -63,7 +66,8 @@ class TeamcityTestResult(TestResult):
 
         err = self.formatErr(err)
         if self.getTestName(test) != self.test_name:
-            sys.stderr.write("INTERNAL ERROR: addFailure(%s) outside of test\n" % self.getTestName(test))
+            sys.stderr.write("INTERNAL ERROR: addFailure(%s) outside of test\n"
+                             % self.getTestName(test))
             sys.stderr.write("Error: %s\n" % err)
             return
 
@@ -78,7 +82,8 @@ class TeamcityTestResult(TestResult):
     def stopTest(self, test):
         time_diff = datetime.datetime.now() - self.test_started_datetime
         if self.getTestName(test) != self.test_name:
-            sys.stderr.write("INTERNAL ERROR: stopTest(%s) after startTest(%s)" % (self.getTestName(test), self.test_name))
+            sys.stderr.write("INTERNAL ERROR: stopTest(%s) after startTest(%s)"
+                             % (self.getTestName(test), self.test_name))
         self.messages.testFinished(self.test_name, time_diff)
         self.test_name = None
 

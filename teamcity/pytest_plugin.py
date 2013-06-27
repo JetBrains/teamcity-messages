@@ -20,7 +20,8 @@ from teamcity.messages import TeamcityServiceMessages
 def pytest_addoption(parser):
     group = parser.getgroup("terminal reporting", "reporting", after="general")
     group._addoption('--teamcity', action="count",
-                     dest="teamcity", default=0, help="output teamcity messages")
+                     dest="teamcity", default=0,
+                     help="output teamcity messages")
 
 
 def pytest_configure(config):
@@ -70,12 +71,15 @@ class EchoTeamCityMessages(object):
                 self.teamcity.testFinished(testname, testDuration=duration)
         elif report.failed:
             if report.when == "call":
-                self.teamcity.testFailed(testname, str(report.location), str(report.longrepr))
+                self.teamcity.testFailed(testname, str(report.location),
+                                         str(report.longrepr))
                 duration = datetime.timedelta(seconds=report.duration)
-                self.teamcity.testFinished(testname, testDuration=duration)  # report finished after the failure
+                # report finished after the failure
+                self.teamcity.testFinished(testname, testDuration=duration)
         elif report.skipped:
             self.teamcity.testIgnored(testname, str(report.longrepr))
-            self.teamcity.testFinished(testname)  # report finished after the skip
+            # report finished after the skip
+            self.teamcity.testFinished(testname)
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
         if self.currentSuite:
