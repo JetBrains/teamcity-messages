@@ -16,6 +16,7 @@ class Framework(object):
         self.version = version
         self.test_command = test_command
 
+
 FRAMEWORKS = [
     Framework("unittest", "bundled", ["python", "test-unittest.py"]),
     Framework("nose", "1.2.1", ["nosetests", "-w", "nose_integration_tests"]),
@@ -45,6 +46,7 @@ def clean_directory(d):
 
 def build_egg():
     from distutils import core
+
     if os.path.isdir("dist"):
         shutil.rmtree("dist")
     dist = core.run_setup("setup.py", script_args=["-q", "bdist_egg"])
@@ -57,13 +59,22 @@ def runner():
 
     ok = True
     for fw in FRAMEWORKS:
-        sys.stdout.write("* testing %s, %s\n" % (fw.name, fw.version))
-
-        success = run(fw, temp)
-        if not success:
-            ok = False
+        test = "Framework.%s(%s)" % (fw.name, fw.version)
+        tc_msg("##teamcity[testStarted name='%s']" % test)
+        try:
+            success = run(fw, temp)
+            if not success:
+                ok = False
+                tc_msg("##teamcity[testFailed name='%s']" % test)
+        finally:
+            tc_msg("##teamcity[testFinished name='%s']" % test)
 
     return ok
+
+
+def tc_msg(msg):
+    if os.environ.get('TEAMCITY_VERSION') is not None:
+        print(msg)
 
 
 def find_script(venv, name):
@@ -136,10 +147,11 @@ def in_venv(venv, framework):
 
     actual_output_file = file_prefix + ".tmp"
     if expected_output != output:
-        sys.stderr.write("ERROR Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
+        sys.stderr.write(
+            "ERROR Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
         open(actual_output_file, "w").write(output)
 
-        DIFF="/usr/bin/diff"
+        DIFF = "/usr/bin/diff"
         if os.path.exists(DIFF):
             subprocess.call([DIFF, "-u", expected_output_file, actual_output_file])
         return False
@@ -163,6 +175,7 @@ def main(args):
                 success = in_venv(venv, fw)
 
     sys.exit(0 if success else 1)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
