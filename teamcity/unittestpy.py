@@ -1,10 +1,17 @@
 # coding=utf-8
 import traceback
 import sys
-from unittest import TestResult
 import datetime
 
 from teamcity.messages import TeamcityServiceMessages
+
+minor = sys.version_info[1]
+major = sys.version_info[0]
+if major < 3 and minor < 7:
+    from unittest2 import TestResult
+else:
+    from unittest import TestResult
+
 
 def _is_string(obj):
     if sys.version_info >= (3, 0):
@@ -53,6 +60,12 @@ class TeamcityTestResult(TestResult):
 
         self.messages.testFailed(self.getTestName(test),
                                  message='Error', details=err)
+
+    def addSkip(self, test, reason):
+        TestResult.addSkip(self, test, reason)
+        self.output.write("skipped %s - %s\n" % (self.getTestName(test), reason))
+        #TODO: "testIgnored" should be replaced by "testSkipped" when implemented
+        self.messages.testIgnored(self.getTestName(test), reason)
 
     def addFailure(self, test, err, *k):
         # workaround nose bug on python 3
