@@ -240,11 +240,11 @@ ok
 
 ##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='Failure: NameError (name |'evil_non_existent_method_123J|' is not defined)']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='Failure: ImportError (No module named |'EvilClassThatDoesNotExist|')']
+##teamcity[testStarted timestamp='TIMESTAMP' name='Failure: ImportError (No module named EvilClassThatDoesNotExist)']
 
-##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='Failure: ImportError (No module named |'EvilClassThatDoesNotExist|')']
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='Failure: ImportError (No module named EvilClassThatDoesNotExist)']
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='Failure: ImportError (No module named |'EvilClassThatDoesNotExist|')']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='Failure: ImportError (No module named EvilClassThatDoesNotExist)']
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_test_l']
 

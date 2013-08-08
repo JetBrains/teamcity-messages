@@ -41,6 +41,7 @@ def normalize_output(s):
     s = re.sub(r"instance at 0x.*>", "instance at 0x????????>", s)
     s = re.sub(r"object at 0x.*>", "instance at 0x????????>", s)
     s = re.sub(r"line \d+", "line LINE", s)
+    s = re.sub(r"\|'EvilClassThatDoesNotExist\|'", "EvilClassThatDoesNotExist", s)  # workaround
     return s
 
 
@@ -89,12 +90,12 @@ def install_package(package):
 
 def escape_for_tc_message_value(expected_output):
     return expected_output \
-            .replace('\r', '')  \
-            .replace('|',  '||') \
-            .replace('\n', '|n') \
-            .replace("'",  "|'") \
-            .replace('[',  '|[') \
-            .replace(']',  '|]')
+        .replace('\r', '') \
+        .replace('|', '||') \
+        .replace('\n', '|n') \
+        .replace("'", "|'") \
+        .replace('[', '|[') \
+        .replace(']', '|]')
 
 
 def run_test_internal(venv, framework):

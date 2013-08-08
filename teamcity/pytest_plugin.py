@@ -12,7 +12,7 @@ py.test with a --teamcity command line option.
 """
 
 import py
-import datetime
+from datetime import datetime, timedelta
 
 from teamcity.messages import TeamcityServiceMessages
 
@@ -66,12 +66,12 @@ class EchoTeamCityMessages(object):
         file, testname = self.format_names(report.nodeid)
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
-                duration = datetime.timedelta(seconds=report.duration)
+                duration = timedelta(seconds=report.duration)
                 self.teamcity.testFinished(testname, testDuration=duration)
         elif report.failed:
             if report.when == "call":
                 self.teamcity.testFailed(testname, str(report.location), str(report.longrepr))
-                duration = datetime.timedelta(seconds=report.duration)
+                duration = timedelta(seconds=report.duration)
                 self.teamcity.testFinished(testname, testDuration=duration)  # report finished after the failure
         elif report.skipped:
             self.teamcity.testIgnored(testname, str(report.longrepr))
