@@ -5,13 +5,11 @@ import re
 import shutil
 from os.path import join
 import traceback
-import tests
 
 
 eggs = os.path.abspath("test_support")
 test_name = 'Unnamed_Test'
 in_teamcity = False
-
 
 
 class Framework(object):
@@ -61,7 +59,6 @@ def build_egg():
     return os.path.abspath(dist.dist_files[0][2])
 
 
-
 def tc_msg(msg):
     if os.environ.get('TEAMCITY_VERSION') is not None:
         sys.stdout.write(msg)
@@ -78,11 +75,10 @@ def find_script(venv, name):
     raise RuntimeError("No " + name + " found in " + venv)
 
 
-
-def install_file(file):
+def install_file(file_to_install):
     from setuptools.command import easy_install
 
-    easy_install.main(["-q", file])
+    easy_install.main(["-q", file_to_install])
 
 
 def install_package(package):
@@ -99,7 +95,6 @@ def escape_for_tc_message_value(expected_output):
             .replace("'",  "|'") \
             .replace('[',  '|[') \
             .replace(']',  '|]')
-
 
 
 def run_test_internal(venv, framework):
@@ -138,7 +133,7 @@ def run_test_internal(venv, framework):
             expected_string = escape_for_tc_message_value(expected_output)
             actual_string = escape_for_tc_message_value(output)
             message = "##teamcity[testFailed type='comparisonFailure' name='%s' message='Output doesn|'t match the relative gold file. See the diff for detail.' expected='%s' actual='%s']\n" \
-                    % (test_name, expected_string, actual_string)
+                      % (test_name, expected_string, actual_string)
             sys.stdout.write(message)
             sys.stdout.flush()
         else:
@@ -157,7 +152,7 @@ def run_test_internal(venv, framework):
         return 2
 
 
-
+#noinspection PyBroadException
 def run_one_test_in_venv(venv, framework):
     """
     Runs one test for the specified virtual env and framework.
@@ -176,8 +171,6 @@ def run_one_test_in_venv(venv, framework):
         return 0
 
 
-
-
 def run_one_test(args):
     (name, version, venv) = args
     global test_name, in_teamcity
@@ -192,8 +185,9 @@ def run_one_test(args):
 
 
 def main(args):
-    if (len(args) == 0):
-        tests.main()
+    if len(args) == 0:
+        from tests import main as main2
+        main2()
     else:
         run_one_test(args)
 
