@@ -10,12 +10,8 @@ __author__ = 'Leonid Bushuev'
 
 
 def main():
-
     success = runner()
     sys.exit(0 if success else 1)
-
-
-
 
 
 def runner():
@@ -55,7 +51,6 @@ def run(fw, temp):
     rc = subprocess.call([python, "test.py", fw.name, fw.version, venv])
 
     return rc
-
 
 
 ##########################

@@ -24,6 +24,7 @@ class TestTeamcityMessages(unittest.TestCase):
     def testException(self):
         raise Exception("some exception")
 
+
 if __name__ == '__main__':
     if is_running_under_teamcity():
         runner = TeamcityTestRunner()

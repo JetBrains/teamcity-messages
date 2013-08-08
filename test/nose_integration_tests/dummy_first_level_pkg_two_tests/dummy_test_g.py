@@ -5,6 +5,7 @@ from nose.plugins.attrib import attr
 #there is even a chance to define the test method.
 evil_non_existent_method_123G()
 
+
 @attr('demo_smoke', 'smoke', 'known_good')
 def test_dummy_g_never_gets_called():
     """

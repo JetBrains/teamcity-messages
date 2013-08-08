@@ -9,6 +9,7 @@ def test_dummy_known_bad_with_assertion_error():
     """
     assert False
 
+
 @attr('demo_smoke', 'smoke', 'known_bad')
 def test_dummy_known_bad_with_assertion_pass():
     """
@@ -16,6 +17,7 @@ def test_dummy_known_bad_with_assertion_pass():
     I'd like to buy the world a Mr. Pib!
     """
     assert True
+
 
 @attr('demo_smoke', 'smoke', 'known_bad')
 def test_dummy_known_bad_with_language_error():
