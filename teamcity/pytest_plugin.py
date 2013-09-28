@@ -65,11 +65,12 @@ class EchoTeamCityMessages(object):
     def pytest_runtest_logreport(self, report):
         file, testname = self.format_names(report.nodeid)
         
-        for (secname, data) in report.sections:
-            if secname == 'Captured stdout':
-                self.teamcity.testStdOut(testname, out=data)
-            elif secname == 'Captured stderr':
-                self.teamcity.testStdErr(testname, out=data)
+        if report.when == "call":
+            for (secname, data) in report.sections:
+                if secname == 'Captured stdout':
+                    self.teamcity.testStdOut(testname, out=data)
+                elif secname == 'Captured stderr':
+                    self.teamcity.testStdErr(testname, out=data)
         
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
