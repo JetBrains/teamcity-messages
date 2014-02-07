@@ -23,6 +23,9 @@ class TeamcityServiceMessages(object):
             self.output.write(" %s='%s'" % (k, self.escapeValue(value)))
         self.output.write("]\n")
 
+    def _single_value_message(self, messageName, value):
+        self.output.write("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
+
     def testSuiteStarted(self, suiteName):
         self.message('testSuiteStarted', name=suiteName)
 
@@ -53,3 +56,9 @@ class TeamcityServiceMessages(object):
 
     def testStdErr(self, testName, out):
         self.message('testStdErr', name=testName, out=out)
+        
+    def publishArtifacts(self, path):
+        self._single_value_message('publishArtifacts', path)
+
+    def customMessage(self, text, status, errorDetails=''):
+        self.message('message', text=text, status=status, errorDetails=errorDetails)
