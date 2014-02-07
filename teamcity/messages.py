@@ -23,6 +23,9 @@ class TeamcityServiceMessages(object):
             self.output.write(" %s='%s'" % (k, self.escapeValue(value)))
         self.output.write("]\n")
 
+    def _single_value_message(self, messageName, value):
+        self.output.write("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
+
     def testSuiteStarted(self, suiteName):
         self.message('testSuiteStarted', name=suiteName)
 
