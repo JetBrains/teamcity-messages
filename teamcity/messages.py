@@ -56,3 +56,6 @@ class TeamcityServiceMessages(object):
 
     def testStdErr(self, testName, out):
         self.message('testStdErr', name=testName, out=out)
+        
+    def publishArtifacts(self, path):
+        self._single_value_message('publishArtifacts', path)
