@@ -59,3 +59,6 @@ class TeamcityServiceMessages(object):
         
     def publishArtifacts(self, path):
         self._single_value_message('publishArtifacts', path)
+
+    def customMessage(self, text, status, errorDetails=''):
+        self.message('message', text=text, status=status, errorDetails=errorDetails)
