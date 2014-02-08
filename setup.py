@@ -3,9 +3,9 @@ from setuptools import setup
 
 setup(
     name="teamcity-messages",
-    version="1.7",
+    version="1.8",
     author='Leonid Shalupov',
-    author_email='Leonid.Shalupov@jetbrains.com',
+    author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +
                 'to TeamCity continuous integration server from unittest, nose and py.test',
     long_description="""This packages provides unittest, nose and py.test
