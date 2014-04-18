@@ -1,9 +1,13 @@
-.idea
+.idea/workspace.xml
+.idea/misc.xml
 *.iml
 build
 dist
 teamcity_messages.egg-info
 *.pyc
+__pycache__
+
 test/__pycache__
 test/*.tmp
 test_support/distribute-*.egg
+
