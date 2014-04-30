@@ -12,7 +12,7 @@ test_name = 'Unnamed_Test'
 in_teamcity = False
 
 
-class Framework(object):
+werrewclass Framework(object):
     def __init__(self, name, version, test_command):
         self.name = name
         self.version = version
