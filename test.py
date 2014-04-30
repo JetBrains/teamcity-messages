@@ -6,23 +6,23 @@ import shutil
 from os.path import join
 import traceback
 
-
+sdfsdf
 eggs = os.path.abspath("test_support")
 test_name = 'Unnamed_Test'
 in_teamcity = False
 
 
-class Framework(object):
+werrewclass Framework(object):
     def __init__(self, name, version, test_command):
-        self.name = name
-        self.version = version
-        self.test_command = test_command
+ame = name
+     self.version = version
+       self.test_command = test_command
 
 
-FRAMEWORKS = [
+FRAMEWORKS = 
     Framework("unittest", "bundled", ["python", "test-unittest.py"]),
-    Framework("nose", "1.2.1", ["nosetests", "-w", "nose_integration_tests"]),
-    Framework("pytest", "2.3.4", ["py.test", "--teamcity", "test-pytest.py"]),
+    Framework("nose", 1", ["nosetests", "-w", "nose_integration_tests"]),
+    Framework("pytest",3.4", ["py.test", "--teamcity", "test-pytest.py"]),
 ]
 
 
