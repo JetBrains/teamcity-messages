@@ -25,6 +25,8 @@ def normalize_gold(s):
     s = s.replace("\r", "")
     if sys.version_info < (2, 7):
         s = re.sub(r"(?m)^\+27\+[^\n]*\n?", "", s)
+    if sys.version_info < (3, 4):
+        s = re.sub(r"(?m)^\+34\+[^\n]*\n?", "", s)
     s = re.sub(r"(?m)^\+[0-9][0-9]\+", "", s)
     return s
 

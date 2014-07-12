@@ -40,6 +40,18 @@ class TestTeamcityMessages(unittest.TestCase):
         def testUnexpectedSuccess(self):
             assert 1 == 1
 
+    if sys.version_info >= (3, 4):
+        # subtests are only available since python 3.4
+        # https://docs.python.org/3/library/unittest.html#distinguishing-test-iterations-using-subtests
+        def testSubtestSuccess(self):
+            for i in range(0, 2):
+                with self.subTest(i=i):
+                    self.assertEqual(i, i)
+
+        def testSubtestFailure(self):
+            for i in range(0, 3):
+                with self.subTest(i=i):
+                    assert i % 2 == 0
 
 if __name__ == '__main__':
     unittest.main(testRunner=TeamcityTestRunner())
