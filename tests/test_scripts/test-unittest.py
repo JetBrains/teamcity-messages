@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import absolute_import
+import sys
 
 from teamcity.unittestpy import TeamcityTestRunner
 import unittest
@@ -23,6 +24,13 @@ class TestTeamcityMessages(unittest.TestCase):
 
     def testException(self):
         raise Exception("some exception")
+
+    if sys.version_info >= (2, 7):
+        # test skipping markup is only available since python 2.7
+        # http://docs.python.org/2/library/unittest.html#skipping-tests-and-expected-failures
+        @unittest.skip("Reason for skipping")
+        def testSkipped(self):
+            self.fail("This should not appear")
 
 
 if __name__ == '__main__':

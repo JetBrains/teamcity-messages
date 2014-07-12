@@ -72,6 +72,17 @@ class TeamcityTestResult(TestResult):
         self.messages.testFailed(self.getTestName(test),
                                  message='Failure', details=err)
 
+    def addSkip(self, test, reason):
+        TestResult.addSkip(self, test, reason)
+        
+        if self.getTestName(test) != self.test_name:
+            sys.stderr.write("INTERNAL ERROR: addSkip(%s) outside of test\n" % self.getTestName(test))
+            sys.stderr.write("Reason: %s\n" % reason)
+            return
+            
+        ##teamcity[testIgnored name='<testname>' message='<reason>']
+        self.messages.testIgnored(self.getTestName(test), reason)
+
     def startTest(self, test):
         self.test_started_datetime = datetime.datetime.now()
         self.test_name = self.getTestName(test)

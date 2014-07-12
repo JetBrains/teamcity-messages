@@ -33,3 +33,9 @@
 ok
 
 ##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testPass (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testSkipped (__main__.TestTeamcityMessages)']
+
+##teamcity[testIgnored timestamp='TIMESTAMP' message='Reason for skipping' name='testSkipped (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testSkipped (__main__.TestTeamcityMessages)']
