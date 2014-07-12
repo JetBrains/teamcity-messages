@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 import unittest
 import subprocess
+import sys
 from teamcity.messages import TeamcityServiceMessages
 from tests.util import normalize_output, get_script_path
 
@@ -36,7 +37,7 @@ class IntegrationTest(unittest.TestCase):
                                                          % " ".join(command))
 
     def test_unittest(self):
-        self._run_and_compare(['python', get_script_path('test-unittest.py')],
+        self._run_and_compare([sys.executable, get_script_path('test-unittest.py')],
                               'test-unittest.output.gold')
 
     def test_pytest(self):
