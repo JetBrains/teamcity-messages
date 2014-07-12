@@ -4,7 +4,13 @@ package and then destroys the virtualenv.
 It is recommended to run setup.py test instead, but this requires the plugin to be wrapped in a virtualenv itself.
 """
 
-import importlib
+try:
+    from importlib import import_module
+except ImportError:
+    # Thin compat layer for Py2.6
+    def import_module(name):
+        __import__(name)
+        return sys.modules[name]
 import os
 import shutil
 import sys
@@ -58,7 +64,7 @@ def run_test(test_name):
 
     # Import the specific test
     module_name, testcase_name, method_name = test_name.rsplit('.', 2)
-    module = importlib.import_module(module_name)
+    module = import_module(module_name)
     testcase = getattr(module, testcase_name)
 
     # Run the specific test
