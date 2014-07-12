@@ -1,7 +1,7 @@
 # coding=utf-8
 import traceback
 import sys
-from unittest import TestResult
+import unittest
 import datetime
 
 from teamcity.messages import TeamcityServiceMessages
@@ -15,14 +15,15 @@ def _is_string(obj):
 
 
 # Added *k to some methods to get compatibility with nosetests
-class TeamcityTestResult(TestResult):
+# noinspection PyPep8Naming
+class TeamcityTestResult(unittest.TestResult):
     def __init__(self, stream=sys.stdout):
-        TestResult.__init__(self)
+        super(TeamcityTestResult, self).__init__()
 
         self.output = stream
         self.test_started_datetime = None
         self.test_name = None
-
+        self.messages = None
         self.createMessages()
 
     def createMessages(self):
@@ -32,20 +33,20 @@ class TeamcityTestResult(TestResult):
         try:
             exctype, value, tb = err
             return ''.join(traceback.format_exception(exctype, value, tb))
-        except:
+        except Exception:
             tb = traceback.format_exc()
             return "*FAILED TO GET TRACEBACK*: " + tb
 
     def getTestName(self, test):
         return test.shortDescription() or str(test)
 
-    def addSuccess(self, test, *k):
-        TestResult.addSuccess(self, test)
+    def addSuccess(self, test, *args):
+        super(TeamcityTestResult, self).addSuccess(test)
 
         self.output.write("ok\n")
 
     def addError(self, test, err, *k):
-        TestResult.addError(self, test, err)
+        super(TeamcityTestResult, self).addError(test, err)
 
         err = self.formatErr(err)
         if self.getTestName(test) != self.test_name:
@@ -61,7 +62,7 @@ class TeamcityTestResult(TestResult):
         if _is_string(err[1]):
             err = (err[0], Exception(err[1]), err[2])
 
-        TestResult.addFailure(self, test, err)
+        super(TeamcityTestResult, self).addFailure(test, err)
 
         err = self.formatErr(err)
         if self.getTestName(test) != self.test_name:
@@ -73,15 +74,33 @@ class TeamcityTestResult(TestResult):
                                  message='Failure', details=err)
 
     def addSkip(self, test, reason):
-        TestResult.addSkip(self, test, reason)
+        super(TeamcityTestResult, self).addSkip(test, reason)
         
         if self.getTestName(test) != self.test_name:
             sys.stderr.write("INTERNAL ERROR: addSkip(%s) outside of test\n" % self.getTestName(test))
             sys.stderr.write("Reason: %s\n" % reason)
             return
-            
-        ##teamcity[testIgnored name='<testname>' message='<reason>']
+
         self.messages.testIgnored(self.getTestName(test), reason)
+
+    def addExpectedFailure(self, test, err):
+        super(TeamcityTestResult, self).addExpectedFailure(test, err)
+
+        if self.getTestName(test) != self.test_name:
+            sys.stderr.write("INTERNAL ERROR: addExpectedFailure(%s) outside of test\n" % self.getTestName(test))
+            sys.stderr.write("Error: %s\n" % err)
+            return
+
+        self.output.write("ok (failure expected)\n")
+
+    def addUnexpectedSuccess(self, test):
+        super(TeamcityTestResult, self).addUnexpectedSuccess(test)
+
+        if self.getTestName(test) != self.test_name:
+            sys.stderr.write("INTERNAL ERROR: addUnexpectedSuccess(%s) outside of test\n" % self.getTestName(test))
+            return
+
+        self.messages.testFailed(self.getTestName(test), message='Unexpected success')
 
     def startTest(self, test):
         self.test_started_datetime = datetime.datetime.now()

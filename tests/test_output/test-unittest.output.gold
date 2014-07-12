@@ -22,6 +22,11 @@
 ##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='testException (__main__.TestTeamcityMessages)']
 
 ##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testException (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testStarted timestamp='TIMESTAMP' name='testExpectedFailure (__main__.TestTeamcityMessages)']
++27+ok (failure expected)
++27+
++27+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testExpectedFailure (__main__.TestTeamcityMessages)']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='testFail (__main__.TestTeamcityMessages)']
 
@@ -39,3 +44,9 @@ ok
 +27+##teamcity[testIgnored timestamp='TIMESTAMP' message='Reason for skipping' name='testSkipped (__main__.TestTeamcityMessages)']
 +27+
 +27+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testSkipped (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testStarted timestamp='TIMESTAMP' name='testUnexpectedSuccess (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testFailed timestamp='TIMESTAMP' details='' message='Unexpected success' name='testUnexpectedSuccess (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testUnexpectedSuccess (__main__.TestTeamcityMessages)']
