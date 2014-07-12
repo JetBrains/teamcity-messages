@@ -12,12 +12,20 @@ def normalize_output(s):
     s = re.sub(r"duration='\d+'", "duration='MS'", s)
     s = re.sub(r"File \"[^\"]*\"", "File \"FILE\"", s)
     s = re.sub(r"passed in \d+\.\d+ seconds", "passed in X.XX seconds", s)
-    s = re.sub(r"^platform .+$", "platform SPEC", s)
+    s = re.sub(r"(?m)^platform [^\n]+", "platform SPEC", s)
     s = re.sub(r"instance at 0x.*>", "instance at 0x????????>", s)
     s = re.sub(r"object at 0x.*>", "instance at 0x????????>", s)
     s = re.sub(r"line \d+", "line LINE", s)
     s = re.sub(r"\|'EvilClassThatDoesNotExist\|'", "EvilClassThatDoesNotExist", s)  # workaround
     s = re.sub(r"/?(tests/)?test_scripts/", "", s)
+    return s
+
+
+def normalize_gold(s):
+    s = s.replace("\r", "")
+    if sys.version_info < (2, 7):
+        s = re.sub(r"(?m)^\+27\+[^\n]*\n?", "", s)
+    s = re.sub(r"(?m)^\+[0-9][0-9]\+", "", s)
     return s
 
 

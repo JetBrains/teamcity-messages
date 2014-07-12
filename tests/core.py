@@ -4,7 +4,7 @@ import os
 import unittest
 import subprocess
 from teamcity.messages import TeamcityServiceMessages
-from tests.util import normalize_output, get_script_path
+from tests.util import normalize_output, get_script_path, normalize_gold
 
 
 class IntegrationTest(unittest.TestCase):
@@ -25,12 +25,12 @@ class IntegrationTest(unittest.TestCase):
 
         # Start the process and wait for its output
         proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env)
-        actual_output = "".join([normalize_output(x.decode()) for x in proc.stdout.readlines()])
+        actual_output = normalize_output("".join([x.decode() for x in proc.stdout.readlines()]))
         proc.wait()
 
         # Get the expected output
         with open(gold_file, 'r') as f:
-            expected_output = f.read().replace("\r", "")
+            expected_output = normalize_gold(f.read())
 
         self.assertEqual(expected_output, actual_output, "actual output does not match gold file, called with: %s"
                                                          % " ".join(command))
