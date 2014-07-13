@@ -37,7 +37,10 @@ class TeamcityTestResult(TestResult):
             return "*FAILED TO GET TRACEBACK*: " + tb
 
     def getTestName(self, test):
-        return test.shortDescription() or str(test)
+        desc = test.shortDescription()
+        if desc:
+            return "%s (%s)" % (test.id(), desc)
+        return test.id()
 
     def addSuccess(self, test, *k):
         TestResult.addSuccess(self, test)

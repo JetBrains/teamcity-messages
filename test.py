@@ -1,197 +1,115 @@
-# coding=utf-8
+"""Additional test module that wraps each of the integration tests in their own virtualenv, installs the required
+package and then destroys the virtualenv.
+
+It is recommended to run setup.py test instead, but this requires the plugin to be wrapped in a virtualenv itself.
+"""
+
+import importlib
 import os
-import sys
-import re
 import shutil
-from os.path import join
-import traceback
+import sys
+import tempfile
+import subprocess
+import unittest
+from tests.core import MessagesTest
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+from tests.util import find_script, teamcity_message, escape_for_tc_message_value
 
 
-eggs = os.path.abspath("test_support")
-test_name = 'Unnamed_Test'
-in_teamcity = False
+def wrap_test_in_venv(test_name, package=None):
+    """Create a new virtualenv to run the test case in."""
 
+    import virtualenv
+    venv_dir = tempfile.mkdtemp()
+    virtualenv.create_environment(venv_dir)
 
-class Framework(object):
-    def __init__(self, name, version, test_command):
-        self.name = name
-        self.version = version
-        self.test_command = test_command
+    cmd = [find_script(venv_dir, "python"), sys.argv[0], test_name]
+    if package:
+        cmd.append(package)
 
-
-FRAMEWORKS = [
-    Framework("unittest", "bundled", ["python", "test-unittest.py"]),
-    Framework("nose", "1.2.1", ["nosetests", "-w", "nose_integration_tests"]),
-    Framework("pytest", "2.3.4", ["py.test", "--teamcity", "test-pytest.py"]),
-]
-
-
-def generate_test_name(fw_name, fw_version):
-    return "Framework.%s(%s)" % (fw_name, fw_version)
-
-
-def normalize_output(s):
-    s = s.replace("\r", "")
-    s = re.sub(r"'Traceback(\|'|[^'])+'", "'TRACEBACK'", s)
-    s = re.sub(r"timestamp='\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d\d\d'", "timestamp='TIMESTAMP'", s)
-    s = re.sub(r"duration='\d+'", "duration='MS'", s)
-    s = re.sub(r"File \"[^\"]*\"", "File \"FILE\"", s)
-    s = re.sub(r"passed in \d+\.\d+ seconds", "passed in X.XX seconds", s)
-    s = re.sub(r"^platform .+$", "platform SPEC", s)
-    s = re.sub(r"instance at 0x.*>", "instance at 0x????????>", s)
-    s = re.sub(r"object at 0x.*>", "instance at 0x????????>", s)
-    s = re.sub(r"line \d+", "line LINE", s)
-    s = re.sub(r"\|'EvilClassThatDoesNotExist\|'", "EvilClassThatDoesNotExist", s)  # workaround
-    return s
-
-
-def clean_directory(d):
-    if os.path.isdir(d):
-        shutil.rmtree(d)
-    os.mkdir(d)
-
-
-def build_egg():
-    from distutils import core
-
-    if os.path.isdir("dist"):
-        shutil.rmtree("dist")
-    dist = core.run_setup("setup.py", script_args=["-q", "bdist_egg"])
-    return os.path.abspath(dist.dist_files[0][2])
-
-
-def tc_msg(msg):
-    if os.environ.get('TEAMCITY_VERSION') is not None:
-        sys.stdout.write(msg)
-        sys.stdout.write('\n')
-        sys.stdout.flush()
-
-
-def find_script(venv, name):
-    if os.path.isdir(join(venv, "bin")):
-        return join(venv, "bin", name)
-    if os.path.isdir(join(venv, "Scripts")):
-        return join(venv, "Scripts", name)
-
-    raise RuntimeError("No " + name + " found in " + venv)
-
-
-def install_file(file_to_install):
-    from setuptools.command import easy_install
-
-    easy_install.main(["-q", file_to_install])
-
-
-def install_package(package):
-    from setuptools.command import easy_install
-
-    easy_install.main(["-q", "-Hnone", "-f", eggs, package])
-
-
-def escape_for_tc_message_value(expected_output):
-    return expected_output \
-        .replace('\r', '') \
-        .replace('|', '||') \
-        .replace('\n', '|n') \
-        .replace("'", "|'") \
-        .replace('[', '|[') \
-        .replace(']', '|]')
-
-
-def run_test_internal(venv, framework):
-    teamcity_messages_egg = build_egg()
-    install_file(teamcity_messages_egg)
-
-    if framework.version != "bundled":
-        install_package(framework.name + "==" + framework.version)
-
-    global in_teamcity, test_name
-
-    (cmd, args) = (framework.test_command[0], framework.test_command[1:])
-    cmd = find_script(venv, cmd)
-
-    cwd = os.getcwd()
-    os.chdir("test")
-    clean_directory("__pycache__")
-    os.putenv("TEAMCITY_PROJECT_NAME", "project_name")
-
-    import subprocess
-
-    proc = subprocess.Popen([cmd] + args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    output = "".join([normalize_output(x.decode()) for x in proc.stdout.readlines()])
-    proc.wait()
-
-    os.chdir(cwd)
-
-    file_prefix = join("test", "test-" + framework.name + ".output")
-
-    expected_output_file = file_prefix + ".gold"
-    expected_output = "".join(open(expected_output_file, "r").readlines()).replace("\r", "")
-
-    actual_output_file = file_prefix + ".tmp"
-    if expected_output != output:
-        if in_teamcity:
-            expected_string = escape_for_tc_message_value(expected_output)
-            actual_string = escape_for_tc_message_value(output)
-            message = "##teamcity[testFailed type='comparisonFailure' name='%s' message='Output doesn|'t match the relative gold file. See the diff for detail.' expected='%s' actual='%s']\n" \
-                      % (test_name, expected_string, actual_string)
-            sys.stdout.write(message)
-            sys.stdout.flush()
-        else:
-            sys.stderr.write(
-                "ERROR Wrong output, check the differences between " + expected_output_file + " and " + actual_output_file + "\n")
-            open(actual_output_file, "w").write(output)
-
-            DIFF = "/usr/bin/diff"
-            if os.path.exists(DIFF):
-                subprocess.call([DIFF, "-u", expected_output_file, actual_output_file])
-        return 1
-    else:
-        sys.stdout.write("OK\n")
-        if os.path.isfile(actual_output_file):
-            os.unlink(actual_output_file)
-        return 2
-
-
-#noinspection PyBroadException
-def run_one_test_in_venv(venv, framework):
-    """
-    Runs one test for the specified virtual env and framework.
-    Returns:
-        2 - the test passed successfully
-        1 - the test finished with non-matched output (test failure)
-        0 or an exception - the test not finished (probably a run-time error happened)
-    """
     try:
-        return run_test_internal(venv, framework)
-    except:
-        err_name = escape_for_tc_message_value(sys.exc_info()[0].__name__)
-        trace = escape_for_tc_message_value(traceback.format_exc())
-        if in_teamcity:
-            tc_msg("##teamcity[testFailed name='%s' message='%s' details='%s']" % (test_name, err_name, trace))
-        return 0
+        teamcity_message("##teamcity[testStarted name='%s']" % test_name)
+        subprocess.call(cmd)
+    finally:
+        shutil.rmtree(venv_dir)
+        teamcity_message("##teamcity[testFinished name='%s']" % test_name)
 
 
-def run_one_test(args):
-    (name, version, venv) = args
-    global test_name, in_teamcity
-    test_name = generate_test_name(name, version)
-    in_teamcity = os.environ.get('TEAMCITY_VERSION') is not None
-    success = 0
-    for fw in FRAMEWORKS:
-        if fw.name == name and fw.version == version:
-            success = run_one_test_in_venv(venv, fw)
-            break
-    sys.exit(success)
+def prepare_test(test_name, package=None):
+    """Prepare the test by installing the specified package (if any). This is called from a new process!"""
+
+    if package:
+        import pip
+        sys.stdout = StringIO()
+        pip.main(['install', package])
+        sys.stdout = sys.__stdout__
+
+    run_test(test_name)
 
 
-def main(args):
-    if len(args) == 0:
-        from tests import main as main2
-        main2()
+def run_test(test_name):
+    """Actually run the test."""
+
+    testsuite = unittest.TestSuite()
+
+    # Import the specific test
+    module_name, testcase_name, method_name = test_name.rsplit('.', 2)
+    module = importlib.import_module(module_name)
+    testcase = getattr(module, testcase_name)
+
+    # Run the specific test
+    testsuite.addTest(testcase(method_name))
+
+    # Report the results, if it is a
+    if os.environ.get('TEAMCITY_VERSION') is not None:
+        result = unittest.TestResult()
+        testsuite.run(result)
+
+        for failure in result.failures:
+            teamcity_message("##teamcity[testFailed name='%s' message='%s' details='%s']" %
+                             (test_name, 'Error', escape_for_tc_message_value(failure[1])))
+        for error in result.errors:
+            teamcity_message("##teamcity[testFailed name='%s' message='%s' details='%s']" %
+                             (test_name, 'Error', escape_for_tc_message_value(error[1])))
     else:
-        run_one_test(args)
+        unittest.TextTestRunner(verbosity=2).run(testsuite)
+
+
+def run_remaining_tests():
+    """Run the remaining tests"""
+
+    testsuite = unittest.TestLoader().loadTestsFromTestCase(MessagesTest)
+
+    # Report the results, if it is a
+    if os.environ.get('TEAMCITY_VERSION') is not None:
+        result = unittest.TestResult()
+
+        teamcity_message("##teamcity[testStarted name='remaining']")
+        testsuite.run(result)
+
+        for failure in result.failures:
+            teamcity_message("##teamcity[testFailed name='%s' message='%s' details='%s']" %
+                             ("remaining", 'Error', escape_for_tc_message_value(failure[1])))
+        for error in result.errors:
+            teamcity_message("##teamcity[testFailed name='%s' message='%s' details='%s']" %
+                             ("remaining", 'Error', escape_for_tc_message_value(error[1])))
+
+        teamcity_message("##teamcity[testFinished name='remaining']")
+    else:
+        unittest.TextTestRunner(verbosity=2).run(testsuite)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    if len(sys.argv) == 1:
+        wrap_test_in_venv('tests.core.IntegrationTest.test_unittest')
+        wrap_test_in_venv('tests.core.IntegrationTest.test_pytest', 'pytest==2.3.4')
+        wrap_test_in_venv('tests.core.IntegrationTest.test_nosetest', 'nose==1.2.1')
+        run_remaining_tests()
+    elif len(sys.argv) == 2:
+        prepare_test(sys.argv[1])
+    elif len(sys.argv) == 3:
+        prepare_test(sys.argv[1], sys.argv[2])

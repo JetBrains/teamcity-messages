@@ -1,6 +1,4 @@
 
-##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='nose_integration_tests']
-
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests']
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_second_level_pkg_A_tests']
@@ -41,17 +39,17 @@ ok
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_test_d']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
 stderr string
 
-##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_error']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_pass']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_pass']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_pass']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_second_level_pkg_B_tests.dummy_test_d.test_dummy_in_development_with_assertion_pass']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='dummy_test_d']
 
@@ -59,37 +57,37 @@ ok
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_test_a']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_dummy_known_good_with_assertion_pass']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_dummy_known_good_with_assertion_pass']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_dummy_known_good_with_assertion_pass']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_dummy_known_good_with_assertion_pass']
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='test_with_generator']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(0,)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(0,)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(0,)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(0,)']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(1,)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(1,)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(1,)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(1,)']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(2,)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(2,)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(2,)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(2,)']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(3,)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(3,)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(3,)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(3,)']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(4,)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(4,)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(4,)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_one_tests.dummy_test_a.test_with_generator(4,)']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='test_with_generator']
 
@@ -161,31 +159,31 @@ ok
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_test_e']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_e.test_dummy_known_good_with_assertion_pass']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_two_tests.dummy_test_e.test_dummy_known_good_with_assertion_pass']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_e.test_dummy_known_good_with_assertion_pass']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_two_tests.dummy_test_e.test_dummy_known_good_with_assertion_pass']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='dummy_test_e']
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='dummy_test_f']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_error']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_error']
 
-##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_error']
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_error']
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_error']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_error']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_pass']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_pass']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_pass']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_assertion_pass']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_language_error']
+##teamcity[testStarted timestamp='TIMESTAMP' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_language_error']
 
-##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_language_error']
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_language_error']
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_language_error']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='dummy_first_level_pkg_two_tests.dummy_test_f.test_dummy_known_bad_with_language_error']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='dummy_test_f']
 
@@ -211,10 +209,10 @@ ok
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='DummyTestH']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_h.DummyTestH)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_h.DummyTestH)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_h.DummyTestH)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_h.DummyTestH)']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='DummyTestH']
 
@@ -224,11 +222,11 @@ ok
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='DummyTestI']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_i.DummyTestI)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_i.DummyTestI)']
 
-##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_i.DummyTestI)']
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_i.DummyTestI)']
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_i.DummyTestI)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_i.DummyTestI)']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='DummyTestI']
 
@@ -250,20 +248,18 @@ ok
 
 ##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='DummyTestL']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something (dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
 
-##teamcity[testStarted timestamp='TIMESTAMP' name='test_something_else (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
+##teamcity[testStarted timestamp='TIMESTAMP' name='test_something_else (dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
 ok
 
-##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something_else (nose_integration_tests.dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='test_something_else (dummy_first_level_pkg_two_tests.dummy_test_l.DummyTestL)']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='DummyTestL']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='dummy_test_l']
 
 ##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='dummy_first_level_pkg_two_tests']
-
-##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='nose_integration_tests']
