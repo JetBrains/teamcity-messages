@@ -6,8 +6,7 @@ setup(
     version="1.8",
     author='Leonid Shalupov',
     author_email='teamcity-feedback@jetbrains.com',
-    description='Send test results ' +
-                'to TeamCity continuous integration server from unittest, nose and py.test',
+    description='Send test results to TeamCity continuous integration server from unittest, nose and py.test',
     long_description="""This packages provides unittest, nose and py.test
 addons for sending test result messages
 to TeamCity continuous integration server
@@ -29,19 +28,21 @@ under TeamCity and prints usual diagnostics without it.
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.6',
+        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Testing'
     ],
     url="https://github.com/JetBrains/teamcity-python",
     platforms=["any"],
-
     packages=["teamcity"],
-
+    test_suite='tests.core',
+    tests_require=['nose==1.2.1', 'pytest==2.3.4'],
     entry_points={
         'nose.plugins': [
             'nose-teamcity = teamcity.nose_report:TeamcityReport'
         ],
-
         'pytest11': [
             'name_of_plugin = teamcity.pytest_plugin',
         ],
