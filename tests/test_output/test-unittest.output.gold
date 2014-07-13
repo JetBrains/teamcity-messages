@@ -1,0 +1,68 @@
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testAssert (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testAssert (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testAssert (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testAssertEqual (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testAssertEqual (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testAssertEqual (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testAssertEqualMsg (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testException (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Error' name='testException (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testException (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testStarted timestamp='TIMESTAMP' name='testExpectedFailure (__main__.TestTeamcityMessages)']
++27+ok (failure expected)
++27+
++27+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testExpectedFailure (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testFail (__main__.TestTeamcityMessages)']
+
+##teamcity[testFailed timestamp='TIMESTAMP' details='TRACEBACK' message='Failure' name='testFail (__main__.TestTeamcityMessages)']
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testFail (__main__.TestTeamcityMessages)']
+
+##teamcity[testStarted timestamp='TIMESTAMP' name='testPass (__main__.TestTeamcityMessages)']
+ok
+
+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testPass (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testStarted timestamp='TIMESTAMP' name='testSkipped (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testIgnored timestamp='TIMESTAMP' message='Reason for skipping' name='testSkipped (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testSkipped (__main__.TestTeamcityMessages)']
++34+
++34+##teamcity[testStarted timestamp='TIMESTAMP' name='testSubtestFailure (__main__.TestTeamcityMessages)']
++34+testSubtestFailure (__main__.TestTeamcityMessages) (i=0): ok
++34+testSubtestFailure (__main__.TestTeamcityMessages) (i=1): failure
++34+testSubtestFailure (__main__.TestTeamcityMessages) (i=2): ok
++34+
++34+##teamcity[testFailed timestamp='TIMESTAMP' details='testSubtestFailure (__main__.TestTeamcityMessages) (i=1):|nTraceback (most recent call last):|n  File "FILE", line LINE, in testPartExecutor|n    yield|n  File "FILE", line LINE, in subTest|n    yield|n  File "FILE", line LINE, in testSubtestFailure|n    assert i % 2 == 0|nAssertionError|n' message='Subtest error' name='testSubtestFailure (__main__.TestTeamcityMessages)']
++34+
++34+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testSubtestFailure (__main__.TestTeamcityMessages)']
++34+
++34+##teamcity[testStarted timestamp='TIMESTAMP' name='testSubtestSuccess (__main__.TestTeamcityMessages)']
++34+testSubtestSuccess (__main__.TestTeamcityMessages) (i=0): ok
++34+testSubtestSuccess (__main__.TestTeamcityMessages) (i=1): ok
++34+ok
++34+
++34+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testSubtestSuccess (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testStarted timestamp='TIMESTAMP' name='testUnexpectedSuccess (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testFailed timestamp='TIMESTAMP' details='' message='Unexpected success' name='testUnexpectedSuccess (__main__.TestTeamcityMessages)']
++27+
++27+##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='testUnexpectedSuccess (__main__.TestTeamcityMessages)']
