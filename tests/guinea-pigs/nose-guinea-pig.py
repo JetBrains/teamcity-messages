@@ -11,6 +11,10 @@ class GuineaPig (unittest.TestCase):
         assert 2 * 2 == 5
 
 
+    def test_fail_with_msg(self):
+        assert 2 * 2 == 5, "Bitte keine Werbung"
+
+
     def test_fail_output(self):
         print("Output line 1")
         print("Output line 2")

@@ -22,7 +22,9 @@
     <option name="params" value="" />
     <option name="USE_PARAM" value="false" />
     <option name="USE_KEYWORD" value="false" />
+    <RunnerSettings RunnerId="PyDebugRunner" />
     <RunnerSettings RunnerId="PythonRunner" />
+    <ConfigurationWrapper RunnerId="PyDebugRunner" />
     <ConfigurationWrapper RunnerId="PythonRunner" />
     <method />
   </configuration>
