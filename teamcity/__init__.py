@@ -3,8 +3,8 @@ __all__ = ['is_running_under_teamcity']
 
 import os
 
-TEAMCITY_ENV_PROJECT_NAME = "TEAMCITY_PROJECT_NAME"
+teamcity_presence_env_var = "TEAMCITY_VERSION"
 
 
 def is_running_under_teamcity():
-    return os.getenv(TEAMCITY_ENV_PROJECT_NAME) is not None
+    return os.getenv(teamcity_presence_env_var) is not None
