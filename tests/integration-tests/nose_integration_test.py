@@ -91,8 +91,7 @@ def run(venv, file, clazz, test):
 
     # Start the process and wait for its output
     command = os.path.join(venv.bin, 'nosetests') + " -v " \
-              + os.path.join('tests', 'guinea-pigs', file) + " " \
-              + clazz + ':' + test
+              + os.path.join('tests', 'guinea-pigs', file) + ":" + clazz + '.' + test
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
