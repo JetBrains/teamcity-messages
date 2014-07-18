@@ -8,29 +8,38 @@ import pytest
 import virtualenv
 
 
+windows = os.name == 'nt'
+
 
 class virtual_env_desc:
     home = ""
+    bin = ""
     python = ""
     pip = ""
-    def __init__(self, home, python, pip):
+    def __init__(self, home, bin, python, pip):
         self.home = home
+        self.bin = bin
         self.python = python
         self.pip = pip
 
 
 @pytest.fixture(scope='module')
 def venv():
+    """
+    Prepares a virtual environment for nose.
+    :rtype : virtual_env_desc
+    """
     vdir = 'env'
-    print(vdir)
     if (os.path.exists(vdir)):
         shutil.rmtree(vdir)
     virtualenv.create_environment(vdir)
-    vpython = os.path.join(vdir,'Scripts','python')
-    vpip = os.path.join(vdir,'Scripts','pip')
+    vbin = os.path.join(vdir, ('bin','Scripts')[windows])
+    exe_suffix = ("",".exe")[windows]
+    vpython = os.path.join(vbin, 'python'+exe_suffix)
+    vpip = os.path.join(vbin, 'pip'+exe_suffix)
     subprocess.call([vpip, "install", "nose"])
     subprocess.call([vpython, "setup.py", "install"])
-    return virtual_env_desc(home=vdir, python=vpython, pip=vpip)
+    return virtual_env_desc(home=vdir, bin=vbin, python=vpython, pip=vpip)
 
 
 def test_pass(venv):
@@ -70,6 +79,9 @@ def test_fail(venv):
 
 
 def run(venv, file, clazz, test):
+    """
+    Executes the specified test using nose
+    """
 
     # environment variables
     env = os.environ.copy()
@@ -78,7 +90,7 @@ def run(venv, file, clazz, test):
     env['TEAMCITY_PROJECT'] = "TEST"
 
     # Start the process and wait for its output
-    command = os.path.join(venv.home, 'Scripts', 'nosetests') + " -v " \
+    command = os.path.join(venv.bin, 'nosetests') + " -v " \
               + os.path.join('tests', 'guinea-pigs', file) + " " \
               + clazz + ':' + test
     print("RUN: " + command)
