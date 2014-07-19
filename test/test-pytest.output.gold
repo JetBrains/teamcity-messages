@@ -4,7 +4,7 @@ plugins: teamcity-messages
 collected 5 items
 
 test-pytest.py 
-##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='test-pytest.py']
+##teamcity[testSuiteStarted timestamp='TIMESTAMP' name='test-pytest_py']
 
 ##teamcity[testStarted timestamp='TIMESTAMP' name='TestTeamcityMessages.testPass']
 .
@@ -32,7 +32,7 @@ F
 
 ##teamcity[testFinished timestamp='TIMESTAMP' duration='MS' name='TestTeamcityMessages.testException']
 
-##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='test-pytest.py']
+##teamcity[testSuiteFinished timestamp='TIMESTAMP' name='test-pytest_py']
 
 
 =================================== FAILURES ===================================
