@@ -12,10 +12,6 @@ windows = os.name == 'nt'
 
 
 class virtual_env_desc:
-    home = ""
-    bin = ""
-    python = ""
-    pip = ""
     def __init__(self, home, bin, python, pip):
         self.home = home
         self.bin = bin
@@ -24,37 +20,38 @@ class virtual_env_desc:
 
 
 class service_message:
-    name = ""
-    params = dict()
     def __init__(self, name, params):
         self.name = name
         self.params = params
+
     def __ge__(self, other):
         """
         :type self: service_message
         :type other: service_message
         :rtype: bool
         """
-        if self.name != other.name: return False
+        if self.name != other.name:
+            return False
+
         for p in other.params:
             if p in self.params:
                 v1 = self.params[p]
                 v2 = other.params[p]
-                if not (v2 in v1): return False
+                if not (v2 in v1):
+                    return False
             else:
                 return False
         return True
+
     def __str__(self):
         str = "[" + self.name
-        for k,v in self.params.iteritems():
-            str = str + ' ' + k + "='"+v+"'"
-        str = str+ "]"
+        for k, v in self.params.iteritems():
+            str = str + ' ' + k + "='" + v + "'"
+        str = str + "]"
         return str
+
     def __repr__(self):
         return self.__str__()
-
-
-
 
 
 @pytest.fixture(scope='module', params=['1.2.1', '1.3.0', "latest"])
@@ -64,13 +61,13 @@ def venv(request):
     :rtype : virtual_env_desc
     """
     vdir = 'env'
-    if (os.path.exists(vdir)):
+    if os.path.exists(vdir):
         shutil.rmtree(vdir)
     virtualenv.create_environment(vdir)
-    vbin = os.path.join(vdir, ('bin','Scripts')[windows])
-    exe_suffix = ("",".exe")[windows]
-    vpython = os.path.join(vbin, 'python'+exe_suffix)
-    vpip = os.path.join(vbin, 'pip'+exe_suffix)
+    vbin = os.path.join(vdir, ('bin', 'Scripts')[windows])
+    exe_suffix = ("", ".exe")[windows]
+    vpython = os.path.join(vbin, 'python' + exe_suffix)
+    vpip = os.path.join(vbin, 'pip' + exe_suffix)
 
     if request.param == "latest":
         nose_spec = "nose"
@@ -85,37 +82,36 @@ def venv(request):
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
 
-    #print(output)
+    # print(output)
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
     ms = parseServiceMessages(output)
 
-    assert ms[0] >= service_message('testSuiteStarted', {'name':'nose-guinea-pig'})
-    assert ms[1] >= service_message('testSuiteStarted', {'name':'GuineaPig'})
-    assert ms[2] >= service_message('testStarted', {'name':'test_pass'})
-    assert ms[3] >= service_message('testFinished', {'name':'test_pass'})
-    assert ms[4] >= service_message('testSuiteFinished', {'name':'GuineaPig'})
-    assert ms[5] >= service_message('testSuiteFinished', {'name':'nose-guinea-pig'})
-
+    assert ms[0] >= service_message('testSuiteStarted', {'name': 'nose-guinea-pig'})
+    assert ms[1] >= service_message('testSuiteStarted', {'name': 'GuineaPig'})
+    assert ms[2] >= service_message('testStarted', {'name': 'test_pass'})
+    assert ms[3] >= service_message('testFinished', {'name': 'test_pass'})
+    assert ms[4] >= service_message('testSuiteFinished', {'name': 'GuineaPig'})
+    assert ms[5] >= service_message('testSuiteFinished', {'name': 'nose-guinea-pig'})
 
 
 def test_fail(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail')
 
-    #print(output)
+    # print(output)
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
     ms = parseServiceMessages(output)
 
-    assert ms[0] >= service_message('testSuiteStarted', {'name':'nose-guinea-pig'})
-    assert ms[1] >= service_message('testSuiteStarted', {'name':'GuineaPig'})
-    assert ms[2] >= service_message('testStarted', {'name':'test_fail'})
-    assert ms[3] >= service_message('testFailed', {'name':'test_fail', 'details':'Traceback'})
-    assert ms[4] >= service_message('testFinished', {'name':'test_fail'})
-    assert ms[5] >= service_message('testSuiteFinished', {'name':'GuineaPig'})
-    assert ms[6] >= service_message('testSuiteFinished', {'name':'nose-guinea-pig'})
+    assert ms[0] >= service_message('testSuiteStarted', {'name': 'nose-guinea-pig'})
+    assert ms[1] >= service_message('testSuiteStarted', {'name': 'GuineaPig'})
+    assert ms[2] >= service_message('testStarted', {'name': 'test_fail'})
+    assert ms[3] >= service_message('testFailed', {'name': 'test_fail', 'details': 'Traceback'})
+    assert ms[4] >= service_message('testFinished', {'name': 'test_fail'})
+    assert ms[5] >= service_message('testSuiteFinished', {'name': 'GuineaPig'})
+    assert ms[6] >= service_message('testSuiteFinished', {'name': 'nose-guinea-pig'})
 
     assert "2 * 2 == 5" in output
 
@@ -123,19 +119,20 @@ def test_fail(venv):
 def test_fail_with_msg(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_with_msg')
 
-    #print(output)
+    # print(output)
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
     ms = parseServiceMessages(output)
 
-    assert ms[0] >= service_message('testSuiteStarted', {'name':'nose-guinea-pig'})
-    assert ms[1] >= service_message('testSuiteStarted', {'name':'GuineaPig'})
-    assert ms[2] >= service_message('testStarted', {'name':'test_fail'})
-    assert ms[3] >= service_message('testFailed', {'name':'test_fail', 'details':'Bitte keine Werbung'})
-    assert ms[4] >= service_message('testFinished', {'name':'test_fail'})
-    assert ms[5] >= service_message('testSuiteFinished', {'name':'GuineaPig'})
-    assert ms[6] >= service_message('testSuiteFinished', {'name':'nose-guinea-pig'})
+    assert ms[0] >= service_message('testSuiteStarted', {'name': 'nose-guinea-pig'})
+    assert ms[1] >= service_message('testSuiteStarted', {'name': 'GuineaPig'})
+    assert ms[2] >= service_message('testStarted', {'name': 'test_fail'})
+    assert ms[3] >= service_message('testFailed',
+                                    {'name': 'test_fail', 'details': 'Bitte keine Werbung'})
+    assert ms[4] >= service_message('testFinished', {'name': 'test_fail'})
+    assert ms[5] >= service_message('testSuiteFinished', {'name': 'GuineaPig'})
+    assert ms[6] >= service_message('testSuiteFinished', {'name': 'nose-guinea-pig'})
 
 
 def test_fail_output(venv):
@@ -147,11 +144,9 @@ def test_fail_output(venv):
 
     ms = parseServiceMessages(output)
 
-    assert ms[3] >= service_message('testFailed', {'name':'test_fail', 'details':'Output line 1'})
-    assert ms[3] >= service_message('testFailed', {'name':'test_fail', 'details':'Output line 2'})
-    assert ms[3] >= service_message('testFailed', {'name':'test_fail', 'details':'Output line 3'})
-
-
+    assert ms[3] >= service_message('testFailed', {'name': 'test_fail', 'details': 'Output line 1'})
+    assert ms[3] >= service_message('testFailed', {'name': 'test_fail', 'details': 'Output line 2'})
+    assert ms[3] >= service_message('testFailed', {'name': 'test_fail', 'details': 'Output line 3'})
 
 
 def run(venv, file, clazz, test):
@@ -169,7 +164,8 @@ def run(venv, file, clazz, test):
     command = os.path.join(venv.bin, 'nosetests') + " -v " \
               + os.path.join('tests', 'guinea-pigs', file) + ":" + clazz + '.' + test
     print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
+                            shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
 
@@ -205,12 +201,12 @@ def parseSM(str):
     """
     b1 = str.index('[')
     b2 = str.rindex(']', b1)
-    inner = str[b1+1:b2].strip()
+    inner = str[b1 + 1:b2].strip()
     space1 = inner.find(' ')
     namelen = space1 if space1 >= 0 else inner.__len__()
     name = inner[0:namelen]
     params = dict()
-    beg = namelen+1
+    beg = namelen + 1
     while beg < inner.__len__():
         if inner[beg] == '_':
             beg = beg + 1
@@ -219,13 +215,13 @@ def parseSM(str):
         if eq == -1: break
         q1 = inner.find("'", eq)
         if q1 == -1: break
-        q2 = inner.find("'", q1+1)
-        while(q2 > 0 and inner[q2-1] == '|'): q2 = inner.find("'", q2+1)
+        q2 = inner.find("'", q1 + 1)
+        while (q2 > 0 and inner[q2 - 1] == '|'): q2 = inner.find("'", q2 + 1)
         if q2 == -1: break
         param_name = inner[beg:eq].strip()
-        param_value = inner[q1+1:q2]
+        param_value = inner[q1 + 1:q2]
         params[param_name] = param_value
-        beg = q2+1
+        beg = q2 + 1
     return service_message(name, params)
 
 
