@@ -1,8 +1,10 @@
 .idea/workspace.xml
 .idea/misc.xml
+.idea/dictionaries/*
 env
 build
 dist
+test-result.xml
 teamcity_messages.egg-info
 *.pyc
 __pycache__

@@ -13,7 +13,7 @@ class PyTest(TestCommand):
         #import here, cause outside the eggs aren't loaded
         import pytest
         import sys 
-        errno = pytest.main("tests")
+        errno = pytest.main(["-l", "--junitxml=test-result.xml", "tests/integration-tests", "tests/unit-tests"])
         sys.exit(errno)
 
 setup(
@@ -52,7 +52,7 @@ under TeamCity and prints usual diagnostics without it.
 
     packages=["teamcity"],
 
-    tests_require=['pytest', 'virtualenv', 'teamcity_messages==1.7'],
+    tests_require=['pytest', 'virtualenv'],
     cmdclass={'test': PyTest},
 
     entry_points={
