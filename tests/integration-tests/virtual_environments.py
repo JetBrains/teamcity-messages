@@ -8,9 +8,9 @@ _windows = os.name == 'nt'
 
 
 class VirtualEnvDescription:
-    def __init__(self, home, bin, python, pip):
-        self.home = home
-        self.bin = bin
+    def __init__(self, home_dir, bin_dir, python, pip):
+        self.home = home_dir
+        self.bin = bin_dir
         self.python = python
         self.pip = pip
 
@@ -37,4 +37,4 @@ def prepare_virtualenv(package_name=None, package_version=None):
         subprocess.call([vpip, "install", package_spec])
 
     subprocess.call([vpython, "setup.py", "install"])
-    return VirtualEnvDescription(home=vdir, bin=vbin, python=vpython, pip=vpip)
+    return VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip)

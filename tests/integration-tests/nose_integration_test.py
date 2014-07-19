@@ -6,7 +6,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import parseServiceMessages, ServiceMessage
+from service_messages import parse_service_messages, ServiceMessage
 
 
 @pytest.fixture(scope='module', params=['1.2.1', '1.3.0', "latest"])
@@ -25,7 +25,7 @@ def test_pass(venv):
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
-    ms = parseServiceMessages(output)
+    ms = parse_service_messages(output)
 
     assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
     assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
@@ -42,7 +42,7 @@ def test_fail(venv):
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
-    ms = parseServiceMessages(output)
+    ms = parse_service_messages(output)
 
     assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
     assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
@@ -62,7 +62,7 @@ def test_fail_with_msg(venv):
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
-    ms = parseServiceMessages(output)
+    ms = parse_service_messages(output)
 
     assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
     assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
@@ -81,7 +81,7 @@ def test_fail_output(venv):
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
-    ms = parseServiceMessages(output)
+    ms = parse_service_messages(output)
 
     assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Output line 1'})
     assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Output line 2'})
