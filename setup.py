@@ -1,6 +1,21 @@
 # coding=utf-8
 from setuptools import setup
 
+from setuptools.command.test import test as TestCommand
+
+class PyTest(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        import sys 
+        errno = pytest.main("tests")
+        sys.exit(errno)
+
 setup(
     name="teamcity-messages",
     version="1.9",
@@ -36,6 +51,9 @@ under TeamCity and prints usual diagnostics without it.
     platforms=["any"],
 
     packages=["teamcity"],
+
+    tests_require=['pytest', 'virtualenv', 'teamcity_messages==1.7'],
+    cmdclass={'test': PyTest},
 
     entry_points={
         'nose.plugins': [
