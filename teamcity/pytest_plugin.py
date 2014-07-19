@@ -12,7 +12,8 @@ py.test with a --teamcity command line option.
 """
 
 import py
-from datetime import datetime, timedelta
+import os
+from datetime import timedelta
 
 from teamcity.messages import TeamcityServiceMessages
 
@@ -30,10 +31,10 @@ def pytest_configure(config):
 
 
 def pytest_unconfigure(config):
-    teamcityReporiting = getattr(config, '_teamcityReporting', None)
-    if teamcityReporiting:
+    teamcity_reporting = getattr(config, '_teamcityReporting', None)
+    if teamcity_reporting:
         del config._teamcityReporting
-        config.pluginmanager.unregister(teamcityReporiting)
+        config.pluginmanager.unregister(teamcity_reporting)
 
 
 class EchoTeamCityMessages(object):
@@ -43,15 +44,15 @@ class EchoTeamCityMessages(object):
         self.currentSuite = None
 
     def format_names(self, name):
-        split = '.py'
-        file, testname = name.split(split, 1)
+        file, testname = name.split("::", 1)
         if not testname:
             testname = file
             file = 'NO_TEST_FILE_FOUND'
         testname = testname.replace("::()::", ".")
         testname = testname.replace("::", ".")
         testname = testname.strip(".")
-        return "".join([file, split]), testname
+        file = file.replace(".", "_").replace(os.sep, ".").replace("/", ".")
+        return file, testname
 
     def pytest_runtest_logstart(self, nodeid, location):
         file, testname = self.format_names(nodeid)
