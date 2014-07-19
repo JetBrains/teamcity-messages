@@ -29,12 +29,15 @@ def prepare_virtualenv(package_name=None, package_version=None):
     vpython = os.path.join(vbin, 'python' + exe_suffix)
     vpip = os.path.join(vbin, 'pip' + exe_suffix)
 
+    env = os.environ.copy()
+    env['PIP_DOWNLOAD_CACHE'] = os.path.abspath(".pip-download-cache")
+
     if package_name is not None:
         if package_version is None or package_version == "latest":
             package_spec = package_name
         else:
             package_spec = package_name + "==" + package_version
-        subprocess.call([vpip, "install", package_spec])
+        subprocess.call([vpip, "install", package_spec], env=env)
 
-    subprocess.call([vpython, "setup.py", "install"])
+    subprocess.call([vpython, "setup.py", "install"], env=env)
     return VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip)
