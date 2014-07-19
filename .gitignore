@@ -1,6 +1,7 @@
 .idea/workspace.xml
 .idea/misc.xml
 .idea/dictionaries/*
+..idea/runConfigurations/Default.xml
 env
 build
 dist
