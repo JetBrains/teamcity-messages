@@ -57,8 +57,8 @@ class service_message:
 
 
 
-@pytest.fixture(scope='module')
-def venv():
+@pytest.fixture(scope='module', params=['1.2.1', '1.3.0', "latest"])
+def venv(request):
     """
     Prepares a virtual environment for nose.
     :rtype : virtual_env_desc
@@ -71,7 +71,13 @@ def venv():
     exe_suffix = ("",".exe")[windows]
     vpython = os.path.join(vbin, 'python'+exe_suffix)
     vpip = os.path.join(vbin, 'pip'+exe_suffix)
-    subprocess.call([vpip, "install", "nose"])
+
+    if request.param == "latest":
+        nose_spec = "nose"
+    else:
+        nose_spec = "nose==" + request.param
+    subprocess.call([vpip, "install", nose_spec])
+
     subprocess.call([vpython, "setup.py", "install"])
     return virtual_env_desc(home=vdir, bin=vbin, python=vpython, pip=vpip)
 
