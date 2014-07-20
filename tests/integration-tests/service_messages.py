@@ -1,5 +1,9 @@
 class ServiceMessage:
     def __init__(self, name, params):
+        """
+        :type name: string
+        :type params: dict[string, string]
+        """
         self.name = name
         self.params = params
 
@@ -40,7 +44,7 @@ def parse_service_messages(text):
     """
     Parses service messages from the given build log.
     :type text: str
-    :rtype: list
+    :rtype: list[ServiceMessage]
     """
     messages = list()
     for line in text.splitlines():
