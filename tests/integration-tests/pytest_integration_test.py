@@ -8,7 +8,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import parse_service_messages, ServiceMessage
+from service_messages import parse_service_messages, ServiceMessage, assert_service_messages
 
 
 @pytest.fixture(scope='module', params=["latest"])
@@ -21,25 +21,54 @@ def venv(request):
 
 
 def test_hierarchy(venv):
-    output = run(venv, os.path.join('namespace'))
+    output = run(venv, 'namespace')
 
     ms = parse_service_messages(output)
-    assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'})
-    assert ms[1] >= ServiceMessage('testStarted', {'name': 'TestSmoke.test_smoke'})
-    assert ms[2] >= ServiceMessage('testFinished', {'name': 'TestSmoke.test_smoke'})
-    assert ms[3] >= ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'})
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'}),
+            ServiceMessage('testStarted', {'name': 'TestSmoke.test_smoke'}),
+            ServiceMessage('testFinished', {'name': 'TestSmoke.test_smoke'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'}),
+        ])
 
 
 def test_custom_test_items(venv):
-    output = run(venv, os.path.join('custom'))
+    output = run(venv, 'custom')
 
     ms = parse_service_messages(output)
-    assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'})
-    assert ms[1] >= ServiceMessage('testStarted', {'name': 'line1'})
-    assert ms[2] >= ServiceMessage('testFinished', {'name': 'line1'})
-    assert ms[3] >= ServiceMessage('testStarted', {'name': 'line2'})
-    assert ms[4] >= ServiceMessage('testFinished', {'name': 'line2'})
-    assert ms[5] >= ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'})
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'}),
+            ServiceMessage('testStarted', {'name': 'line1'}),
+            ServiceMessage('testFinished', {'name': 'line1'}),
+            ServiceMessage('testStarted', {'name': 'line2'}),
+            ServiceMessage('testFinished', {'name': 'line2'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'}),
+        ])
+
+
+def test_runtime_error(venv):
+    output = run(venv, 'runtime_error_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py'}),
+            ServiceMessage('testStarted', {'name': 'test_exception'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'test_exception'}),
+            ServiceMessage('testStarted', {'name': 'test_error'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'test_error'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py'}),
+        ])
+    assert ms[2].params["details"].index("raise Exception") > 0
+    assert ms[2].params["details"].index("oops") > 0
+    assert ms[5].params["details"].index("assert 0 != 0") > 0
 
 
 def run(venv, file, test=None):
@@ -48,7 +77,6 @@ def run(venv, file, test=None):
     env['TEAMCITY_VERSION'] = "0.0.0"
     env['TEAMCITY_PROJECT'] = "TEST"
 
-    print(env['PYTHONPATH'])
     # Start the process and wait for its output
     test_suffix = ("::" + test) if test is not None else ""
     command = os.path.join(venv.bin, 'py.test') + " --teamcity " + \

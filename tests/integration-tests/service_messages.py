@@ -85,3 +85,13 @@ def _parse_one_service_message(s):
         params[param_name] = param_value
         beg = q2 + 1
     return ServiceMessage(name, params)
+
+
+def assert_service_messages(actual_messages, expected_messages):
+    if len(actual_messages) != len(expected_messages):
+        msg = "Expected {0} services messages, but got {1}: {2}" \
+            .format(len(expected_messages), len(actual_messages), repr(actual_messages))
+        raise AssertionError(msg)
+
+    for actual, expected in zip(actual_messages, expected_messages):
+        assert actual >= expected
