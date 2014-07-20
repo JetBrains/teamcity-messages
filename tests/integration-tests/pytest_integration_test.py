@@ -37,7 +37,9 @@ def test_custom_test_items(venv):
     assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'})
     assert ms[1] >= ServiceMessage('testStarted', {'name': 'line1'})
     assert ms[2] >= ServiceMessage('testFinished', {'name': 'line1'})
-    assert ms[3] >= ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'})
+    assert ms[3] >= ServiceMessage('testStarted', {'name': 'line2'})
+    assert ms[4] >= ServiceMessage('testFinished', {'name': 'line2'})
+    assert ms[5] >= ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'})
 
 
 def run(venv, file, test=None):
