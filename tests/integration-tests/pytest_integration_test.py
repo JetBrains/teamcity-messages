@@ -70,6 +70,26 @@ def test_runtime_error(venv):
     assert ms[2].params["details"].index("oops") > 0
     assert ms[5].params["details"].index("assert 0 != 0") > 0
 
+def test_unittest_error(venv):
+    output = run(venv, 'unittest_error_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py'}),
+            ServiceMessage('testStarted', {'name': 'TestErrorFail.test_error'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'TestErrorFail.test_error'}),
+            ServiceMessage('testStarted', {'name': 'TestErrorFail.test_fail'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'TestErrorFail.test_fail'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py'}),
+        ])
+    assert ms[2].params["details"].index("raise Exception") > 0
+    assert ms[2].params["details"].index("oops") > 0
+    assert ms[5].params["details"].index("AssertionError: False is not true") > 0
+
 
 def run(venv, file, test=None):
     env = os.environ.copy()
