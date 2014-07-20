@@ -70,6 +70,7 @@ def test_runtime_error(venv):
     assert ms[2].params["details"].index("oops") > 0
     assert ms[5].params["details"].index("assert 0 != 0") > 0
 
+
 def test_unittest_error(venv):
     output = run(venv, 'unittest_error_test.py')
 
@@ -89,6 +90,47 @@ def test_unittest_error(venv):
     assert ms[2].params["details"].index("raise Exception") > 0
     assert ms[2].params["details"].index("oops") > 0
     assert ms[5].params["details"].index("AssertionError: False is not true") > 0
+
+
+def test_fixture_error(venv):
+    output = run(venv, 'fixture_error_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py'}),
+            ServiceMessage('testStarted', {'name': 'test_error1'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'test_error1'}),
+            ServiceMessage('testStarted', {'name': 'test_error2'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'test_error2'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py'}),
+        ])
+    assert ms[2].params["details"].index("raise Exception") > 0
+    assert ms[2].params["details"].index("oops") > 0
+    assert ms[5].params["details"].index("raise Exception") > 0
+    assert ms[5].params["details"].index("oops") > 0
+
+
+def test_teardown_error(venv):
+    output = run(venv, 'teardown_error_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py'}),
+            ServiceMessage('testStarted', {'name': 'test_error'}),
+            ServiceMessage('testFinished', {'name': 'test_error'}),
+            ServiceMessage('testStarted', {'name': 'test_error_teardown'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'test_error_teardown'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py'}),
+        ])
+    assert ms[4].params["details"].index("raise Exception") > 0
+    assert ms[4].params["details"].index("teardown oops") > 0
 
 
 def run(venv, file, test=None):
