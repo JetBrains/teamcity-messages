@@ -66,9 +66,9 @@ def test_runtime_error(venv):
             ServiceMessage('testFinished', {'name': 'test_error'}),
             ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py'}),
         ])
-    assert ms[2].params["details"].index("raise Exception") > 0
-    assert ms[2].params["details"].index("oops") > 0
-    assert ms[5].params["details"].index("assert 0 != 0") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[5].params["details"].find("assert 0 != 0") > 0
 
 
 def test_unittest_error(venv):
@@ -87,9 +87,9 @@ def test_unittest_error(venv):
             ServiceMessage('testFinished', {'name': 'TestErrorFail.test_fail'}),
             ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py'}),
         ])
-    assert ms[2].params["details"].index("raise Exception") > 0
-    assert ms[2].params["details"].index("oops") > 0
-    assert ms[5].params["details"].index("AssertionError: False is not true") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[5].params["details"].find("AssertionError: False is not true") > 0
 
 
 def test_fixture_error(venv):
@@ -108,10 +108,10 @@ def test_fixture_error(venv):
             ServiceMessage('testFinished', {'name': 'test_error2'}),
             ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py'}),
         ])
-    assert ms[2].params["details"].index("raise Exception") > 0
-    assert ms[2].params["details"].index("oops") > 0
-    assert ms[5].params["details"].index("raise Exception") > 0
-    assert ms[5].params["details"].index("oops") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[5].params["details"].find("raise Exception") > 0
+    assert ms[5].params["details"].find("oops") > 0
 
 
 def test_teardown_error(venv):
@@ -129,8 +129,22 @@ def test_teardown_error(venv):
             ServiceMessage('testFinished', {'name': 'test_error_teardown'}),
             ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py'}),
         ])
-    assert ms[4].params["details"].index("raise Exception") > 0
-    assert ms[4].params["details"].index("teardown oops") > 0
+    assert ms[4].params["details"].find("raise Exception") > 0
+    assert ms[4].params["details"].find("teardown oops") > 0
+
+def test_module_error(venv):
+    output = run(venv, 'module_error_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.module_error_test_py_collect'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.module_error_test_py_collect'}),
+        ])
+    assert ms[1].params["details"].find("raise Exception") > 0
+    assert ms[1].params["details"].find("module oops") > 0
 
 
 def run(venv, file, test=None):
