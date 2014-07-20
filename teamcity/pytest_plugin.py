@@ -68,6 +68,9 @@ class EchoTeamCityMessages(object):
 
 
     def pytest_runtest_logreport(self, report):
+        """
+        :type report: _pytest.runner.TestReport
+        """
         file, testname = self.format_names(report.nodeid)
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
@@ -84,7 +87,11 @@ class EchoTeamCityMessages(object):
                 self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
                 self.teamcity.testFinished(name)
         elif report.skipped:
-            self.teamcity.testIgnored(testname, str(report.longrepr))
+            if type(report.longrepr) is tuple and len(report.longrepr) == 3:
+                reason = report.longrepr[2]
+            else:
+                reason = str(report.longrepr)
+            self.teamcity.testIgnored(testname, reason)
             self.teamcity.testFinished(testname)  # report finished after the skip
 
 

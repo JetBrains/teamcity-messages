@@ -147,6 +147,40 @@ def test_module_error(venv):
     assert ms[1].params["details"].find("module oops") > 0
 
 
+def test_skip(venv):
+    output = run(venv, 'skip_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.skip_test_py'}),
+            ServiceMessage('testStarted', {'name': 'test_function'}),
+            ServiceMessage('testIgnored', {'message': 'Skipped: skip reason'}),
+            ServiceMessage('testFinished', {'name': 'test_function'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.skip_test_py'}),
+        ])
+
+
+def test_xfail(venv):
+    output = run(venv, 'xfail_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.xfail_test_py'}),
+            ServiceMessage('testStarted', {'name': 'test_unexpectedly_passing'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'test_unexpectedly_passing'}),
+            ServiceMessage('testStarted', {'name': 'test_expected_to_fail'}),
+            ServiceMessage('testIgnored', {}),
+            ServiceMessage('testFinished', {'name': 'test_expected_to_fail'}),
+            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test_py'}),
+        ])
+    assert ms[5].params["message"].find("xfail reason") > 0
+
+
 def run(venv, file, test=None):
     env = os.environ.copy()
     env['PYTHONPATH'] = os.path.abspath(os.path.join('tests', 'guinea-pigs', 'pytest'))

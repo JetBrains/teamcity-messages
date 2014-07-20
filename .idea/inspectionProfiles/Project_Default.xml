@@ -20,8 +20,9 @@
     <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredIdentifiers">
         <value>
-          <list size="1">
+          <list size="2">
             <item index="0" class="java.lang.String" itemvalue="pytest.fixture" />
+            <item index="1" class="java.lang.String" itemvalue="pytest.mark" />
           </list>
         </value>
       </option>
