@@ -183,9 +183,7 @@ def test_xfail(venv):
 
 def run(venv, file, test=None):
     env = os.environ.copy()
-    env['PYTHONPATH'] = os.path.abspath(os.path.join('tests', 'guinea-pigs', 'pytest'))
     env['TEAMCITY_VERSION'] = "0.0.0"
-    env['TEAMCITY_PROJECT'] = "TEST"
 
     # Start the process and wait for its output
     test_suffix = ("::" + test) if test is not None else ""

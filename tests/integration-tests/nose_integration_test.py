@@ -95,9 +95,7 @@ def run(venv, file, clazz, test):
 
     # environment variables
     env = os.environ.copy()
-    env['PYTHONPATH'] = venv.home
     env['TEAMCITY_VERSION'] = "0.0.0"
-    env['TEAMCITY_PROJECT'] = "TEST"
 
     # Start the process and wait for its output
     command = os.path.join(venv.bin, 'nosetests') + " -v " \
