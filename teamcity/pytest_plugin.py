@@ -43,16 +43,19 @@ class EchoTeamCityMessages(object):
         self.teamcity = TeamcityServiceMessages(self.tw)
         self.currentSuite = None
 
+
     def format_names(self, name):
-        file, testname = name.split("::", 1)
-        if not testname:
-            testname = file
-            file = 'NO_TEST_FILE_FOUND'
+        if name.find("::") > 0:
+            file, testname = name.split("::", 1)
+        else:
+            file, testname = name, "top_level"
+
         testname = testname.replace("::()::", ".")
         testname = testname.replace("::", ".")
         testname = testname.strip(".")
         file = file.replace(".", "_").replace(os.sep, ".").replace("/", ".")
         return file, testname
+
 
     def pytest_runtest_logstart(self, nodeid, location):
         file, testname = self.format_names(nodeid)
@@ -62,6 +65,7 @@ class EchoTeamCityMessages(object):
             self.currentSuite = file
             self.teamcity.testSuiteStarted(self.currentSuite)
         self.teamcity.testStarted(testname)
+
 
     def pytest_runtest_logreport(self, report):
         file, testname = self.format_names(report.nodeid)
@@ -82,6 +86,16 @@ class EchoTeamCityMessages(object):
         elif report.skipped:
             self.teamcity.testIgnored(testname, str(report.longrepr))
             self.teamcity.testFinished(testname)  # report finished after the skip
+
+
+    def pytest_collectreport(self, report):
+        if report.failed:
+            file, testname = self.format_names(report.nodeid)
+
+            name = file + "_collect"
+            self.teamcity.testStarted(name)
+            self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
+            self.teamcity.testFinished(name)
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
         if self.currentSuite:
