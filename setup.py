@@ -13,7 +13,7 @@ class PyTest(TestCommand):
         #import here, cause outside the eggs aren't loaded
         import pytest
         import sys 
-        errno = pytest.main(["-l", "--junitxml=test-result.xml", "tests/integration-tests", "tests/unit-tests"])
+        errno = pytest.main(["-l", "--junitxml=test-result.xml", "tests/unit-tests", "tests/integration-tests"])
         sys.exit(errno)
 
 setup(
