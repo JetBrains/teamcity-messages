@@ -89,7 +89,7 @@ def test_unittest_error(venv):
         ])
     assert ms[2].params["details"].find("raise Exception") > 0
     assert ms[2].params["details"].find("oops") > 0
-    assert ms[5].params["details"].find("AssertionError: False is not true") > 0
+    assert ms[5].params["details"].find("AssertionError") > 0
 
 
 def test_fixture_error(venv):
