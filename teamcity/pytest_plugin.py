@@ -70,10 +70,15 @@ class EchoTeamCityMessages(object):
                 duration = timedelta(seconds=report.duration)
                 self.teamcity.testFinished(testname, testDuration=duration)
         elif report.failed:
-            if report.when == "call":
+            if report.when in ("call", "setup"):
                 self.teamcity.testFailed(testname, str(report.location), str(report.longrepr))
                 duration = timedelta(seconds=report.duration)
                 self.teamcity.testFinished(testname, testDuration=duration)  # report finished after the failure
+            elif report.when == "teardown":
+                name = testname + "_teardown"
+                self.teamcity.testStarted(name)
+                self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
+                self.teamcity.testFinished(name)
         elif report.skipped:
             self.teamcity.testIgnored(testname, str(report.longrepr))
             self.teamcity.testFinished(testname)  # report finished after the skip
