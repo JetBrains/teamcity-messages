@@ -22,24 +22,24 @@ This package uses service messages to report  build status to TeamCity. See http
 If you wish to use Python default's unittest framework, you should modify the Test runner, e.g.:
 
 ```python
-    import unittest
-    from teamcity import is_running_under_teamcity
-    from teamcity.unittestpy import TeamcityTestRunner
-    
-    class Test(unittest.TestCase):
-        ...
-    
-    if __name__ == '__main__':
-        if is_running_under_teamcity():
-            runner = TeamcityTestRunner()
-        else:
-            runner = unittest.TextTestRunner()
-        unittest.main(testRunner=runner)
+import unittest
+from teamcity import is_running_under_teamcity
+from teamcity.unittestpy import TeamcityTestRunner
+
+class Test(unittest.TestCase):
+    ...
+
+if __name__ == '__main__':
+    if is_running_under_teamcity():
+        runner = TeamcityTestRunner()
+    else:
+        runner = unittest.TextTestRunner()
+    unittest.main(testRunner=runner)
 ```
 
 See `examples/simple.py` for a full example.
 
-If you are used to running unittest from the command line, instead of using `python -m unittest`, you could use `python -m teamcity.unittest.py`. 
+If you are used to running unittest from the command line, instead of using `python -m unittest`, you could use `python -m teamcity.unittestpy`. 
 
 ### nose
 Test status reporting is enabled automatically when under TeamCity build.
