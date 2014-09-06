@@ -8,4 +8,8 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
-script: python setup.py test
+install:
+  - pip install pep8
+script:
+  - pep8 --ignore E501 teamcity examples tests/unit-tests tests/integration-tests
+  - python setup.py test
