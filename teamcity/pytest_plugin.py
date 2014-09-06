@@ -43,7 +43,6 @@ class EchoTeamCityMessages(object):
         self.teamcity = TeamcityServiceMessages(self.tw)
         self.currentSuite = None
 
-
     def format_names(self, name):
         if name.find("::") > 0:
             file, testname = name.split("::", 1)
@@ -56,7 +55,6 @@ class EchoTeamCityMessages(object):
         file = file.replace(".", "_").replace(os.sep, ".").replace("/", ".")
         return file, testname
 
-
     def pytest_runtest_logstart(self, nodeid, location):
         file, testname = self.format_names(nodeid)
         if not file == self.currentSuite:
@@ -65,7 +63,6 @@ class EchoTeamCityMessages(object):
             self.currentSuite = file
             self.teamcity.testSuiteStarted(self.currentSuite)
         self.teamcity.testStarted(testname)
-
 
     def pytest_runtest_logreport(self, report):
         """
@@ -93,7 +90,6 @@ class EchoTeamCityMessages(object):
                 reason = str(report.longrepr)
             self.teamcity.testIgnored(testname, reason)
             self.teamcity.testFinished(testname)  # report finished after the skip
-
 
     def pytest_collectreport(self, report):
         if report.failed:

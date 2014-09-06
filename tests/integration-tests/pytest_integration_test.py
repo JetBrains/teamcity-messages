@@ -132,6 +132,7 @@ def test_teardown_error(venv):
     assert ms[4].params["details"].find("raise Exception") > 0
     assert ms[4].params["details"].find("teardown oops") > 0
 
+
 def test_module_error(venv):
     output = run(venv, 'module_error_test.py')
 
@@ -188,10 +189,9 @@ def run(venv, file, test=None):
     # Start the process and wait for its output
     test_suffix = ("::" + test) if test is not None else ""
     command = os.path.join(venv.bin, 'py.test') + " --teamcity " + \
-              os.path.join('tests', 'guinea-pigs', 'pytest', file) + test_suffix
+        os.path.join('tests', 'guinea-pigs', 'pytest', file) + test_suffix
     print("RUN: " + command)
-    proc = subprocess.Popen(
-        command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
 

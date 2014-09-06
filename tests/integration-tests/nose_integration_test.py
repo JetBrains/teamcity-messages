@@ -67,8 +67,7 @@ def test_fail_with_msg(venv):
     assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
     assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
     assert ms[2] >= ServiceMessage('testStarted', {'name': 'test_fail'})
-    assert ms[3] >= ServiceMessage('testFailed',
-                                    {'name': 'test_fail', 'details': 'Bitte keine Werbung'})
+    assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Bitte keine Werbung'})
     assert ms[4] >= ServiceMessage('testFinished', {'name': 'test_fail'})
     assert ms[5] >= ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'})
     assert ms[6] >= ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'})
@@ -98,8 +97,7 @@ def run(venv, file, clazz, test):
     env['TEAMCITY_VERSION'] = "0.0.0"
 
     # Start the process and wait for its output
-    command = os.path.join(venv.bin, 'nosetests') + " -v " \
-              + os.path.join('tests', 'guinea-pigs', file) + ":" + clazz + '.' + test
+    command = os.path.join(venv.bin, 'nosetests') + " -v " + os.path.join('tests', 'guinea-pigs', file) + ":" + clazz + '.' + test
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
                             shell=True)

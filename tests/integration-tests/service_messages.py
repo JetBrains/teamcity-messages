@@ -7,7 +7,6 @@ class ServiceMessage:
         self.name = name
         self.params = params
 
-
     def __ge__(self, other):
         """
         :type self: service_message
@@ -27,14 +26,12 @@ class ServiceMessage:
                 return False
         return True
 
-
     def __str__(self):
         buf = "[" + self.name
         for k, v in self.params.items():
             buf += ' ' + k + "='" + v + "'"
         buf += "]"
         return buf
-
 
     def __repr__(self):
         return self.__str__()
@@ -73,13 +70,21 @@ def _parse_one_service_message(s):
         if inner[beg] == '_':
             beg += 1
             continue
+
         eq = inner.find('=', beg)
-        if eq == -1: break
+        if eq == -1:
+            break
+
         q1 = inner.find("'", eq)
-        if q1 == -1: break
+        if q1 == -1:
+            break
+
         q2 = inner.find("'", q1 + 1)
-        while q2 > 0 and inner[q2 - 1] == '|': q2 = inner.find("'", q2 + 1)
-        if q2 == -1: break
+        while q2 > 0 and inner[q2 - 1] == '|':
+            q2 = inner.find("'", q2 + 1)
+        if q2 == -1:
+            break
+
         param_name = inner[beg:eq].strip()
         param_value = inner[q1 + 1:q2]
         params[param_name] = param_value

@@ -38,8 +38,8 @@ class TeamcityServiceMessages(object):
     def testFinished(self, testName, testDuration=None):
         if testDuration is not None:
             duration_ms = testDuration.days * 86400000 + \
-                          testDuration.seconds * 1000 + \
-                          int(testDuration.microseconds / 1000)
+                testDuration.seconds * 1000 + \
+                int(testDuration.microseconds / 1000)
             self.message('testFinished', name=testName, duration=str(duration_ms))
         else:
             self.message('testFinished', name=testName)
@@ -56,7 +56,7 @@ class TeamcityServiceMessages(object):
 
     def testStdErr(self, testName, out):
         self.message('testStdErr', name=testName, out=out)
-        
+
     def publishArtifacts(self, path):
         self._single_value_message('publishArtifacts', path)
 
