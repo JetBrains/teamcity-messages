@@ -60,6 +60,12 @@ class TeamcityServiceMessages(object):
     def testStdErr(self, testName, out):
         self.message('testStdErr', name=testName, out=out)
 
+    def buildStatisticLinesCovered(self, linesCovered):
+        self.message('buildStatisticValue', key='CodeCoverageAbsLCovered', value=str(linesCovered))
+
+    def buildStatisticTotalLines(self, totalLines):
+        self.message('buildStatisticValue', key='CodeCoverageAbsLTotal', value=str(totalLines))
+
     def publishArtifacts(self, path):
         self._single_value_message('publishArtifacts', path)
 
