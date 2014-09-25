@@ -45,6 +45,10 @@ class TeamcityTestResult(TestResult):
         self.output.write("ok\n")
 
     def addError(self, test, err, *k):
+        # workaround nose bug on python 3
+        if _is_string(err[1]):
+            err = (err[0], Exception(err[1]), err[2])
+
         TestResult.addError(self, test, err)
 
         err = self.formatErr(err)
