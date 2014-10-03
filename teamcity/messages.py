@@ -14,7 +14,7 @@ class TeamcityServiceMessages(object):
         return "".join([self.quote.get(x, x) for x in value])
 
     def message(self, messageName, **properties):
-        self.output.write("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().isoformat()[:-3]))
+        self.output.write("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]))
         for k in sorted(properties.keys()):
             value = properties[k]
             if value is None:
@@ -38,8 +38,8 @@ class TeamcityServiceMessages(object):
     def testFinished(self, testName, testDuration=None):
         if testDuration is not None:
             duration_ms = testDuration.days * 86400000 + \
-                          testDuration.seconds * 1000 + \
-                          int(testDuration.microseconds / 1000)
+                testDuration.seconds * 1000 + \
+                int(testDuration.microseconds / 1000)
             self.message('testFinished', name=testName, duration=str(duration_ms))
         else:
             self.message('testFinished', name=testName)
@@ -56,7 +56,7 @@ class TeamcityServiceMessages(object):
 
     def testStdErr(self, testName, out):
         self.message('testStdErr', name=testName, out=out)
-        
+
     def publishArtifacts(self, path):
         self._single_value_message('publishArtifacts', path)
 
