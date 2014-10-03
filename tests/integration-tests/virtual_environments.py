@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 import virtualenv
 
 
@@ -21,7 +22,7 @@ def prepare_virtualenv(package_name=None, package_version=None):
     Prepares a virtual environment.
     :rtype : VirtualEnvDescription
     """
-    vroot = 'env'
+    vroot = get_vroot()
     env_key = get_env_key(package_name, package_version)
     vdir = os.path.join(vroot, env_key)
 
@@ -42,7 +43,7 @@ def prepare_virtualenv(package_name=None, package_version=None):
     virtualenv.create_environment(vdir)
 
     env = get_clean_system_environment()
-    env['PIP_DOWNLOAD_CACHE'] = os.path.abspath(".pip-download-cache")
+    env['PIP_DOWNLOAD_CACHE'] = os.path.abspath(os.path.join(vroot, "pip-download-cache"))
 
     if package_name is not None:
         if package_version is None or package_version == "latest":
@@ -73,3 +74,7 @@ def get_clean_system_environment():
     env = dict([(k, cur_env[k]) for k in cur_env.keys() if not k.lower().startswith("python")])
 
     return env
+
+
+def get_vroot():
+    return os.path.join(tempfile.gettempdir(), "teamcity-python-venv")
