@@ -11,7 +11,7 @@ class TeamcityReport(TeamcityTestResult):
     score = 2
 
     def __init__(self):
-        super(TeamcityTestResult, self).__init__()
+        super(TeamcityReport, self).__init__()
 
     def configure(self, options, conf):
         self.enabled = is_running_under_teamcity()
