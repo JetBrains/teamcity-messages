@@ -9,7 +9,7 @@ import virtual_environments
 from service_messages import parse_service_messages, ServiceMessage
 
 
-@pytest.fixture(scope='module', params=["latest"]) # '1.7'
+@pytest.fixture(scope='module', params=["1.6", "1.7", "latest"])
 def venv(request):
     return virtual_environments.prepare_virtualenv("django", request.param)
 
@@ -21,6 +21,7 @@ def test_smoke(venv):
 
     assert ms[0] >= ServiceMessage('testStarted', {'name': 'XXX identity'})
     assert ms[1] >= ServiceMessage('testFinished', {'name': 'XXX identity'})
+
 
 def run(venv):
     env = virtual_environments.get_clean_system_environment()
