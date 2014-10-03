@@ -88,15 +88,9 @@ def test_fail_output(venv):
 
 
 def run(venv, file, clazz, test):
-    """
-    Executes the specified test using nose
-    """
-
-    # environment variables
-    env = os.environ.copy()
+    env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
-    # Start the process and wait for its output
     command = os.path.join(venv.bin, 'nosetests') + " -v " + os.path.join('tests', 'guinea-pigs', file) + ":" + clazz + '.' + test
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,

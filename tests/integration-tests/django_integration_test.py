@@ -23,17 +23,16 @@ def test_smoke(venv):
     assert ms[1] >= ServiceMessage('testFinished', {'name': 'XXX identity'})
 
 def run(venv):
-    # environment variables
-    cur_env = os.environ.copy()
-    env = dict([(k, cur_env[k]) for k in cur_env.keys() if not k.lower().startswith("python")])
+    env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
-    # Start the process and wait for its output
     command = os.path.join(os.getcwd(), venv.bin, 'python') + " manage.py test"
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
                             cwd=os.path.join(os.getcwd(), "tests", "guinea-pigs", "djangotest"), shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
+
+    print("OUTPUT:" + output)
 
     return output
