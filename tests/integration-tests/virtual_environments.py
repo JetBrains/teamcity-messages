@@ -57,6 +57,7 @@ def prepare_virtualenv(package_name=None, package_version=None):
 
     return venv_description
 
+
 def get_env_key(package_name, package_version):
     key = "%d.%d.%d" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
     key += "-" + os.name
@@ -65,6 +66,7 @@ def get_env_key(package_name, package_version):
     if package_version is not None:
         key += "-" + package_version
     return key
+
 
 def get_clean_system_environment():
     cur_env = os.environ.copy()
