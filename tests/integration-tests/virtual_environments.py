@@ -32,29 +32,27 @@ def prepare_virtualenv(package_name=None, package_version=None):
     vpip = os.path.join(vbin, 'pip' + exe_suffix)
     venv_description = VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip)
 
-    # Cache environment
-    done_flag_file = os.path.join(vdir, "done")
-    if os.path.exists(done_flag_file):
-        return venv_description
-
-    if os.path.exists(vdir):
-        shutil.rmtree(vdir)
-
-    virtualenv.create_environment(vdir)
-
     env = get_clean_system_environment()
     env['PIP_DOWNLOAD_CACHE'] = os.path.abspath(os.path.join(vroot, "pip-download-cache"))
 
-    if package_name is not None:
-        if package_version is None or package_version == "latest":
-            package_spec = package_name
-        else:
-            package_spec = package_name + "==" + package_version
-        subprocess.call([vpip, "install", package_spec], env=env)
+    # Cache environment
+    done_flag_file = os.path.join(vdir, "done")
+    if not os.path.exists(done_flag_file):
+        if os.path.exists(vdir):
+            shutil.rmtree(vdir)
+
+        virtualenv.create_environment(vdir)
+
+        if package_name is not None:
+            if package_version is None or package_version == "latest":
+                package_spec = package_name
+            else:
+                package_spec = package_name + "==" + package_version
+            subprocess.call([vpip, "install", package_spec], env=env)
+
+        open(done_flag_file, 'a').close()
 
     subprocess.call([vpython, "setup.py", "install"], env=env)
-
-    open(done_flag_file, 'a').close()
 
     return venv_description
 
