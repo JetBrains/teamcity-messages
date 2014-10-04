@@ -1,3 +1,7 @@
+import pprint
+import sys
+
+
 class ServiceMessage:
     def __init__(self, name, params):
         """
@@ -93,10 +97,13 @@ def _parse_one_service_message(s):
 
 
 def assert_service_messages(actual_messages, expected_messages):
-    if len(actual_messages) != len(expected_messages):
-        msg = "Expected {0} services messages, but got {1}: {2}" \
-            .format(len(expected_messages), len(actual_messages), repr(actual_messages))
-        raise AssertionError(msg)
+    try:
+        if len(actual_messages) != len(expected_messages):
+            raise AssertionError("Expected {0} services messages, but got {1}".format(len(expected_messages), len(actual_messages)))
+        for actual, expected in zip(actual_messages, expected_messages):
+            assert actual >= expected
+    except AssertionError as e:
+        print("Actual:\n" + pprint.pformat(actual_messages) + "\n")
+        print("Expected:\n" + pprint.pformat(expected_messages) + "\n")
 
-    for actual, expected in zip(actual_messages, expected_messages):
-        assert actual >= expected
+        raise e
