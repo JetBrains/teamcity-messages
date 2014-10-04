@@ -59,6 +59,27 @@ class TeamcityTestResult(TestResult):
 
         self.output.write("ok\n")
 
+    def addExpectedFailure(self, test, err):
+        # workaround nose bug on python 3
+        if _is_string(err[1]):
+            err = (err[0], Exception(err[1]), err[2])
+
+        TestResult.addExpectedFailure(self, test, err)
+
+        err = self.formatErr(err)
+
+        self.messages.testIgnored(self.test_name, message="Expected failure: " + err)
+
+    def addSkip(self, test, reason, *k):
+        TestResult.addSkip(self, test, reason)
+
+        self.messages.testIgnored(self.test_name, message="Skipped: " + reason)
+
+    def addUnexpectedSuccess(self, test):
+        TestResult.addUnexpectedSuccess(self, test)
+
+        self.messages.testFailed(self.test_name, message='Failure', details="Test should not succeed since it's marked with @unittest.expectedFailure")
+
     def addError(self, test, err, *k):
         # workaround nose bug on python 3
         if _is_string(err[1]):

@@ -104,10 +104,53 @@ def test_doctests(venv):
         ])
 
 
-def test_discovery(venv):
-    if sys.version_info < (2, 7):
-        pytest.skip("unittest discovery requires Python 2.7+")
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="skip requires Python 2.7+")
+def test_skip(venv):
+    output = run_directly(venv, 'skip_test.py')
 
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_skip_me'}),
+            ServiceMessage('testIgnored', {'name': '__main__.TestSkip.test_skip_me', 'message': 'Skipped: testing skipping'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_skip_me'}),
+        ])
+
+
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="expectedFailure requires Python 2.7+")
+def test_expected_failure(venv):
+    output = run_directly(venv, 'expected_failure.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_expected_failure'}),
+            ServiceMessage('testIgnored', {'name': '__main__.TestSkip.test_expected_failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_expected_failure'}),
+        ])
+    assert ms[1].params['message'].find("Expected failure") == 0
+    assert ms[1].params['message'].find("this should happen unfortunately") > 0
+
+
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="unexpected_success requires Python 2.7+")
+def test_unexpected_success(venv):
+    output = run_directly(venv, 'unexpected_success.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_unexpected_success'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestSkip.test_unexpected_success',
+                                          'details': "Test should not succeed since it|'s marked with @unittest.expectedFailure"}),
+            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_unexpected_success'}),
+        ])
+
+
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="unittest discovery requires Python 2.7+")
+def test_discovery(venv):
     output = run_directly(venv, 'discovery.py')
 
     ms = parse_service_messages(output)
