@@ -9,7 +9,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import parse_service_messages, ServiceMessage, assert_service_messages
+from service_messages import ServiceMessage, assert_service_messages
 
 
 @pytest.fixture(scope='module')
@@ -180,6 +180,49 @@ def test_setup_module_error(venv):
         ])
 
     assert ms[1].params['details'].index("assert 1 == 0") > 0
+
+
+def test_setup_class_error(venv):
+    output = run_directly(venv, 'setup_class_error.py')
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.setUpClass'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestXXX.setUpClass', 'message': 'Failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.setUpClass'}),
+        ])
+
+    assert ms[1].params['details'].index("RRR") > 0
+
+
+def test_teardown_class_error(venv):
+    output = run_directly(venv, 'teardown_class_error.py')
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.test_ok'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.test_ok'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.tearDownClass'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestXXX.tearDownClass', 'message': 'Failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.tearDownClass'}),
+        ])
+
+    assert ms[3].params['details'].index("RRR") > 0
+
+
+def test_teardown_module_error(venv):
+    output = run_directly(venv, 'teardown_module_error.py')
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.test_ok'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.test_ok'}),
+            ServiceMessage('testStarted', {'name': '__main__.tearDownModule'}),
+            ServiceMessage('testFailed', {'name': '__main__.tearDownModule', 'message': 'Failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.tearDownModule'}),
+        ])
+
+    assert ms[3].params['details'].index("assert 1 == 0") > 0
 
 
 def run_directly(venv, file):
