@@ -22,10 +22,8 @@ def venv(request):
 
 def test_hierarchy(venv):
     output = run(venv, 'namespace')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'}),
             ServiceMessage('testStarted', {'name': 'TestSmoke.test_smoke'}),
@@ -36,10 +34,8 @@ def test_hierarchy(venv):
 
 def test_custom_test_items(venv):
     output = run(venv, 'custom')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'}),
             ServiceMessage('testStarted', {'name': 'line1'}),
@@ -52,10 +48,8 @@ def test_custom_test_items(venv):
 
 def test_runtime_error(venv):
     output = run(venv, 'runtime_error_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py'}),
             ServiceMessage('testStarted', {'name': 'test_exception'}),
@@ -73,10 +67,8 @@ def test_runtime_error(venv):
 
 def test_unittest_error(venv):
     output = run(venv, 'unittest_error_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py'}),
             ServiceMessage('testStarted', {'name': 'TestErrorFail.test_error'}),
@@ -94,10 +86,8 @@ def test_unittest_error(venv):
 
 def test_fixture_error(venv):
     output = run(venv, 'fixture_error_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py'}),
             ServiceMessage('testStarted', {'name': 'test_error1'}),
@@ -116,10 +106,8 @@ def test_fixture_error(venv):
 
 def test_teardown_error(venv):
     output = run(venv, 'teardown_error_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py'}),
             ServiceMessage('testStarted', {'name': 'test_error'}),
@@ -135,10 +123,8 @@ def test_teardown_error(venv):
 
 def test_module_error(venv):
     output = run(venv, 'module_error_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.module_error_test_py_collect'}),
             ServiceMessage('testFailed', {}),
@@ -150,10 +136,8 @@ def test_module_error(venv):
 
 def test_skip(venv):
     output = run(venv, 'skip_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.skip_test_py'}),
             ServiceMessage('testStarted', {'name': 'test_function'}),
@@ -165,10 +149,8 @@ def test_skip(venv):
 
 def test_xfail(venv):
     output = run(venv, 'xfail_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.xfail_test_py'}),
             ServiceMessage('testStarted', {'name': 'test_unexpectedly_passing'}),

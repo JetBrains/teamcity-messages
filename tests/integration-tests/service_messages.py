@@ -96,7 +96,9 @@ def _parse_one_service_message(s):
     return ServiceMessage(name, params)
 
 
-def assert_service_messages(actual_messages, expected_messages):
+def assert_service_messages(actual_messages_string, expected_messages):
+    actual_messages = parse_service_messages(actual_messages_string)
+
     try:
         if len(actual_messages) != len(expected_messages):
             raise AssertionError("Expected {0} services messages, but got {1}".format(len(expected_messages), len(actual_messages)))
@@ -107,3 +109,5 @@ def assert_service_messages(actual_messages, expected_messages):
         print("Expected:\n" + pprint.pformat(expected_messages) + "\n")
 
         raise e
+
+    return actual_messages

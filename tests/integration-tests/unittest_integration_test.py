@@ -23,10 +23,8 @@ def venv(request):
 
 def test_nested_suits(venv):
     output = run_directly(venv, 'nested_suits.py')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
@@ -35,10 +33,8 @@ def test_nested_suits(venv):
 
 def test_docstring(venv):
     output = run_directly(venv, 'docstring.py')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.A test'}),
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.A test'}),
@@ -47,10 +43,8 @@ def test_docstring(venv):
 
 def test_assert(venv):
     output = run_directly(venv, 'assert.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
             ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Failure'}),
@@ -62,10 +56,8 @@ def test_assert(venv):
 
 def test_fail(venv):
     output = run_directly(venv, 'fail_test.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
             ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Failure'}),
@@ -77,10 +69,8 @@ def test_fail(venv):
 
 def test_setup_error(venv):
     output = run_directly(venv, 'setup_error.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
             ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Error'}),
@@ -93,10 +83,8 @@ def test_setup_error(venv):
 
 def test_teardown_error(venv):
     output = run_directly(venv, 'teardown_error.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
             ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Error'}),
@@ -109,10 +97,8 @@ def test_teardown_error(venv):
 
 def test_doctests(venv):
     output = run_directly(venv, 'doctests.py')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.factorial'}),
             ServiceMessage('testFinished', {'name': '__main__.factorial'}),
@@ -122,10 +108,8 @@ def test_doctests(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="skip requires Python 2.7+")
 def test_skip(venv):
     output = run_directly(venv, 'skip_test.py')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_skip_me'}),
             ServiceMessage('testIgnored', {'name': '__main__.TestSkip.test_skip_me', 'message': 'Skipped: testing skipping'}),
@@ -136,10 +120,8 @@ def test_skip(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="expectedFailure requires Python 2.7+")
 def test_expected_failure(venv):
     output = run_directly(venv, 'expected_failure.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_expected_failure'}),
             ServiceMessage('testIgnored', {'name': '__main__.TestSkip.test_expected_failure'}),
@@ -152,10 +134,8 @@ def test_expected_failure(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="unexpected_success requires Python 2.7+")
 def test_unexpected_success(venv):
     output = run_directly(venv, 'unexpected_success.py')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_unexpected_success'}),
             ServiceMessage('testFailed', {'name': '__main__.TestSkip.test_unexpected_success',
@@ -167,25 +147,19 @@ def test_unexpected_success(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="unittest discovery requires Python 2.7+")
 def test_discovery(venv):
     output = run_directly(venv, 'discovery.py')
-
-    ms = parse_service_messages(output)
     assert_service_messages(
-        ms,
+        output,
         [
             ServiceMessage('testStarted', {'name': 'testsimple.TestTeamcityMessages.runTest'}),
             ServiceMessage('testFinished', {'name': 'testsimple.TestTeamcityMessages.runTest'}),
         ])
 
 
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="unittest discovery requires Python 2.7+")
 def test_discovery_errors(venv):
-    if sys.version_info < (2, 7):
-        pytest.skip("unittest discovery requires Python 2.7+")
-
     output = run_directly(venv, 'discovery_errors.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': 'unittest.loader.ModuleImportFailure.testsimple'}),
             ServiceMessage('testFailed', {'name': 'unittest.loader.ModuleImportFailure.testsimple', 'message': 'Error'}),
@@ -197,10 +171,8 @@ def test_discovery_errors(venv):
 
 def test_setup_module_error(venv):
     output = run_directly(venv, 'setup_module_error.py')
-
-    ms = parse_service_messages(output)
-    assert_service_messages(
-        ms,
+    ms = assert_service_messages(
+        output,
         [
             ServiceMessage('testStarted', {'name': '__main__.setUpModule'}),
             ServiceMessage('testFailed', {'name': '__main__.setUpModule', 'message': 'Failure'}),
