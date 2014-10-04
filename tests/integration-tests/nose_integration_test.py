@@ -6,10 +6,10 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import parse_service_messages, ServiceMessage
+from service_messages import parse_service_messages, ServiceMessage, assert_service_messages
 
 
-@pytest.fixture(scope='module', params=['1.2.1', '1.3.0', "latest"])
+@pytest.fixture(scope='module', params=["latest"])  # '1.2.1', '1.3.0',
 def venv(request):
     """
     Prepares a virtual environment for nose.
@@ -18,84 +18,102 @@ def venv(request):
     return virtual_environments.prepare_virtualenv("nose", request.param)
 
 
+def test_hierarchy(venv):
+    output = run(venv, 'hierarchy')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'namespace1'}),
+            ServiceMessage('testSuiteStarted', {'name': 'namespace2'}),
+            ServiceMessage('testSuiteStarted', {'name': 'testmyzz'}),
+            ServiceMessage('testStarted', {'name': 'test'}),
+            ServiceMessage('testFinished', {'name': 'test'}),
+            ServiceMessage('testSuiteFinished', {'name': 'testmyzz'}),
+            ServiceMessage('testSuiteFinished', {'name': 'namespace2'}),
+            ServiceMessage('testSuiteFinished', {'name': 'namespace1'}),
+        ])
+
+
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
-
-    # print(output)
-
-    assert "##teamcity" in output, "Output should contain TC service messages"
-
-    ms = parse_service_messages(output)
-
-    assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
-    assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
-    assert ms[2] >= ServiceMessage('testStarted', {'name': 'test_pass'})
-    assert ms[3] >= ServiceMessage('testFinished', {'name': 'test_pass'})
-    assert ms[4] >= ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'})
-    assert ms[5] >= ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'})
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'}),
+            ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'}),
+            ServiceMessage('testStarted', {'name': 'test_pass'}),
+            ServiceMessage('testFinished', {'name': 'test_pass'}),
+            ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'}),
+            ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'}),
+        ])
 
 
 def test_fail(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail')
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'}),
+            ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'}),
+            ServiceMessage('testStarted', {'name': 'test_fail'}),
+            ServiceMessage('testFailed', {'name': 'test_fail'}),
+            ServiceMessage('testFinished', {'name': 'test_fail'}),
+            ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'}),
+            ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'}),
+        ])
 
-    # print(output)
-
-    assert "##teamcity" in output, "Output should contain TC service messages"
-
-    ms = parse_service_messages(output)
-
-    assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
-    assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
-    assert ms[2] >= ServiceMessage('testStarted', {'name': 'test_fail'})
-    assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Traceback'})
-    assert ms[4] >= ServiceMessage('testFinished', {'name': 'test_fail'})
-    assert ms[5] >= ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'})
-    assert ms[6] >= ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'})
-
-    assert "2 * 2 == 5" in output
+    assert ms[3].params['details'].find("Traceback") == 0
+    assert ms[3].params['details'].find("2 * 2 == 5") > 0
 
 
 def test_fail_with_msg(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_with_msg')
-
-    # print(output)
-
-    assert "##teamcity" in output, "Output should contain TC service messages"
-
-    ms = parse_service_messages(output)
-
-    assert ms[0] >= ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'})
-    assert ms[1] >= ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'})
-    assert ms[2] >= ServiceMessage('testStarted', {'name': 'test_fail'})
-    assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Bitte keine Werbung'})
-    assert ms[4] >= ServiceMessage('testFinished', {'name': 'test_fail'})
-    assert ms[5] >= ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'})
-    assert ms[6] >= ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'})
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'}),
+            ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'}),
+            ServiceMessage('testStarted', {'name': 'test_fail_with_msg'}),
+            ServiceMessage('testFailed', {'name': 'test_fail_with_msg'}),
+            ServiceMessage('testFinished', {'name': 'test_fail_with_msg'}),
+            ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'}),
+            ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'}),
+        ])
+    assert ms[3].params['details'].find("Bitte keine Werbung") > 0
 
 
 def test_fail_output(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_output')
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'nose-guinea-pig'}),
+            ServiceMessage('testSuiteStarted', {'name': 'GuineaPig'}),
+            ServiceMessage('testStarted', {'name': 'test_fail_output'}),
+            ServiceMessage('testFailed', {'name': 'test_fail_output'}),
+            ServiceMessage('testFinished', {'name': 'test_fail_output'}),
+            ServiceMessage('testSuiteFinished', {'name': 'GuineaPig'}),
+            ServiceMessage('testSuiteFinished', {'name': 'nose-guinea-pig'}),
+        ])
 
-    # print(output)
-
-    assert "##teamcity" in output, "Output should contain TC service messages"
-
-    ms = parse_service_messages(output)
-
-    assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Output line 1'})
-    assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Output line 2'})
-    assert ms[3] >= ServiceMessage('testFailed', {'name': 'test_fail', 'details': 'Output line 3'})
+    assert ms[3].params['details'].find('Output line 1') > 0
+    assert ms[3].params['details'].find('Output line 2') > 0
+    assert ms[3].params['details'].find('Output line 3') > 0
 
 
-def run(venv, file, clazz, test):
+def run(venv, file, clazz=None, test=None):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
-    command = os.path.join(venv.bin, 'nosetests') + " -v " + os.path.join('tests', 'guinea-pigs', file) + ":" + clazz + '.' + test
+    command = os.path.join(venv.bin, 'nosetests') + \
+              " -v " + os.path.join('tests', 'guinea-pigs', 'nose', file) + \
+              ((":" + clazz) if clazz else "") + \
+              (('.' + test) if test else "")
     print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
-                            shell=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
+
+    print("OUTPUT:" + output.replace("#", "*"))
 
     return output

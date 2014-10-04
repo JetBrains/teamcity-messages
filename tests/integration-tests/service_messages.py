@@ -24,7 +24,7 @@ class ServiceMessage:
             if p in self.params:
                 v1 = self.params[p]
                 v2 = other.params[p]
-                if not (v2 in v1):
+                if v1 != v2:
                     return False
             else:
                 return False
