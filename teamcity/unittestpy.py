@@ -58,8 +58,6 @@ class TeamcityTestResult(TestResult):
     def addSuccess(self, test, *k):
         TestResult.addSuccess(self, test)
 
-        self.output.write("ok\n")
-
     def addExpectedFailure(self, test, err):
         # workaround nose bug on python 3
         if _is_string(err[1]):
