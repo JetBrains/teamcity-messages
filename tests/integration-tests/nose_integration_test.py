@@ -76,7 +76,7 @@ def test_fail_with_msg(venv):
 def test_fail_output(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_output')
 
-    print(output)
+    # print(output)
 
     assert "##teamcity" in output, "Output should contain TC service messages"
 
