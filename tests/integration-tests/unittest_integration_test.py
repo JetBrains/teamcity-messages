@@ -40,8 +40,8 @@ def test_docstring(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'A test'}),
-            ServiceMessage('testFinished', {'name': 'A test'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.A test'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.A test'}),
         ])
 
 
@@ -58,6 +58,21 @@ def test_assert(venv):
         ])
 
     assert ms[1].params['details'].index("assert 1 == 0") > 0
+
+
+def test_fail(venv):
+    output = run_directly(venv, 'fail_test.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
+        ])
+
+    assert ms[1].params['details'].index('fail("Grr")') > 0
 
 
 def test_setup_error(venv):
