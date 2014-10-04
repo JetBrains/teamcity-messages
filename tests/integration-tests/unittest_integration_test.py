@@ -92,6 +92,18 @@ def test_teardown_error(venv):
     assert ms[1].params['details'].index("tearDown") > 0
 
 
+def test_doctests(venv):
+    output = run_directly(venv, 'doctests.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.factorial'}),
+            ServiceMessage('testFinished', {'name': '__main__.factorial'}),
+        ])
+
+
 def test_discovery(venv):
     if sys.version_info < (2, 7):
         pytest.skip("unittest discovery requires Python 2.7+")
