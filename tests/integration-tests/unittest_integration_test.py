@@ -169,6 +169,7 @@ def test_discovery_errors(venv):
     assert ms[1].params['details'].index("ImportError") > 0
 
 
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_setup_module_error(venv):
     output = run_directly(venv, 'setup_module_error.py')
     ms = assert_service_messages(
@@ -182,6 +183,7 @@ def test_setup_module_error(venv):
     assert ms[1].params['details'].index("assert 1 == 0") > 0
 
 
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_setup_class_error(venv):
     output = run_directly(venv, 'setup_class_error.py')
     ms = assert_service_messages(
@@ -195,6 +197,7 @@ def test_setup_class_error(venv):
     assert ms[1].params['details'].index("RRR") > 0
 
 
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_teardown_class_error(venv):
     output = run_directly(venv, 'teardown_class_error.py')
     ms = assert_service_messages(
@@ -210,6 +213,7 @@ def test_teardown_class_error(venv):
     assert ms[3].params['details'].index("RRR") > 0
 
 
+@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_teardown_module_error(venv):
     output = run_directly(venv, 'teardown_module_error.py')
     ms = assert_service_messages(
