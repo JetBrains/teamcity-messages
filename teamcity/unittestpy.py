@@ -3,6 +3,7 @@ import traceback
 import sys
 from unittest import TestResult
 import datetime
+import re
 
 from teamcity.messages import TeamcityServiceMessages
 
@@ -88,13 +89,24 @@ class TeamcityTestResult(TestResult):
         TestResult.addError(self, test, err)
 
         err = self.formatErr(err)
-        if self.getTestName(test) != self.test_name:
-            sys.stderr.write("INTERNAL ERROR: addError(%s) outside of test\n" % self.getTestName(test))
-            sys.stderr.write("Error: %s\n" % err)
+
+        if self._class_fullname(test) == "unittest.suite._ErrorHolder":
+            # This is a standalone error
+
+            test_name = test.id()
+            # patch setUpModule (__main__) -> __main__.setUpModule
+            test_name = re.sub(r'^(.*) \((.*)\)$', r'\2.\1', test_name)
+
+            self.messages.testStarted(test_name)
+            self.messages.testFailed(test_name, message='Failure', details=err)
+            self.messages.testFinished(test_name)
             return
 
-        self.messages.testFailed(self.getTestName(test),
-                                 message='Error', details=err)
+        if self.getTestName(test) != self.test_name:
+            sys.stderr.write("INTERNAL ERROR: addError(%s) outside of test %s\n" % (self.getTestName(test), self.test_name))
+            sys.stderr.write("Error: %s\n" % err)
+
+        self.messages.testFailed(self.getTestName(test), message='Error', details=err)
 
     def addFailure(self, test, err, *k):
         # workaround nose bug on python 3

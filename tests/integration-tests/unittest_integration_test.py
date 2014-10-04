@@ -195,6 +195,21 @@ def test_discovery_errors(venv):
     assert ms[1].params['details'].index("ImportError") > 0
 
 
+def test_setup_module_error(venv):
+    output = run_directly(venv, 'setup_module_error.py')
+
+    ms = parse_service_messages(output)
+    assert_service_messages(
+        ms,
+        [
+            ServiceMessage('testStarted', {'name': '__main__.setUpModule'}),
+            ServiceMessage('testFailed', {'name': '__main__.setUpModule', 'message': 'Failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.setUpModule'}),
+        ])
+
+    assert ms[1].params['details'].index("assert 1 == 0") > 0
+
+
 def run_directly(venv, file):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
