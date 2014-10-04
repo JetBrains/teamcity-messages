@@ -36,8 +36,21 @@ class TeamcityTestResult(TestResult):
             tb = traceback.format_exc()
             return "*FAILED TO GET TRACEBACK*: " + tb
 
+    def _class_fullname(self, o):
+        module = o.__class__.__module__
+        if module is None or module == str.__class__.__module__:
+            return o.__class__.__name__
+        return module + '.' + o.__class__.__name__
+
     def getTestName(self, test):
-        return test.shortDescription() or str(test)
+        if test.shortDescription():
+            test_name = test.shortDescription()
+        else:
+            test_id = test.id()
+            dot_in_id_pos = test_id.rfind('.')
+            test_name = test_id[dot_in_id_pos + 1:] if dot_in_id_pos > 0 else test_id
+        class_name = self._class_fullname(test)
+        return class_name + "." + test_name
 
     def addSuccess(self, test, *k):
         TestResult.addSuccess(self, test)

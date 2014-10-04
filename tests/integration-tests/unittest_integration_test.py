@@ -28,8 +28,8 @@ def test_nested_suits(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'runTest (__main__.TestXXX)'}),
-            ServiceMessage('testFinished', {'name': 'runTest (__main__.TestXXX)'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
         ])
 
 
@@ -52,9 +52,9 @@ def test_assert(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'runTest (__main__.TestXXX)'}),
-            ServiceMessage('testFailed', {'name': 'runTest (__main__.TestXXX)', 'message': 'Failure'}),
-            ServiceMessage('testFinished', {'name': 'runTest (__main__.TestXXX)'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Failure'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
         ])
 
     assert ms[1].params['details'].index("assert 1 == 0") > 0
@@ -67,9 +67,9 @@ def test_setup_error(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'runTest (__main__.TestXXX)'}),
-            ServiceMessage('testFailed', {'name': 'runTest (__main__.TestXXX)', 'message': 'Error'}),
-            ServiceMessage('testFinished', {'name': 'runTest (__main__.TestXXX)'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Error'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
         ])
 
     assert ms[1].params['details'].index("RRR") > 0
@@ -83,9 +83,9 @@ def test_teardown_error(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'runTest (__main__.TestXXX)'}),
-            ServiceMessage('testFailed', {'name': 'runTest (__main__.TestXXX)', 'message': 'Error'}),
-            ServiceMessage('testFinished', {'name': 'runTest (__main__.TestXXX)'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Error'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
         ])
 
     assert ms[1].params['details'].index("RRR") > 0
@@ -102,8 +102,8 @@ def test_discovery(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'runTest (testsimple.TestTeamcityMessages)'}),
-            ServiceMessage('testFinished', {'name': 'runTest (testsimple.TestTeamcityMessages)'}),
+            ServiceMessage('testStarted', {'name': 'testsimple.TestTeamcityMessages.runTest'}),
+            ServiceMessage('testFinished', {'name': 'testsimple.TestTeamcityMessages.runTest'}),
         ])
 
 
@@ -117,9 +117,9 @@ def test_discovery_errors(venv):
     assert_service_messages(
         ms,
         [
-            ServiceMessage('testStarted', {'name': 'testsimple (unittest.loader.ModuleImportFailure)'}),
-            ServiceMessage('testFailed', {'name': 'testsimple (unittest.loader.ModuleImportFailure)', 'message': 'Error'}),
-            ServiceMessage('testFinished', {'name': 'testsimple (unittest.loader.ModuleImportFailure)'}),
+            ServiceMessage('testStarted', {'name': 'unittest.loader.ModuleImportFailure.testsimple'}),
+            ServiceMessage('testFailed', {'name': 'unittest.loader.ModuleImportFailure.testsimple', 'message': 'Error'}),
+            ServiceMessage('testFinished', {'name': 'unittest.loader.ModuleImportFailure.testsimple'}),
         ])
 
     assert ms[1].params['details'].index("ImportError") > 0
