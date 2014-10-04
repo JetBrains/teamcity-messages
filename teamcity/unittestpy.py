@@ -102,11 +102,7 @@ class TeamcityTestResult(TestResult):
             self.messages.testFinished(test_name)
             return
 
-        if self.getTestName(test) != self.test_name:
-            sys.stderr.write("INTERNAL ERROR: addError(%s) outside of test %s\n" % (self.getTestName(test), self.test_name))
-            sys.stderr.write("Error: %s\n" % err)
-
-        self.messages.testFailed(self.getTestName(test), message='Error', details=err)
+        self.messages.testFailed(self.test_name, message='Error', details=err)
 
     def addFailure(self, test, err, *k):
         # workaround nose bug on python 3
@@ -116,13 +112,7 @@ class TeamcityTestResult(TestResult):
         TestResult.addFailure(self, test, err)
 
         err = self.formatErr(err)
-        if self.getTestName(test) != self.test_name:
-            sys.stderr.write("INTERNAL ERROR: addFailure(%s) outside of test\n" % self.getTestName(test))
-            sys.stderr.write("Error: %s\n" % err)
-            return
-
-        self.messages.testFailed(self.getTestName(test),
-                                 message='Failure', details=err)
+        self.messages.testFailed(self.test_name, message='Failure', details=err)
 
     def startTest(self, test):
         self.test_started_datetime = datetime.datetime.now()
@@ -131,9 +121,6 @@ class TeamcityTestResult(TestResult):
 
     def stopTest(self, test):
         time_diff = datetime.datetime.now() - self.test_started_datetime
-        if self.getTestName(test) != self.test_name:
-            sys.stderr.write(
-                "INTERNAL ERROR: stopTest(%s) after startTest(%s)" % (self.getTestName(test), self.test_name))
         self.messages.testFinished(self.test_name, time_diff)
         self.test_name = None
 
