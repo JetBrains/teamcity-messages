@@ -11,12 +11,6 @@ def factorial(n):
 
     >>> [factorial(n) for n in range(6)]
     [1, 1, 2, 6, 24, 120]
-    >>> [factorial(long(n)) for n in range(6)]
-    [1, 1, 2, 6, 24, 120]
-    >>> factorial(30)
-    265252859812191058636308480000000L
-    >>> factorial(30L)
-    265252859812191058636308480000000L
     >>> factorial(-1)
     Traceback (most recent call last):
         ...
@@ -27,8 +21,6 @@ def factorial(n):
     Traceback (most recent call last):
         ...
     ValueError: n must be exact integer
-    >>> factorial(30.0)
-    265252859812191058636308480000000L
 
     It must also not be ridiculously large:
     >>> factorial(1e100)
