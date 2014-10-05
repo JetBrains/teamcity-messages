@@ -34,6 +34,34 @@ def test_hierarchy(venv):
         ])
 
 
+def test_doctests(venv):
+    output = run(venv, 'doctests', options="--with-doctest")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'doctests'}),
+            ServiceMessage('testSuiteStarted', {'name': 'namespace1'}),
+            ServiceMessage('testSuiteStarted', {'name': 'd'}),
+            ServiceMessage('testStarted', {'name': 'multiply'}),
+            ServiceMessage('testFinished', {'name': 'multiply'}),
+            ServiceMessage('testSuiteFinished', {'name': 'd'}),
+            ServiceMessage('testSuiteFinished', {'name': 'namespace1'}),
+            ServiceMessage('testSuiteFinished', {'name': 'doctests'}),
+        ])
+
+
+def test_docstrings(venv):
+    output = run(venv, 'docstrings')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'testa'}),
+            ServiceMessage('testStarted', {'name': 'My cool test name'}),
+            ServiceMessage('testFinished', {'name': 'My cool test name'}),
+            ServiceMessage('testSuiteFinished', {'name': 'testa'}),
+        ])
+
+
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
     assert_service_messages(
@@ -101,12 +129,13 @@ def test_fail_output(venv):
     assert ms[3].params['details'].find('Output line 3') > 0
 
 
-def run(venv, file, clazz=None, test=None):
+def run(venv, file, clazz=None, test=None, options=""):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
     command = os.path.join(venv.bin, 'nosetests') + \
-              " -v " + os.path.join('tests', 'guinea-pigs', 'nose', file) + \
+              " -v " + options + " " + \
+              os.path.join('tests', 'guinea-pigs', 'nose', file) + \
               ((":" + clazz) if clazz else "") + \
               (('.' + test) if test else "")
     print("RUN: " + command)

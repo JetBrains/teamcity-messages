@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import inspect
+import sys
 
 from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestResult
@@ -23,8 +24,10 @@ class TeamcityReport(TeamcityTestResult):
         short_description = test.shortDescription()
         test_id = test.id()
 
-        if short_description and short_description != test_id:
-            return short_description
+        # Force test_id for nose doctests
+        if self._class_fullname(test) != "nose.plugins.doctests.DocTestCase":
+            if short_description and short_description != test_id:
+                return short_description
 
         return self._lastPart(test_id)
 
