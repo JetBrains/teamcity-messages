@@ -90,6 +90,24 @@ def test_deprecated(venv):
         ])
 
 
+def test_generators(venv):
+    output = run(venv, 'generators')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'testa'}),
+            ServiceMessage('testSuiteStarted', {'name': 'test_evens'}),
+            ServiceMessage('testStarted', {'name': 'test_evens(0, 0)'}),
+            ServiceMessage('testFinished', {'name': 'test_evens(0, 0)'}),
+            ServiceMessage('testStarted', {'name': 'test_evens(1, 3)'}),
+            ServiceMessage('testFinished', {'name': 'test_evens(1, 3)'}),
+            ServiceMessage('testStarted', {'name': 'test_evens(2, 6)'}),
+            ServiceMessage('testFinished', {'name': 'test_evens(2, 6)'}),
+            ServiceMessage('testSuiteFinished', {'name': 'test_evens'}),
+            ServiceMessage('testSuiteFinished', {'name': 'testa'}),
+        ])
+
+
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
     assert_service_messages(
