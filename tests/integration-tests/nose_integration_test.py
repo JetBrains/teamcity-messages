@@ -62,6 +62,21 @@ def test_docstrings(venv):
         ])
 
 
+def test_skip(venv):
+    # Note: skip reason is unavailable, see https://groups.google.com/forum/#!topic/nose-users/MnPwgZG8UbQ
+
+    output = run(venv, 'skiptest')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'testa'}),
+            ServiceMessage('testStarted', {'name': 'test_func'}),
+            ServiceMessage('testIgnored', {'name': 'test_func', 'message': 'Skipped'}),
+            ServiceMessage('testFinished', {'name': 'test_func'}),
+            ServiceMessage('testSuiteFinished', {'name': 'testa'}),
+        ])
+
+
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
     assert_service_messages(

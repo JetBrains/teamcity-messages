@@ -1,7 +1,6 @@
 # coding=utf-8
 import os
 import inspect
-import sys
 
 from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestResult
@@ -9,10 +8,12 @@ from teamcity.unittestpy import TeamcityTestResult
 
 class TeamcityReport(TeamcityTestResult):
     name = 'teamcity-report'
-    score = 2
+    score = 10000
 
     def __init__(self):
         super(TeamcityReport, self).__init__()
+
+        self.enabled = False
 
     def configure(self, options, conf):
         self.enabled = is_running_under_teamcity()

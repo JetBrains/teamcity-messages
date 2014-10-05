@@ -67,10 +67,10 @@ class TeamcityTestResult(TestResult):
 
         self.messages.testIgnored(self.test_name, message="Expected failure: " + err)
 
-    def addSkip(self, test, reason, *k):
+    def addSkip(self, test, reason="", *k):
         TestResult.addSkip(self, test, reason)
 
-        self.messages.testIgnored(self.test_name, message="Skipped: " + reason)
+        self.messages.testIgnored(self.test_name, message="Skipped" + ((": " + reason) if reason else ""))
 
     def addUnexpectedSuccess(self, test):
         TestResult.addUnexpectedSuccess(self, test)
