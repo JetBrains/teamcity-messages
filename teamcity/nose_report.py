@@ -32,6 +32,9 @@ class TeamcityReport(TeamcityTestResult):
 
         return self._lastPart(test_id)
 
+    def addDeprecated(self, test):
+        self.messages.testIgnored(self.test_name, message="Deprecated")
+
     def getCtxName(self, ctx):
         if inspect.ismodule(ctx):
             name = self._lastPart(ctx.__name__)

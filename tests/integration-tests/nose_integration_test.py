@@ -77,6 +77,19 @@ def test_skip(venv):
         ])
 
 
+def test_deprecated(venv):
+    output = run(venv, 'deprecatedtest')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'testa'}),
+            ServiceMessage('testStarted', {'name': 'test_func'}),
+            ServiceMessage('testIgnored', {'name': 'test_func', 'message': 'Deprecated'}),
+            ServiceMessage('testFinished', {'name': 'test_func'}),
+            ServiceMessage('testSuiteFinished', {'name': 'testa'}),
+        ])
+
+
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
     assert_service_messages(
