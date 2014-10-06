@@ -180,10 +180,10 @@ def run(venv, file, clazz=None, test=None, options=""):
     env['TEAMCITY_VERSION'] = "0.0.0"
 
     command = os.path.join(venv.bin, 'nosetests') + \
-              " -v " + options + " " + \
-              os.path.join('tests', 'guinea-pigs', 'nose', file) + \
-              ((":" + clazz) if clazz else "") + \
-              (('.' + test) if test else "")
+        " -v " + options + " " + \
+        os.path.join('tests', 'guinea-pigs', 'nose', file) + \
+        ((":" + clazz) if clazz else "") + \
+        (('.' + test) if test else "")
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
