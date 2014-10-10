@@ -9,6 +9,9 @@ class StreamStub(object):
     def write(self, msg):
         self.observed_output += msg
 
+    def flush(self):
+        pass
+
 fixed_date = datetime(2000, 11, 2, 10, 23, 1, 556789)
 
 
