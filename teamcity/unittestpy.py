@@ -68,7 +68,8 @@ class TeamcityTestResult(TestResult):
         self.messages.testIgnored(self.test_name, message="Expected failure: " + err)
 
     def addSkip(self, test, reason="", *k):
-        TestResult.addSkip(self, test, reason)
+        if sys.version_info >= (2, 7):
+            TestResult.addSkip(self, test, reason)
 
         self.messages.testIgnored(self.test_name, message="Skipped" + ((": " + reason) if reason else ""))
 
