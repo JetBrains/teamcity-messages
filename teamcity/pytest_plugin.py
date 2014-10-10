@@ -39,8 +39,7 @@ def pytest_unconfigure(config):
 
 class EchoTeamCityMessages(object):
     def __init__(self, ):
-        self.tw = py.io.TerminalWriter(py.std.sys.stdout)
-        self.teamcity = TeamcityServiceMessages(self.tw)
+        self.teamcity = TeamcityServiceMessages()
         self.currentSuite = None
 
     def format_names(self, name):
