@@ -18,7 +18,7 @@ def _is_string(obj):
 # Added *k to some methods to get compatibility with nosetests
 class TeamcityTestResult(TestResult):
     def __init__(self, stream=sys.stdout):
-        TestResult.__init__(self)
+        super(TeamcityTestResult, self).__init__()
 
         self.output = stream
         self.test_started_datetime = None
@@ -54,14 +54,14 @@ class TeamcityTestResult(TestResult):
         return class_name + "." + test_name
 
     def addSuccess(self, test, *k):
-        TestResult.addSuccess(self, test)
+        super(TeamcityTestResult, self).addSuccess(test)
 
     def addExpectedFailure(self, test, err):
         # workaround nose bug on python 3
         if _is_string(err[1]):
             err = (err[0], Exception(err[1]), err[2])
 
-        TestResult.addExpectedFailure(self, test, err)
+        super(TeamcityTestResult, self).addExpectedFailure(test, err)
 
         err = self.formatErr(err)
 
@@ -69,12 +69,12 @@ class TeamcityTestResult(TestResult):
 
     def addSkip(self, test, reason="", *k):
         if sys.version_info >= (2, 7):
-            TestResult.addSkip(self, test, reason)
+            super(TeamcityTestResult, self).addSkip(test, reason)
 
         self.messages.testIgnored(self.test_name, message="Skipped" + ((": " + reason) if reason else ""))
 
     def addUnexpectedSuccess(self, test):
-        TestResult.addUnexpectedSuccess(self, test)
+        super(TeamcityTestResult, self).addUnexpectedSuccess(test)
 
         self.messages.testFailed(self.test_name, message='Failure', details="Test should not succeed since it's marked with @unittest.expectedFailure")
 
@@ -83,7 +83,7 @@ class TeamcityTestResult(TestResult):
         if _is_string(err[1]):
             err = (err[0], Exception(err[1]), err[2])
 
-        TestResult.addError(self, test, err)
+        super(TeamcityTestResult, self).addError(test, err)
 
         err = self.formatErr(err)
 
@@ -106,7 +106,7 @@ class TeamcityTestResult(TestResult):
         if _is_string(err[1]):
             err = (err[0], Exception(err[1]), err[2])
 
-        TestResult.addFailure(self, test, err)
+        super(TeamcityTestResult, self).addFailure(test, err)
 
         err = self.formatErr(err)
         self.messages.testFailed(self.test_name, message='Failure', details=err)
