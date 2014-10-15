@@ -104,6 +104,7 @@ def _configure_pytest_coverage(config):
 
     setattr(cov_controller, 'summary', teamcity_print_summary)
 
+
 def pytest_unconfigure(config):
     teamcity_reporting = getattr(config, '_teamcityReporting', None)
     if teamcity_reporting:
@@ -118,15 +119,15 @@ class EchoTeamCityMessages(object):
 
     def format_names(self, name):
         if name.find("::") > 0:
-            file, testname = name.split("::", 1)
+            filename, testname = name.split("::", 1)
         else:
-            file, testname = name, "top_level"
+            filename, testname = name, "top_level"
 
         testname = testname.replace("::()::", ".")
         testname = testname.replace("::", ".")
         testname = testname.strip(".")
-        file = file.replace(".", "_").replace(os.sep, ".").replace("/", ".")
-        return file, testname
+        filename = filename.replace(".", "_").replace(os.sep, ".").replace("/", ".")
+        return filename, testname
 
     def pytest_runtest_logstart(self, nodeid, location):
         file, testname = self.format_names(nodeid)
@@ -141,7 +142,7 @@ class EchoTeamCityMessages(object):
         """
         :type report: _pytest.runner.TestReport
         """
-        file, testname = self.format_names(report.nodeid)
+        filename, testname = self.format_names(report.nodeid)
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
                 duration = timedelta(seconds=report.duration)
@@ -166,9 +167,9 @@ class EchoTeamCityMessages(object):
 
     def pytest_collectreport(self, report):
         if report.failed:
-            file, testname = self.format_names(report.nodeid)
+            filename, testname = self.format_names(report.nodeid)
 
-            name = file + "_collect"
+            name = filename + "_collect"
             self.teamcity.testStarted(name)
             self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
             self.teamcity.testFinished(name)
