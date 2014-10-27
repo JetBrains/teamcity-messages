@@ -66,6 +66,9 @@ class TeamcityServiceMessages(object):
     def buildStatisticTotalLines(self, totalLines):
         self.message('buildStatisticValue', key='CodeCoverageAbsLTotal', value=str(totalLines))
 
+    def buildStatisticLinesUncovered(self, linesUncovered):
+        self.message('buildStatisticValue', key='CodeCoverageAbsLUncovered', value=str(linesUncovered))
+
     def publishArtifacts(self, path):
         self._single_value_message('publishArtifacts', path)
 

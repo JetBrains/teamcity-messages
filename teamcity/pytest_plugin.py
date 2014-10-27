@@ -86,6 +86,7 @@ def _configure_pytest_coverage(config):
                 total_stmts = total.n_statements + (total.n_branches if self.branches else 0)
                 self.teamcity_messages.buildStatisticLinesCovered(covered)
                 self.teamcity_messages.buildStatisticTotalLines(total_stmts)
+                self.teamcity_messages.buildStatisticLinesUncovered(total_stmts - covered)
 
             return total.pc_covered
 
