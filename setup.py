@@ -71,5 +71,9 @@ Issue Tracker: https://github.com/JetBrains/teamcity-python/issues
         'pytest11': [
             'pytest-teamcity = teamcity.pytest_plugin',
         ],
+
+        'flake8.extension': [
+            'P999 = teamcity.flake8:Pep8MonkeyPatcher',
+        ]
     },
 )
