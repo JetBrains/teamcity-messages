@@ -35,30 +35,39 @@ class Pep8MonkeyPatcher(object):
         report._deferred_print.sort()
 
         messages = TeamcityServiceMessages()
-        messages.testSuiteStarted('pep8')
+
+        suite_name = 'pep8: %s' % report.filename
+        messages.testSuiteStarted(suite_name)
         for line_number, offset, code, text, doc in report._deferred_print:
-            test_name = '%(path)s:%(row)d:%(col)d' % {
+            position = '%(path)s:%(row)d:%(col)d' % {
                 'path': report.filename,
                 'row': report.line_offset + line_number,
                 'col': offset + 1,
             }
 
-            messages.testStarted(test_name)
+            error_message = '%s: %s' % (code, text)
+            test_name = '%s: %s' % (code, position)
 
-            messages.testFailed(test_name, '%s: %s' % (code, text))
+            messages.testStarted(test_name)
 
             if line_number > len(report.lines):
                 line = ''
             else:
                 line = report.lines[line_number - 1]
-            print(line.rstrip())
-            print(re.sub(r'\S', ' ', line[:offset]) + '^')
+
+            details = [
+                line.rstrip(),
+                re.sub(r'\S', ' ', line[:offset]) + '^',
+            ]
 
             if doc:
-                print('    ' + doc.strip())
+                details.append(doc.strip())
 
+            details = '\n'.join(details)
+
+            messages.testFailed(test_name, error_message, details)
             messages.testFinished(test_name)
-        messages.testSuiteFinished('pep8')
+        messages.testSuiteFinished(suite_name)
         return report.file_errors
 
     def run(self):
