@@ -39,6 +39,8 @@ def _configure_pytest_coverage(config):
         return
 
     cov_controller = cov_plugin.cov_controller
+    if not cov_controller:
+        return
 
     # shamelessly stolen from https://bitbucket.org/mou/coverage.py/raw/
     # 18e4dd6ff20c508e3c0f50321564d6004e911fc2/coverage/teamcity.py
