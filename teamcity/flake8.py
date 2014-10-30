@@ -58,6 +58,7 @@ class Pep8MonkeyPatcher(object):
                 print('    ' + doc.strip())
 
             messages.testFinished(test_name)
+        messages.testSuiteFinished('pep8')
         return report.file_errors
 
     def run(self):
