@@ -14,12 +14,9 @@ class Pep8MonkeyPatcher(object):
 
     @classmethod
     def add_options(cls, parser):
-        if is_running_under_teamcity():
-            cls._set_teamcity_options()
-        else:
-            parser.add_option('--teamcity', default=False,
-                              action='callback', callback=Pep8MonkeyPatcher.set_option_callback,
-                              help="Enable teamcity messages")
+        parser.add_option('--teamcity', default=False,
+                          action='callback', callback=Pep8MonkeyPatcher.set_option_callback,
+                          help="Enable teamcity messages")
 
     @staticmethod
     def set_option_callback(option, opt, value, parser):
