@@ -1,3 +1,17 @@
+Version 1.9 Thu Jan 08 2015
+
+  - Django support (Ralph Broenink, https://github.com/ralphje)
+  - Fix test hierarchies on nose and py.test
+  - py.test: report errors in setup and teardown
+  - py.test: report collect errors
+  - py.test: support xfail
+  - nose: support skipped tests
+  - unittest: support skip, expected failure and unexpected success
+  - Totally rewritten integration tests
+    * Thanks to Ralph Broenink (https://github.com/ralphje) and Leonid Bushuev (https://github.com/leo-from-spb)
+
+Version 1.8 Sat Feb 08 2014
+
   - extensive tests for nose integration (James Carpenter)
   - added timestamps to TeamCity service messages (James Carpenter)
 
