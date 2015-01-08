@@ -82,7 +82,7 @@ def test_coverage(venv):
 
     coverage_file = os.path.join(virtual_environments.get_vroot(), "coverage-temp.xml")
 
-    output = run(venv_with_coverage, 'coverage', options="--with-coverage --cover-tests --cover-xml --cover-xml-file=\"" + coverage_file + "\"")
+    output = run(venv_with_coverage, 'coverage', options="--with-coverage --cover-erase --cover-tests --cover-xml --cover-xml-file=\"" + coverage_file + "\"")
     assert_service_messages(
         output,
         [
