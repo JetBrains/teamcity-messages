@@ -9,13 +9,13 @@ import virtual_environments
 from service_messages import parse_service_messages, ServiceMessage, assert_service_messages
 
 
-@pytest.fixture(scope='module', params=["latest"])  # '1.2.1', '1.3.0',
+@pytest.fixture(scope='module', params=["nose"])  # '1.2.1', '1.3.0',
 def venv(request):
     """
     Prepares a virtual environment for nose.
     :rtype : virtual_environments.VirtualEnvDescription
     """
-    return virtual_environments.prepare_virtualenv("nose", request.param)
+    return virtual_environments.prepare_virtualenv([request.param])
 
 
 def test_hierarchy(venv):

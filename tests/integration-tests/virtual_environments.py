@@ -10,27 +10,28 @@ _windows = os.name == 'nt'
 
 
 class VirtualEnvDescription:
-    def __init__(self, home_dir, bin_dir, python, pip):
+    def __init__(self, home_dir, bin_dir, python, pip, packages):
         self.home = home_dir
         self.bin = bin_dir
         self.python = python
         self.pip = pip
+        self.packages = packages
 
 
-def prepare_virtualenv(package_name=None, package_version=None):
+def prepare_virtualenv(packages=()):
     """
     Prepares a virtual environment.
     :rtype : VirtualEnvDescription
     """
     vroot = get_vroot()
-    env_key = get_env_key(package_name, package_version)
+    env_key = get_env_key(packages)
     vdir = os.path.join(vroot, env_key)
 
     vbin = os.path.join(vdir, ('bin', 'Scripts')[_windows])
     exe_suffix = ("", ".exe")[_windows]
     vpython = os.path.join(vbin, 'python' + exe_suffix)
     vpip = os.path.join(vbin, 'pip' + exe_suffix)
-    venv_description = VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip)
+    venv_description = VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip, packages=packages)
 
     env = get_clean_system_environment()
     env['PIP_DOWNLOAD_CACHE'] = os.path.abspath(os.path.join(vroot, "pip-download-cache"))
@@ -43,11 +44,7 @@ def prepare_virtualenv(package_name=None, package_version=None):
 
         virtualenv.create_environment(vdir)
 
-        if package_name is not None:
-            if package_version is None or package_version == "latest":
-                package_spec = package_name
-            else:
-                package_spec = package_name + "==" + package_version
+        for package_spec in packages:
             subprocess.call([vpip, "install", package_spec], env=env)
 
         open(done_flag_file, 'a').close()
@@ -57,13 +54,11 @@ def prepare_virtualenv(package_name=None, package_version=None):
     return venv_description
 
 
-def get_env_key(package_name, package_version):
+def get_env_key(packages):
     key = "%d.%d.%d" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
     key += "-" + os.name
-    if package_name is not None:
-        key += "-" + package_name
-    if package_version is not None:
-        key += "-" + package_version
+    for package in packages:
+        key += "-" + package.replace('=', '-')
     return key
 
 

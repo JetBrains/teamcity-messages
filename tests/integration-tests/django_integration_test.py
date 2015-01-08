@@ -11,11 +11,11 @@ import virtual_environments
 from service_messages import parse_service_messages, ServiceMessage
 
 
-@pytest.fixture(scope='module', params=["1.6", "1.7", "latest"])
+@pytest.fixture(scope='module', params=["django==1.6", "django==1.7", "django"])
 def venv(request):
     if request.param != "1.6" and sys.version_info < (2, 7):
         pytest.skip("Django 1.7+ requires Python 2.7+")
-    return virtual_environments.prepare_virtualenv("django", request.param)
+    return virtual_environments.prepare_virtualenv([request.param])
 
 
 def test_smoke(venv):
