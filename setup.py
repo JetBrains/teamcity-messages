@@ -35,6 +35,11 @@ under TeamCity and prints usual diagnostics without it.
 **nose**: test status reporting enabled automatically under TeamCity build.
 
 **py.test**: run with --teamcity command line option.
+
+**django**: For Django 1.6+: Use the Teamcity runner instead of the default DiscoverRunner by changing the following setting in your settings.py:
+TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
+If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
+
 """,
     license='Apache 2.0',
     keywords='unittest teamcity test nose py.test pytest jetbrains',
