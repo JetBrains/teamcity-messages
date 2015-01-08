@@ -9,7 +9,7 @@ import virtual_environments
 from service_messages import parse_service_messages, ServiceMessage, assert_service_messages
 
 
-@pytest.fixture(scope='module', params=["nose"])  # '1.2.1', '1.3.0',
+@pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.0"])
 def venv(request):
     """
     Prepares a virtual environment for nose.
