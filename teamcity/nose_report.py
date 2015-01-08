@@ -24,13 +24,14 @@ class TeamcityReport(TeamcityTestResult):
     def getTestName(self, test):
         short_description = test.shortDescription()
         test_id = test.id()
+        test_id_last_part = self._lastPart(test_id)
 
         # Force test_id for nose doctests
         if self._class_fullname(test) != "nose.plugins.doctests.DocTestCase":
             if short_description and short_description != test_id:
-                return short_description
+                return "%s (%s)" % (test_id_last_part, short_description)
 
-        return self._lastPart(test_id)
+        return test_id_last_part
 
     def addDeprecated(self, test):
         self.messages.testIgnored(self.test_name, message="Deprecated")

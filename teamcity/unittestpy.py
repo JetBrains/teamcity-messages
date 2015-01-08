@@ -44,14 +44,13 @@ class TeamcityTestResult(TestResult):
         return module + '.' + o.__class__.__name__
 
     def getTestName(self, test):
-        class_name = self._class_fullname(test)
-        if class_name == "doctest.DocTestCase":
-            return test.id()
-        elif test.shortDescription():
-            test_name = test.shortDescription()
-        else:
-            test_name = test.id().split('.')[-1]
-        return class_name + "." + test_name
+        # Force test_id for doctests
+        if self._class_fullname(test) != "doctest.DocTestCase":
+            desc = test.shortDescription()
+            if desc:
+                return "%s (%s)" % (test.id(), desc)
+
+        return test.id()
 
     def addSuccess(self, test, *k):
         super(TeamcityTestResult, self).addSuccess(test)

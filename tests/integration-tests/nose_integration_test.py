@@ -56,8 +56,8 @@ def test_docstrings(venv):
         output,
         [
             ServiceMessage('testSuiteStarted', {'name': 'testa'}),
-            ServiceMessage('testStarted', {'name': 'My cool test name'}),
-            ServiceMessage('testFinished', {'name': 'My cool test name'}),
+            ServiceMessage('testStarted', {'name': 'test_func (My cool test name)'}),
+            ServiceMessage('testFinished', {'name': 'test_func (My cool test name)'}),
             ServiceMessage('testSuiteFinished', {'name': 'testa'}),
         ])
 

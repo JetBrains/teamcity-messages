@@ -23,8 +23,8 @@ def test_smoke(venv):
 
     ms = parse_service_messages(output)
 
-    assert ms[0] >= ServiceMessage('testStarted', {'name': 'test_smoke.SmokeTestCase.XXX identity'})
-    assert ms[1] >= ServiceMessage('testFinished', {'name': 'test_smoke.SmokeTestCase.XXX identity'})
+    assert ms[0] >= ServiceMessage('testStarted', {'name': 'test_smoke.SmokeTestCase.test_xxx (XXX identity)'})
+    assert ms[1] >= ServiceMessage('testFinished', {'name': 'test_smoke.SmokeTestCase.test_xxx (XXX identity)'})
 
 
 def run(venv):

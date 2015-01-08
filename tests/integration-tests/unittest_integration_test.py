@@ -36,8 +36,8 @@ def test_docstring(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.A test'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.A test'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest (A test)'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest (A test)'}),
         ])
 
 
