@@ -42,43 +42,37 @@ class EchoTeamCityMessages(object):
         self.teamcity = TeamcityServiceMessages()
         self.currentSuite = None
 
-    def format_names(self, name):
-        if name.find("::") > 0:
-            file, testname = name.split("::", 1)
+    def format_test_id(self, nodeid):
+        if nodeid.find("::") > 0:
+            file, testname = nodeid.split("::", 1)
         else:
-            file, testname = name, "top_level"
+            file, testname = nodeid, "top_level"
 
         testname = testname.replace("::()::", ".")
         testname = testname.replace("::", ".")
         testname = testname.strip(".")
         file = file.replace(".", "_").replace(os.sep, ".").replace("/", ".")
-        return file, testname
+        return file + "." + testname
 
     def pytest_runtest_logstart(self, nodeid, location):
-        file, testname = self.format_names(nodeid)
-        if not file == self.currentSuite:
-            if self.currentSuite:
-                self.teamcity.testSuiteFinished(self.currentSuite)
-            self.currentSuite = file
-            self.teamcity.testSuiteStarted(self.currentSuite)
-        self.teamcity.testStarted(testname)
+        self.teamcity.testStarted(self.format_test_id(nodeid))
 
     def pytest_runtest_logreport(self, report):
         """
         :type report: _pytest.runner.TestReport
         """
-        file, testname = self.format_names(report.nodeid)
+        test_id = self.format_test_id(report.nodeid)
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
                 duration = timedelta(seconds=report.duration)
-                self.teamcity.testFinished(testname, testDuration=duration)
+                self.teamcity.testFinished(test_id, testDuration=duration)
         elif report.failed:
             if report.when in ("call", "setup"):
-                self.teamcity.testFailed(testname, str(report.location), str(report.longrepr))
+                self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr))
                 duration = timedelta(seconds=report.duration)
-                self.teamcity.testFinished(testname, testDuration=duration)  # report finished after the failure
+                self.teamcity.testFinished(test_id, testDuration=duration)  # report finished after the failure
             elif report.when == "teardown":
-                name = testname + "_teardown"
+                name = test_id + "_teardown"
                 self.teamcity.testStarted(name)
                 self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
                 self.teamcity.testFinished(name)
@@ -87,17 +81,16 @@ class EchoTeamCityMessages(object):
                 reason = report.longrepr[2]
             else:
                 reason = str(report.longrepr)
-            self.teamcity.testIgnored(testname, reason)
-            self.teamcity.testFinished(testname)  # report finished after the skip
+            self.teamcity.testIgnored(test_id, reason)
+            self.teamcity.testFinished(test_id)  # report finished after the skip
 
     def pytest_collectreport(self, report):
         if report.failed:
-            file, testname = self.format_names(report.nodeid)
+            test_id = self.format_test_id(report.nodeid) + "_collect"
 
-            name = file + "_collect"
-            self.teamcity.testStarted(name)
-            self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
-            self.teamcity.testFinished(name)
+            self.teamcity.testStarted(test_id)
+            self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr))
+            self.teamcity.testFinished(test_id)
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
         if self.currentSuite:

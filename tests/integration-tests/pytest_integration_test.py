@@ -25,10 +25,8 @@ def test_hierarchy(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'}),
-            ServiceMessage('testStarted', {'name': 'TestSmoke.test_smoke'}),
-            ServiceMessage('testFinished', {'name': 'TestSmoke.test_smoke'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py.TestSmoke.test_smoke'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py.TestSmoke.test_smoke'}),
         ])
 
 
@@ -37,12 +35,10 @@ def test_custom_test_items(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'}),
-            ServiceMessage('testStarted', {'name': 'line1'}),
-            ServiceMessage('testFinished', {'name': 'line1'}),
-            ServiceMessage('testStarted', {'name': 'line2'}),
-            ServiceMessage('testFinished', {'name': 'line2'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line1'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line1'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line2'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line2'}),
         ])
 
 
@@ -51,18 +47,16 @@ def test_runtime_error(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py'}),
-            ServiceMessage('testStarted', {'name': 'test_exception'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_exception'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'test_exception'}),
-            ServiceMessage('testStarted', {'name': 'test_error'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_exception'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_error'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'test_error'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_error'}),
         ])
-    assert ms[2].params["details"].find("raise Exception") > 0
-    assert ms[2].params["details"].find("oops") > 0
-    assert ms[5].params["details"].find("assert 0 != 0") > 0
+    assert ms[1].params["details"].find("raise Exception") > 0
+    assert ms[1].params["details"].find("oops") > 0
+    assert ms[4].params["details"].find("assert 0 != 0") > 0
 
 
 def test_unittest_error(venv):
@@ -70,18 +64,16 @@ def test_unittest_error(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py'}),
-            ServiceMessage('testStarted', {'name': 'TestErrorFail.test_error'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py.TestErrorFail.test_error'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'TestErrorFail.test_error'}),
-            ServiceMessage('testStarted', {'name': 'TestErrorFail.test_fail'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py.TestErrorFail.test_error'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py.TestErrorFail.test_fail'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'TestErrorFail.test_fail'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test_py.TestErrorFail.test_fail'}),
         ])
-    assert ms[2].params["details"].find("raise Exception") > 0
-    assert ms[2].params["details"].find("oops") > 0
-    assert ms[5].params["details"].find("AssertionError") > 0
+    assert ms[1].params["details"].find("raise Exception") > 0
+    assert ms[1].params["details"].find("oops") > 0
+    assert ms[4].params["details"].find("AssertionError") > 0
 
 
 def test_fixture_error(venv):
@@ -89,19 +81,17 @@ def test_fixture_error(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py'}),
-            ServiceMessage('testStarted', {'name': 'test_error1'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error1'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'test_error1'}),
-            ServiceMessage('testStarted', {'name': 'test_error2'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error1'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error2'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'test_error2'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error2'}),
         ])
-    assert ms[2].params["details"].find("raise Exception") > 0
-    assert ms[2].params["details"].find("oops") > 0
-    assert ms[5].params["details"].find("raise Exception") > 0
-    assert ms[5].params["details"].find("oops") > 0
+    assert ms[1].params["details"].find("raise Exception") > 0
+    assert ms[1].params["details"].find("oops") > 0
+    assert ms[4].params["details"].find("raise Exception") > 0
+    assert ms[4].params["details"].find("oops") > 0
 
 
 def test_teardown_error(venv):
@@ -109,16 +99,14 @@ def test_teardown_error(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py'}),
-            ServiceMessage('testStarted', {'name': 'test_error'}),
-            ServiceMessage('testFinished', {'name': 'test_error'}),
-            ServiceMessage('testStarted', {'name': 'test_error_teardown'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error_teardown'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'test_error_teardown'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error_teardown'}),
         ])
-    assert ms[4].params["details"].find("raise Exception") > 0
-    assert ms[4].params["details"].find("teardown oops") > 0
+    assert ms[3].params["details"].find("raise Exception") > 0
+    assert ms[3].params["details"].find("teardown oops") > 0
 
 
 def test_module_error(venv):
@@ -126,9 +114,9 @@ def test_module_error(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.module_error_test_py_collect'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.module_error_test_py.top_level_collect'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.module_error_test_py_collect'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.module_error_test_py.top_level_collect'}),
         ])
     assert ms[1].params["details"].find("raise Exception") > 0
     assert ms[1].params["details"].find("module oops") > 0
@@ -139,11 +127,9 @@ def test_skip(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.skip_test_py'}),
-            ServiceMessage('testStarted', {'name': 'test_function'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.skip_test_py.test_function'}),
             ServiceMessage('testIgnored', {'message': 'Skipped: skip reason'}),
-            ServiceMessage('testFinished', {'name': 'test_function'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.skip_test_py'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.skip_test_py.test_function'}),
         ])
 
 
@@ -152,16 +138,14 @@ def test_xfail(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': 'tests.guinea-pigs.pytest.xfail_test_py'}),
-            ServiceMessage('testStarted', {'name': 'test_unexpectedly_passing'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.xfail_test_py.test_unexpectedly_passing'}),
             ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'test_unexpectedly_passing'}),
-            ServiceMessage('testStarted', {'name': 'test_expected_to_fail'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test_py.test_unexpectedly_passing'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.xfail_test_py.test_expected_to_fail'}),
             ServiceMessage('testIgnored', {}),
-            ServiceMessage('testFinished', {'name': 'test_expected_to_fail'}),
-            ServiceMessage('testSuiteFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test_py'}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test_py.test_expected_to_fail'}),
         ])
-    assert ms[5].params["message"].find("xfail reason") > 0
+    assert ms[4].params["message"].find("xfail reason") > 0
 
 
 def run(venv, file, test=None):
