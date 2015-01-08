@@ -2,6 +2,7 @@
 .idea/misc.xml
 .idea/dictionaries/*
 .pip-download-cache
+.coverage
 env
 build
 dist

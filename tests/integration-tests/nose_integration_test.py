@@ -77,6 +77,28 @@ def test_skip(venv):
         ])
 
 
+def test_coverage(venv):
+    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ["coverage==3.7.1"])
+
+    coverage_file = os.path.join(virtual_environments.get_vroot(), "coverage-temp.xml")
+
+    output = run(venv_with_coverage, 'coverage', options="--with-coverage --cover-tests --cover-xml --cover-xml-file=\"" + coverage_file + "\"")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'testa'}),
+            ServiceMessage('testStarted', {'name': 'test_mycode'}),
+            ServiceMessage('testFinished', {'name': 'test_mycode'}),
+            ServiceMessage('testSuiteFinished', {'name': 'testa'}),
+        ])
+
+    f = open(coverage_file, "rb")
+    content = str(f.read())
+    f.close()
+
+    assert content.find('<line hits="1" number="2"/>') > 0
+
+
 def test_deprecated(venv):
     output = run(venv, 'deprecatedtest')
     assert_service_messages(
