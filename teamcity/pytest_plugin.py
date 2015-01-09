@@ -35,7 +35,7 @@ def pytest_unconfigure(config):
         del config._teamcityReporting
         config.pluginmanager.unregister(teamcity_reporting)
 
-
+### The following code relies on py.test nodeid uniqueness
 class EchoTeamCityMessages(object):
     def __init__(self, ):
         self.teamcity = TeamcityServiceMessages()
