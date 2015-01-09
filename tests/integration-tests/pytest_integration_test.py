@@ -166,7 +166,7 @@ def test_chunked_output(venv):
         [ServiceMessage('testStdErr', {'out': full_line})] * 20 +
         [ServiceMessage('testStdErr', {'out': leftovers})] +
         [ServiceMessage('testFinished', {})]
-        )
+    )
 
 
 def test_output_no_capture(venv):
