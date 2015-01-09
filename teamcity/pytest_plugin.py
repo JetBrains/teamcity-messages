@@ -58,6 +58,9 @@ class EchoTeamCityMessages(object):
         self.currentSuite = None
         self.test_start_reported_mark = set()
 
+        self.max_reported_output_size = 1 * 1024 * 1024
+        self.reported_output_chunk_size = 50000
+
     def format_test_id(self, nodeid):
         test_id = nodeid
 
@@ -84,15 +87,31 @@ class EchoTeamCityMessages(object):
                 return True
         return False
 
+    def limit_output(self, data):
+        return data[:self.max_reported_output_size]
+
+    def split_output(self, data):
+        while len(data) > 0:
+            if len(data) <= self.reported_output_chunk_size:
+                yield data
+                data = ''
+            else:
+                yield data[:self.reported_output_chunk_size]
+                data = data[self.reported_output_chunk_size:]
+
     def report_test_output(self, report, test_id, when):
         for (secname, data) in report.sections:
             if when not in secname:
                 continue
+            if not data:
+                continue
 
             if 'stdout' in secname:
-                self.teamcity.testStdOut(test_id, out=data, flowId=test_id)
+                for chunk in self.split_output(self.limit_output(data)):
+                    self.teamcity.testStdOut(test_id, out=chunk, flowId=test_id)
             elif 'stderr' in secname:
-                self.teamcity.testStdErr(test_id, out=data, flowId=test_id)
+                for chunk in self.split_output(self.limit_output(data)):
+                    self.teamcity.testStdErr(test_id, out=chunk, flowId=test_id)
 
     def pytest_runtest_logreport(self, report):
         """

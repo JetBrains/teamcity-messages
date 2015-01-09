@@ -152,6 +152,23 @@ def test_output(venv):
         ])
 
 
+def test_chunked_output(venv):
+    output = run(venv, 'chunked_output_test.py')
+
+    full_line = 'x' * 50000
+    leftovers = 'x' * (1024 * 1024 - 50000 * 20)
+
+    assert_service_messages(
+        output,
+        [ServiceMessage('testStarted', {})] +
+        [ServiceMessage('testStdOut', {'out': full_line})] * 20 +
+        [ServiceMessage('testStdOut', {'out': leftovers})] +
+        [ServiceMessage('testStdErr', {'out': full_line})] * 20 +
+        [ServiceMessage('testStdErr', {'out': leftovers})] +
+        [ServiceMessage('testFinished', {})]
+        )
+
+
 def test_output_no_capture(venv):
     output = run(venv, 'output_test.py', options="-s")
 

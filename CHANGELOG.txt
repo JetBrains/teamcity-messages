@@ -1,3 +1,4 @@
+  - py.test: limit captured stdout/stderr by 1M per test and send it to TeamCity in chunks of 50K chars
   - py.test: automatically enable TeamCity reporting under TeamCity build
   - py.test: analyze capture flag of capture plugin and set captureStandardOutput parameter of testStarted accordingly
   - py.test: report setup failures as a separate test
