@@ -40,6 +40,7 @@ class EchoTeamCityMessages(object):
     def __init__(self, ):
         self.teamcity = TeamcityServiceMessages()
         self.currentSuite = None
+        self.test_start_reported_mark = set()
 
     def format_test_id(self, nodeid):
         if nodeid.find("::") > 0:
@@ -54,8 +55,12 @@ class EchoTeamCityMessages(object):
         return file + "." + testname
 
     def pytest_runtest_logstart(self, nodeid, location):
-        test_id = self.format_test_id(nodeid)
-        self.teamcity.testStarted(test_id, flowId=test_id)
+        self.ensure_test_start_reported(self.format_test_id(nodeid))
+
+    def ensure_test_start_reported(self, test_id):
+        if test_id not in self.test_start_reported_mark:
+            self.teamcity.testStarted(test_id, flowId=test_id)
+            self.test_start_reported_mark.add(test_id)
 
     def pytest_runtest_logreport(self, report):
         """
@@ -65,9 +70,11 @@ class EchoTeamCityMessages(object):
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
                 duration = timedelta(seconds=report.duration)
+                self.ensure_test_start_reported(test_id)
                 self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
         elif report.failed:
             if report.when in ("call", "setup"):
+                self.ensure_test_start_reported(test_id)
                 self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
                 duration = timedelta(seconds=report.duration)
                 self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)  # report finished after the failure
@@ -81,6 +88,7 @@ class EchoTeamCityMessages(object):
                 reason = report.longrepr[2]
             else:
                 reason = str(report.longrepr)
+            self.ensure_test_start_reported(test_id)
             self.teamcity.testIgnored(test_id, reason, flowId=test_id)
             self.teamcity.testFinished(test_id, flowId=test_id)  # report finished after the skip
 
