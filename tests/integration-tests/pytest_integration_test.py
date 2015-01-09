@@ -135,6 +135,26 @@ def test_skip(venv):
         ])
 
 
+def test_params(venv):
+    output = run(venv, 'params_test.py')
+
+    test1_name = 'tests.guinea-pigs.pytest.params_test_py.test_eval[3+5-8|]'
+    test2_name = "tests.guinea-pigs.pytest.params_test_py.test_eval[|'1_5|' + |'2|'-1_52|]"
+    test3_name = 'tests.guinea-pigs.pytest.params_test_py.test_eval[6*9-42|]'
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test1_name}),
+            ServiceMessage('testFinished', {'name': test1_name}),
+            ServiceMessage('testStarted', {'name': test2_name}),
+            ServiceMessage('testFinished', {'name': test2_name}),
+            ServiceMessage('testStarted', {'name': test3_name}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': test3_name}),
+        ])
+
+
 def test_xfail(venv):
     output = run(venv, 'xfail_test.py')
     ms = assert_service_messages(
