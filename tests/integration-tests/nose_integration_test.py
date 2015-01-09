@@ -147,7 +147,7 @@ def test_fail_with_msg(venv):
 def test_fail_output(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_output')
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_output'
-    ms = assert_service_messages(
+    assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
@@ -155,6 +155,23 @@ def test_fail_output(venv):
             ServiceMessage('testFailed', {'name': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
+
+
+def test_fail_big_output(venv):
+    output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_big_output')
+    test_name = 'nose-guinea-pig.GuineaPig.test_fail_big_output'
+
+    full_line = 'x' * 50000
+    leftovers = 'x' * (1024 * 1024 - 50000 * 20)
+
+    assert_service_messages(
+        output,
+        [ServiceMessage('testStarted', {})] +
+        [ServiceMessage('testStdOut', {'out': full_line})] * 20 +
+        [ServiceMessage('testStdOut', {'out': leftovers})] +
+        [ServiceMessage('testFailed', {'name': test_name})] +
+        [ServiceMessage('testFinished', {})]
+    )
 
 
 def run(venv, file, clazz=None, test=None, options=""):

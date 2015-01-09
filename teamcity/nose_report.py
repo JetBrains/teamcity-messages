@@ -4,7 +4,7 @@ import sys
 
 from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestResult
-from teamcity.common import is_string
+from teamcity.common import is_string, split_output, limit_output
 
 
 # from nose.util.ln
@@ -55,7 +55,9 @@ class TeamcityReport(TeamcityTestResult):
         if start_index >= 0 and end_index >= 0:
             captured_output = details[start_index + len(_captured_output_start_marker):end_index]
             details = details[:start_index] + details[end_index + len(_captured_output_end_marker):]
-            self.messages.testStdOut(test_id, captured_output)
+
+            for chunk in split_output(limit_output(captured_output)):
+                self.messages.testStdOut(test_id, chunk)
 
         self.messages.testFailed(test_id, message=fail_type, details=details)
 
