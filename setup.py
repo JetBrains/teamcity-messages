@@ -24,7 +24,7 @@ setup(
     description='Send test results ' +
                 'to TeamCity continuous integration server from unittest, nose and py.test',
     long_description="""This packages provides unittest, nose and py.test
-addons for sending test result messages
+plugins for sending test result messages
 to TeamCity continuous integration server
 http://www.jetbrains.com/teamcity/
 
@@ -32,9 +32,7 @@ http://www.jetbrains.com/teamcity/
 write your own test file which reports messages
 under TeamCity and prints usual diagnostics without it.
 
-**nose**: test status reporting enabled automatically under TeamCity build.
-
-**py.test**: run with --teamcity command line option.
+**nose**, **py.test** : test status reporting enabled automatically under TeamCity build (when teamcity-messages package is installed)
 
 **django**: For Django 1.6+: Use the Teamcity runner instead of the default DiscoverRunner by changing the following setting in your settings.py:
 TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"

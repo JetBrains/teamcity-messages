@@ -15,16 +15,27 @@ import os
 from datetime import timedelta
 
 from teamcity.messages import TeamcityServiceMessages
+from teamcity import is_running_under_teamcity
 
 
 def pytest_addoption(parser):
     group = parser.getgroup("terminal reporting", "reporting", after="general")
+
     group._addoption('--teamcity', action="count",
-                     dest="teamcity", default=0, help="output teamcity messages")
+                     dest="teamcity", default=0, help="force output of JetBrains TeamCity service messages")
+    group._addoption('--no-teamcity', action="count",
+                     dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
 
 
 def pytest_configure(config):
-    if config.option.teamcity >= 1:
+    if config.option.no_teamcity >= 1:
+        enabled = False
+    elif config.option.teamcity >= 1:
+        enabled = True
+    else:
+        enabled = is_running_under_teamcity()
+
+    if enabled:
         output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
         config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled)
         config.pluginmanager.register(config._teamcityReporting)

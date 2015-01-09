@@ -96,6 +96,11 @@ def _parse_one_service_message(s):
     return ServiceMessage(name, params)
 
 
+def has_service_messages(messages_string):
+    messages = parse_service_messages(messages_string)
+    return len(messages) > 0
+
+
 def assert_service_messages(actual_messages_string, expected_messages):
     actual_messages = parse_service_messages(actual_messages_string)
 

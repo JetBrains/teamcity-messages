@@ -1,7 +1,9 @@
+  - py.test: automatically enable TeamCity reporting under TeamCity build
   - py.test: analyze capture flag of capture plugin and set captureStandardOutput parameter of testStarted accordingly
   - py.test: report setup failures as a separate test
   - py.test: report captured stdout/stderr (Aron Curzon, https://github.com/curzona) https://github.com/JetBrains/teamcity-python/issues/12
   - py.test: fix parallel tests reporting https://github.com/JetBrains/teamcity-python/issues/11
+
 Version 1.9 Thu Jan 08 2015
 
   - Django support (Ralph Broenink, https://github.com/ralphje)

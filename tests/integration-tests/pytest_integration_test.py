@@ -8,7 +8,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import parse_service_messages, ServiceMessage, assert_service_messages
+from service_messages import ServiceMessage, assert_service_messages, has_service_messages
 
 
 @pytest.fixture(scope='module', params=["pytest"])
@@ -29,6 +29,26 @@ def test_hierarchy(venv):
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
+
+
+def test_force_tc_reporting(venv):
+    output = run(venv, 'namespace', options="--teamcity", set_tc_version=False)
+    assert has_service_messages(output)
+
+
+def test_tc_reporting(venv):
+    output = run(venv, 'namespace')
+    assert has_service_messages(output)
+
+
+def test_no_reporting_when_no_teamcity(venv):
+    output = run(venv, 'namespace', set_tc_version=False)
+    assert not has_service_messages(output)
+
+
+def test_reporting_disabled(venv):
+    output = run(venv, 'namespace', set_tc_version=True, options="--no-teamcity")
+    assert not has_service_messages(output)
 
 
 def test_custom_test_items(venv):
@@ -227,12 +247,14 @@ def test_xfail(venv):
     assert ms[4].params["message"].find("xfail reason") > 0
 
 
-def run(venv, file, test=None, options=''):
+def run(venv, file, test=None, options='', set_tc_version=True):
     env = virtual_environments.get_clean_system_environment()
-    env['TEAMCITY_VERSION'] = "0.0.0"
+
+    if set_tc_version:
+        env['TEAMCITY_VERSION'] = "0.0.0"
 
     test_suffix = ("::" + test) if test is not None else ""
-    command = os.path.join(venv.bin, 'py.test') + " --teamcity " + options + " " + \
+    command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'pytest', file) + test_suffix
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
