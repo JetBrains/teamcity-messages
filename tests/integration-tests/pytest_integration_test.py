@@ -114,10 +114,10 @@ def test_output(venv):
     test_setup = test_name + '_setup'
     test_teardown = test_name + '_teardown'
 
-    ms = assert_service_messages(
+    assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'false'}),
             ServiceMessage('testStarted', {'name': test_setup, 'flowId': test_setup}),
             ServiceMessage('testStdOut', {'name': test_setup, 'flowId': test_setup, 'out': 'setup stdout|n'}),
             ServiceMessage('testStdErr', {'name': test_setup, 'flowId': test_setup, 'out': 'setup stderr|n'}),
@@ -130,6 +130,25 @@ def test_output(venv):
             ServiceMessage('testStdErr', {'name': test_teardown, 'flowId': test_teardown, 'out': 'teardown stderr|n'}),
             ServiceMessage('testFinished', {'name': test_teardown, 'flowId': test_teardown}),
         ])
+
+
+def test_output_no_capture(venv):
+    output = run(venv, 'output_test.py', options="-s")
+
+    test_name = 'tests.guinea-pigs.pytest.output_test_py.test_out'
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'true'}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+    assert "setup stderr" in output
+    assert "setup stdout" in output
+    assert "test stderr" in output
+    assert "test stdout" in output
+    assert "teardown stderr" in output
+    assert "teardown stdout" in output
 
 
 def test_teardown_error(venv):
@@ -208,12 +227,12 @@ def test_xfail(venv):
     assert ms[4].params["message"].find("xfail reason") > 0
 
 
-def run(venv, file, test=None):
+def run(venv, file, test=None, options=''):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
     test_suffix = ("::" + test) if test is not None else ""
-    command = os.path.join(venv.bin, 'py.test') + " --teamcity " + \
+    command = os.path.join(venv.bin, 'py.test') + " --teamcity " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'pytest', file) + test_suffix
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)

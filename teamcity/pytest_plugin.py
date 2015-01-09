@@ -25,7 +25,8 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     if config.option.teamcity >= 1:
-        config._teamcityReporting = EchoTeamCityMessages()
+        output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
+        config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled)
         config.pluginmanager.register(config._teamcityReporting)
 
 
@@ -39,7 +40,9 @@ def pytest_unconfigure(config):
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, ):
+    def __init__(self, output_capture_enabled):
+        self.output_capture_enabled = output_capture_enabled
+
         self.teamcity = TeamcityServiceMessages()
         self.currentSuite = None
         self.test_start_reported_mark = set()
@@ -61,7 +64,7 @@ class EchoTeamCityMessages(object):
 
     def ensure_test_start_reported(self, test_id):
         if test_id not in self.test_start_reported_mark:
-            self.teamcity.testStarted(test_id, flowId=test_id)
+            self.teamcity.testStarted(test_id, flowId=test_id, captureStandardOutput='false' if self.output_capture_enabled else 'true')
             self.test_start_reported_mark.add(test_id)
 
     def report_has_output(self, report):
