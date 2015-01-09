@@ -60,20 +60,24 @@ class TeamcityTestResult(TestResult):
         super(TeamcityTestResult, self).addExpectedFailure(test, err)
 
         err = self.convert_error_to_string(err)
+        test_id = self.get_test_id(test)
 
-        self.messages.testIgnored(self.get_test_id(test), message="Expected failure: " + err)
+        self.messages.testIgnored(test_id, message="Expected failure: " + err, flowId=test_id)
 
     def addSkip(self, test, reason="", *k):
         if sys.version_info >= (2, 7):
             super(TeamcityTestResult, self).addSkip(test, reason)
 
-        self.messages.testIgnored(self.get_test_id(test), message="Skipped" + ((": " + reason) if reason else ""))
+        test_id = self.get_test_id(test)
+        self.messages.testIgnored(test_id, message="Skipped" + ((": " + reason) if reason else ""), flowId=test_id)
 
     def addUnexpectedSuccess(self, test):
         super(TeamcityTestResult, self).addUnexpectedSuccess(test)
 
-        self.messages.testFailed(self.get_test_id(test), message='Failure',
-                                 details="Test should not succeed since it's marked with @unittest.expectedFailure")
+        test_id = self.get_test_id(test)
+        self.messages.testFailed(test_id, message='Failure',
+                                 details="Test should not succeed since it's marked with @unittest.expectedFailure",
+                                 flowId=test_id)
 
     def addError(self, test, err, *k):
         super(TeamcityTestResult, self).addError(test, err)
@@ -85,9 +89,9 @@ class TeamcityTestResult(TestResult):
             # patch setUpModule (__main__) -> __main__.setUpModule
             test_name = re.sub(r'^(.*) \((.*)\)$', r'\2.\1', test_name)
 
-            self.messages.testStarted(test_name)
+            self.messages.testStarted(test_name, flowId=test_name)
             self.report_fail(test_name, 'Failure', err)
-            self.messages.testFinished(test_name)
+            self.messages.testFinished(test_name, flowId=test_name)
 
             return
 
@@ -99,19 +103,20 @@ class TeamcityTestResult(TestResult):
         self.report_fail(test, 'Failure', err)
 
     def report_fail(self, test, fail_type, err):
-        self.messages.testFailed(self.get_test_id(test), message=fail_type, details=self.convert_error_to_string(err))
+        test_id = self.get_test_id(test)
+        self.messages.testFailed(test_id, message=fail_type, details=self.convert_error_to_string(err), flowId=test_id)
 
     def startTest(self, test):
         test_id = self.get_test_id(test)
 
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
-        self.messages.testStarted(test_id, captureStandardOutput='true')
+        self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
 
     def stopTest(self, test):
         test_id = self.get_test_id(test)
 
         time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
-        self.messages.testFinished(test_id, time_diff)
+        self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)
 
 
 class TeamcityTestRunner(object):

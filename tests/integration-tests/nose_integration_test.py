@@ -20,31 +20,34 @@ def venv(request):
 
 def test_hierarchy(venv):
     output = run(venv, 'hierarchy')
+    test_name = 'namespace1.namespace2.testmyzz.test'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'namespace1.namespace2.testmyzz.test', 'captureStandardOutput': 'true'}),
-            ServiceMessage('testFinished', {'name': 'namespace1.namespace2.testmyzz.test'}),
+            ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'true', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
 def test_doctests(venv):
     output = run(venv, 'doctests', options="--with-doctest")
+    test_name = 'doctests.namespace1.d.multiply'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'doctests.namespace1.d.multiply'}),
-            ServiceMessage('testFinished', {'name': 'doctests.namespace1.d.multiply'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
 def test_docstrings(venv):
     output = run(venv, 'docstrings')
+    test_name = 'testa.test_func (My cool test name)'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'testa.test_func (My cool test name)'}),
-            ServiceMessage('testFinished', {'name': 'testa.test_func (My cool test name)'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
@@ -52,12 +55,13 @@ def test_skip(venv):
     # Note: skip reason is unavailable, see https://groups.google.com/forum/#!topic/nose-users/MnPwgZG8UbQ
 
     output = run(venv, 'skiptest')
+    test_name = 'testa.test_func'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'testa.test_func'}),
-            ServiceMessage('testIgnored', {'name': 'testa.test_func', 'message': 'Skipped'}),
-            ServiceMessage('testFinished', {'name': 'testa.test_func'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
@@ -83,12 +87,13 @@ def test_coverage(venv):
 
 def test_deprecated(venv):
     output = run(venv, 'deprecatedtest')
+    test_name = 'testa.test_func'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'testa.test_func'}),
-            ServiceMessage('testIgnored', {'name': 'testa.test_func', 'message': 'Deprecated'}),
-            ServiceMessage('testFinished', {'name': 'testa.test_func'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': 'Deprecated', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
@@ -123,7 +128,7 @@ def test_fail(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
 
@@ -138,7 +143,7 @@ def test_fail_with_msg(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[1].params['details'].find("Bitte keine Werbung") > 0
@@ -150,10 +155,10 @@ def test_fail_output(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n'}),
-            ServiceMessage('testFailed', {'name': test_name}),
-            ServiceMessage('testFinished', {'name': test_name}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n', 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
@@ -167,9 +172,9 @@ def test_fail_big_output(venv):
     assert_service_messages(
         output,
         [ServiceMessage('testStarted', {})] +
-        [ServiceMessage('testStdOut', {'out': full_line})] * 20 +
-        [ServiceMessage('testStdOut', {'out': leftovers})] +
-        [ServiceMessage('testFailed', {'name': test_name})] +
+        [ServiceMessage('testStdOut', {'out': full_line, 'flowId': test_name})] * 20 +
+        [ServiceMessage('testStdOut', {'out': leftovers, 'flowId': test_name})] +
+        [ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name})] +
         [ServiceMessage('testFinished', {})]
     )
 

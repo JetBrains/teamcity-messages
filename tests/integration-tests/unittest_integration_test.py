@@ -23,32 +23,35 @@ def venv(request):
 
 def test_nested_suits(venv):
     output = run_directly(venv, 'nested_suits.py')
+    test_name = '__main__.TestXXX.runTest'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest', 'captureStandardOutput': 'true'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'true', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
         ])
 
 
 def test_docstring(venv):
     output = run_directly(venv, 'docstring.py')
+    test_name = '__main__.TestXXX.runTest (A test)'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest (A test)'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest (A test)'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
 def test_assert(venv):
     output = run_directly(venv, 'assert.py')
+    test_name = '__main__.TestXXX.runTest'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
-            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Failure'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index("assert 1 == 0") > 0
@@ -56,12 +59,13 @@ def test_assert(venv):
 
 def test_fail(venv):
     output = run_directly(venv, 'fail_test.py')
+    test_name = '__main__.TestXXX.runTest'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
-            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Failure'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index('fail("Grr")') > 0
@@ -69,12 +73,13 @@ def test_fail(venv):
 
 def test_setup_error(venv):
     output = run_directly(venv, 'setup_error.py')
+    test_name = '__main__.TestXXX.runTest'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
-            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Error'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Error', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index("RRR") > 0
@@ -83,12 +88,13 @@ def test_setup_error(venv):
 
 def test_teardown_error(venv):
     output = run_directly(venv, 'teardown_error.py')
+    test_name = '__main__.TestXXX.runTest'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
-            ServiceMessage('testFailed', {'name': '__main__.TestXXX.runTest', 'message': 'Error'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Error', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index("RRR") > 0
@@ -97,35 +103,38 @@ def test_teardown_error(venv):
 
 def test_doctests(venv):
     output = run_directly(venv, 'doctests.py')
+    test_name = '__main__.factorial'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.factorial'}),
-            ServiceMessage('testFinished', {'name': '__main__.factorial'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="skip requires Python 2.7+")
 def test_skip(venv):
     output = run_directly(venv, 'skip_test.py')
+    test_name = '__main__.TestSkip.test_skip_me'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_skip_me'}),
-            ServiceMessage('testIgnored', {'name': '__main__.TestSkip.test_skip_me', 'message': 'Skipped: testing skipping'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_skip_me'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped: testing skipping', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="expectedFailure requires Python 2.7+")
 def test_expected_failure(venv):
     output = run_directly(venv, 'expected_failure.py')
+    test_name = '__main__.TestSkip.test_expected_failure'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_expected_failure'}),
-            ServiceMessage('testIgnored', {'name': '__main__.TestSkip.test_expected_failure'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_expected_failure'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
     assert ms[1].params['message'].find("Expected failure") == 0
     assert ms[1].params['message'].find("this should happen unfortunately") > 0
@@ -134,13 +143,15 @@ def test_expected_failure(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="unexpected_success requires Python 2.7+")
 def test_unexpected_success(venv):
     output = run_directly(venv, 'unexpected_success.py')
+    test_name = '__main__.TestSkip.test_unexpected_success'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_unexpected_success'}),
-            ServiceMessage('testFailed', {'name': '__main__.TestSkip.test_unexpected_success',
-                                          'details': "Test should not succeed since it|'s marked with @unittest.expectedFailure"}),
-            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_unexpected_success'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name,
+                                          'details': "Test should not succeed since it|'s marked with @unittest.expectedFailure",
+                                          'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
@@ -158,12 +169,13 @@ def test_discovery(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="unittest discovery requires Python 2.7+")
 def test_discovery_errors(venv):
     output = run_directly(venv, 'discovery_errors.py')
+    test_name = 'unittest.loader.ModuleImportFailure.testsimple'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'unittest.loader.ModuleImportFailure.testsimple'}),
-            ServiceMessage('testFailed', {'name': 'unittest.loader.ModuleImportFailure.testsimple', 'message': 'Error'}),
-            ServiceMessage('testFinished', {'name': 'unittest.loader.ModuleImportFailure.testsimple'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Error', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index("ImportError") > 0
@@ -172,12 +184,13 @@ def test_discovery_errors(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_setup_module_error(venv):
     output = run_directly(venv, 'setup_module_error.py')
+    test_name = '__main__.setUpModule'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.setUpModule'}),
-            ServiceMessage('testFailed', {'name': '__main__.setUpModule', 'message': 'Failure'}),
-            ServiceMessage('testFinished', {'name': '__main__.setUpModule'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index("assert 1 == 0") > 0
@@ -186,12 +199,13 @@ def test_setup_module_error(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_setup_class_error(venv):
     output = run_directly(venv, 'setup_class_error.py')
+    test_name = '__main__.TestXXX.setUpClass'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.setUpClass'}),
-            ServiceMessage('testFailed', {'name': '__main__.TestXXX.setUpClass', 'message': 'Failure'}),
-            ServiceMessage('testFinished', {'name': '__main__.TestXXX.setUpClass'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     assert ms[1].params['details'].index("RRR") > 0
@@ -216,14 +230,15 @@ def test_teardown_class_error(venv):
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
 def test_teardown_module_error(venv):
     output = run_directly(venv, 'teardown_module_error.py')
+    teardown_test_name = '__main__.tearDownModule'
     ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.test_ok'}),
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.test_ok'}),
-            ServiceMessage('testStarted', {'name': '__main__.tearDownModule'}),
-            ServiceMessage('testFailed', {'name': '__main__.tearDownModule', 'message': 'Failure'}),
-            ServiceMessage('testFinished', {'name': '__main__.tearDownModule'}),
+            ServiceMessage('testStarted', {'name': teardown_test_name, 'flowId': teardown_test_name}),
+            ServiceMessage('testFailed', {'name': teardown_test_name, 'message': 'Failure', 'flowId': teardown_test_name}),
+            ServiceMessage('testFinished', {'name': teardown_test_name, 'flowId': teardown_test_name}),
         ])
 
     assert ms[3].params['details'].index("assert 1 == 0") > 0

@@ -1,6 +1,5 @@
 # coding=utf-8
 import os
-import sys
 
 from teamcity import is_running_under_teamcity
 from teamcity.unittestpy import TeamcityTestResult
@@ -57,16 +56,16 @@ class TeamcityReport(TeamcityTestResult):
             details = details[:start_index] + details[end_index + len(_captured_output_end_marker):]
 
             for chunk in split_output(limit_output(captured_output)):
-                self.messages.testStdOut(test_id, chunk)
+                self.messages.testStdOut(test_id, chunk, flowId=test_id)
 
-        self.messages.testFailed(test_id, message=fail_type, details=details)
+        self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
     def is_doctest_class_name(self, fqn):
         return super(TeamcityReport, self).is_doctest_class_name(fqn) or fqn == "nose.plugins.doctests.DocTestCase"
 
     def addDeprecated(self, test):
         test_id = self.get_test_id(test)
-        self.messages.testIgnored(test_id, message="Deprecated")
+        self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
 
     def _lastPart(self, name):
         nameParts = name.split('.')
