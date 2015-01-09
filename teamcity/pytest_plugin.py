@@ -7,14 +7,15 @@ Plug-in for py.test for reporting to TeamCity server
 Report results to TeamCity during test execution for immediate reporting
     when using TeamCity.
 
-This should be installed as a py.test plugin and is enabled by running
-py.test with a --teamcity command line option.
+This should be installed as a py.test plugin and will be automatically enabled by running
+tests under TeamCity build.
 """
 
 import os
 from datetime import timedelta
 
 from teamcity.messages import TeamcityServiceMessages
+from teamcity.common import limit_output, split_output
 from teamcity import is_running_under_teamcity
 
 
@@ -87,18 +88,6 @@ class EchoTeamCityMessages(object):
                 return True
         return False
 
-    def limit_output(self, data):
-        return data[:self.max_reported_output_size]
-
-    def split_output(self, data):
-        while len(data) > 0:
-            if len(data) <= self.reported_output_chunk_size:
-                yield data
-                data = ''
-            else:
-                yield data[:self.reported_output_chunk_size]
-                data = data[self.reported_output_chunk_size:]
-
     def report_test_output(self, report, test_id, when):
         for (secname, data) in report.sections:
             if when not in secname:
@@ -107,10 +96,10 @@ class EchoTeamCityMessages(object):
                 continue
 
             if 'stdout' in secname:
-                for chunk in self.split_output(self.limit_output(data)):
+                for chunk in split_output(limit_output(data)):
                     self.teamcity.testStdOut(test_id, out=chunk, flowId=test_id)
             elif 'stderr' in secname:
-                for chunk in self.split_output(self.limit_output(data)):
+                for chunk in split_output(limit_output(data)):
                     self.teamcity.testStdErr(test_id, out=chunk, flowId=test_id)
 
     def pytest_runtest_logreport(self, report):
