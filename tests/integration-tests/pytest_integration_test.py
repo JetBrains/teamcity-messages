@@ -97,14 +97,15 @@ def test_fixture_error(venv):
 
 def test_teardown_error(venv):
     output = run(venv, 'teardown_error_test.py')
+    teardown_test_id = 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error_teardown'
     ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error'}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error'}),
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error_teardown'}),
-            ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test_py.test_error_teardown'}),
+            ServiceMessage('testStarted', {'name': teardown_test_id, 'flowId': teardown_test_id}),
+            ServiceMessage('testFailed', {'flowId': teardown_test_id}),
+            ServiceMessage('testFinished', {'name': teardown_test_id, 'flowId': teardown_test_id}),
         ])
     assert ms[3].params["details"].find("raise Exception") > 0
     assert ms[3].params["details"].find("teardown oops") > 0

@@ -92,10 +92,10 @@ class EchoTeamCityMessages(object):
                 duration = timedelta(seconds=report.duration)
                 self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)  # report finished after the failure
             elif report.when == "teardown":
-                name = test_id + "_teardown"
-                self.teamcity.testStarted(name, flowId=test_id)
-                self.teamcity.testFailed(name, str(report.location), str(report.longrepr), flowId=test_id)
-                self.teamcity.testFinished(name, flowId=test_id)
+                teardown_test_id = test_id + "_teardown"
+                self.teamcity.testStarted(teardown_test_id, flowId=teardown_test_id)
+                self.teamcity.testFailed(teardown_test_id, str(report.location), str(report.longrepr), flowId=teardown_test_id)
+                self.teamcity.testFinished(teardown_test_id, flowId=teardown_test_id)
         elif report.skipped:
             if type(report.longrepr) is tuple and len(report.longrepr) == 3:
                 reason = report.longrepr[2]
