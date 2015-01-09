@@ -1,5 +1,5 @@
-TeamCity plugin for unittest
-============================
+Python Unit Test Reporting to TeamCity
+======================================
 
 This packages provides unittest, nose and py.test addons for sending test result messages to TeamCity continuous integration server http://www.jetbrains.com/teamcity/
 
