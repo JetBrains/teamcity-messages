@@ -21,12 +21,11 @@ class TeamcityTestResult(TestResult):
         super(TeamcityTestResult, self).__init__()
 
         self.output = stream
-        self.test_started_datetime = None
-        self.test_name = None
+        self.test_started_datetime_map = {}
 
-        self.createMessages()
+        self.create_messages()
 
-    def createMessages(self):
+    def create_messages(self):
         self.messages = TeamcityServiceMessages(self.output)
 
     def formatErr(self, err):
@@ -43,11 +42,14 @@ class TeamcityTestResult(TestResult):
             return o.__class__.__name__
         return module + '.' + o.__class__.__name__
 
-    def getTestName(self, test):
+    def is_doctest_class_name(self, fqn):
+        return fqn == "doctest.DocTestCase"
+
+    def get_test_id(self, test):
         # Force test_id for doctests
-        if self._class_fullname(test) != "doctest.DocTestCase":
+        if not self.is_doctest_class_name(self._class_fullname(test)):
             desc = test.shortDescription()
-            if desc:
+            if desc and desc != test.id():
                 return "%s (%s)" % (test.id(), desc)
 
         return test.id()
@@ -64,18 +66,19 @@ class TeamcityTestResult(TestResult):
 
         err = self.formatErr(err)
 
-        self.messages.testIgnored(self.test_name, message="Expected failure: " + err)
+        self.messages.testIgnored(self.get_test_id(test), message="Expected failure: " + err)
 
     def addSkip(self, test, reason="", *k):
         if sys.version_info >= (2, 7):
             super(TeamcityTestResult, self).addSkip(test, reason)
 
-        self.messages.testIgnored(self.test_name, message="Skipped" + ((": " + reason) if reason else ""))
+        self.messages.testIgnored(self.get_test_id(test), message="Skipped" + ((": " + reason) if reason else ""))
 
     def addUnexpectedSuccess(self, test):
         super(TeamcityTestResult, self).addUnexpectedSuccess(test)
 
-        self.messages.testFailed(self.test_name, message='Failure', details="Test should not succeed since it's marked with @unittest.expectedFailure")
+        self.messages.testFailed(self.get_test_id(test), message='Failure',
+                                 details="Test should not succeed since it's marked with @unittest.expectedFailure")
 
     def addError(self, test, err, *k):
         # workaround nose bug on python 3
@@ -98,7 +101,7 @@ class TeamcityTestResult(TestResult):
             self.messages.testFinished(test_name)
             return
 
-        self.messages.testFailed(self.test_name, message='Error', details=err)
+        self.messages.testFailed(self.get_test_id(test), message='Error', details=err)
 
     def addFailure(self, test, err, *k):
         # workaround nose bug on python 3
@@ -108,17 +111,19 @@ class TeamcityTestResult(TestResult):
         super(TeamcityTestResult, self).addFailure(test, err)
 
         err = self.formatErr(err)
-        self.messages.testFailed(self.test_name, message='Failure', details=err)
+        self.messages.testFailed(self.get_test_id(test), message='Failure', details=err)
 
     def startTest(self, test):
-        self.test_started_datetime = datetime.datetime.now()
-        self.test_name = self.getTestName(test)
-        self.messages.testStarted(self.test_name)
+        test_id = self.get_test_id(test)
+
+        self.test_started_datetime_map[test_id] = datetime.datetime.now()
+        self.messages.testStarted(test_id)
 
     def stopTest(self, test):
-        time_diff = datetime.datetime.now() - self.test_started_datetime
-        self.messages.testFinished(self.test_name, time_diff)
-        self.test_name = None
+        test_id = self.get_test_id(test)
+
+        time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
+        self.messages.testFinished(test_id, time_diff)
 
 
 class TeamcityTestRunner(object):

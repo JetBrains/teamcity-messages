@@ -21,27 +21,12 @@ class TeamcityReport(TeamcityTestResult):
     def options(self, parser, env=os.environ):
         pass
 
-    def getTestName(self, test):
-        short_description = test.shortDescription()
-        test_id = test.id()
-        test_id_last_part = self._lastPart(test_id)
-
-        # Force test_id for nose doctests
-        if self._class_fullname(test) != "nose.plugins.doctests.DocTestCase":
-            if short_description and short_description != test_id:
-                return "%s (%s)" % (test_id_last_part, short_description)
-
-        return test_id_last_part
+    def is_doctest_class_name(self, fqn):
+        return super(TeamcityReport, self).is_doctest_class_name(fqn) or fqn == "nose.plugins.doctests.DocTestCase"
 
     def addDeprecated(self, test):
-        self.messages.testIgnored(self.test_name, message="Deprecated")
-
-    def getCtxName(self, ctx):
-        if inspect.ismodule(ctx):
-            name = self._lastPart(ctx.__name__)
-        else:
-            name = ctx.__name__ if hasattr(ctx, "__name__") else str(ctx)
-        return name
+        test_id = self.get_test_id(test)
+        self.messages.testIgnored(test_id, message="Deprecated")
 
     def _lastPart(self, name):
         nameParts = name.split('.')
@@ -49,7 +34,7 @@ class TeamcityReport(TeamcityTestResult):
 
     def setOutputStream(self, stream):
         self.output = stream
-        self.createMessages()
+        self.create_messages()
 
         class dummy:
             def write(self, *arg):
@@ -63,9 +48,3 @@ class TeamcityReport(TeamcityTestResult):
 
         d = dummy()
         return d
-
-    def startContext(self, ctx):
-        self.messages.testSuiteStarted(self.getCtxName(ctx))
-
-    def stopContext(self, ctx):
-        self.messages.testSuiteFinished(self.getCtxName(ctx))
