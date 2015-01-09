@@ -102,8 +102,8 @@ def assert_service_messages(actual_messages_string, expected_messages):
     try:
         if len(actual_messages) != len(expected_messages):
             raise AssertionError("Expected {0} services messages, but got {1}".format(len(expected_messages), len(actual_messages)))
-        for actual, expected in zip(actual_messages, expected_messages):
-            assert actual >= expected
+        for index, (actual, expected) in enumerate(zip(actual_messages, expected_messages)):
+            assert actual >= expected, "Expected\n%s, but got\n%s\n at index %d" % (pprint.pformat(expected), pprint.pformat(actual), index)
     except AssertionError as e:
         print("Actual:\n" + pprint.pformat(actual_messages) + "\n")
         print("Expected:\n" + pprint.pformat(expected_messages) + "\n")
