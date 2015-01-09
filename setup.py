@@ -38,6 +38,7 @@ under TeamCity and prints usual diagnostics without it.
 TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
 If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
 
+ChangeLog: https://github.com/JetBrains/teamcity-python/blob/master/CHANGELOG.txt
 """,
     license='Apache 2.0',
     keywords='unittest teamcity test nose py.test pytest jetbrains',
