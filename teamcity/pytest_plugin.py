@@ -35,7 +35,9 @@ def pytest_unconfigure(config):
         del config._teamcityReporting
         config.pluginmanager.unregister(teamcity_reporting)
 
-### The following code relies on py.test nodeid uniqueness
+# The following code relies on py.test nodeid uniqueness
+
+
 class EchoTeamCityMessages(object):
     def __init__(self, ):
         self.teamcity = TeamcityServiceMessages()
@@ -43,16 +45,16 @@ class EchoTeamCityMessages(object):
         self.test_start_reported_mark = set()
 
     def format_test_id(self, nodeid):
-        if nodeid.find("::") > 0:
-            file, testname = nodeid.split("::", 1)
-        else:
-            file, testname = nodeid, "top_level"
+        test_id = nodeid
 
-        testname = testname.replace("::()::", ".")
-        testname = testname.replace("::", ".")
-        testname = testname.strip(".")
-        file = file.replace(".", "_").replace(os.sep, ".").replace("/", ".")
-        return file + "." + testname
+        if test_id.find("::") < 0:
+            test_id += "::top_level"
+
+        test_id = test_id.replace("::()::", "::")
+
+        test_id = test_id.replace(".", "_").replace(os.sep, ".").replace("/", ".").replace('::', '.')
+
+        return test_id
 
     def pytest_runtest_logstart(self, nodeid, location):
         self.ensure_test_start_reported(self.format_test_id(nodeid))
