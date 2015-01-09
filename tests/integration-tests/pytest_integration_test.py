@@ -22,11 +22,12 @@ def venv(request):
 
 def test_hierarchy(venv):
     output = run(venv, 'namespace')
+    test_name = 'tests.guinea-pigs.pytest.namespace.pig_test_py.TestSmoke.test_smoke'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py.TestSmoke.test_smoke'}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.namespace.pig_test_py.TestSmoke.test_smoke'}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
 
@@ -48,7 +49,7 @@ def test_runtime_error(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_exception'}),
-            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFailed', {'flowId': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_exception'}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_exception'}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test_py.test_error'}),
             ServiceMessage('testFailed', {}),
@@ -124,12 +125,13 @@ def test_module_error(venv):
 
 def test_skip(venv):
     output = run(venv, 'skip_test.py')
+    test_name = 'tests.guinea-pigs.pytest.skip_test_py.test_function'
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.skip_test_py.test_function'}),
-            ServiceMessage('testIgnored', {'message': 'Skipped: skip reason'}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.skip_test_py.test_function'}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testIgnored', {'message': 'Skipped: skip reason', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
         ])
 
 

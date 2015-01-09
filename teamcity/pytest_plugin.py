@@ -11,7 +11,6 @@ This should be installed as a py.test plugin and is enabled by running
 py.test with a --teamcity command line option.
 """
 
-import py
 import os
 from datetime import timedelta
 
@@ -55,7 +54,8 @@ class EchoTeamCityMessages(object):
         return file + "." + testname
 
     def pytest_runtest_logstart(self, nodeid, location):
-        self.teamcity.testStarted(self.format_test_id(nodeid))
+        test_id = self.format_test_id(nodeid)
+        self.teamcity.testStarted(test_id, flowId=test_id)
 
     def pytest_runtest_logreport(self, report):
         """
@@ -65,32 +65,32 @@ class EchoTeamCityMessages(object):
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
                 duration = timedelta(seconds=report.duration)
-                self.teamcity.testFinished(test_id, testDuration=duration)
+                self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
         elif report.failed:
             if report.when in ("call", "setup"):
-                self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr))
+                self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
                 duration = timedelta(seconds=report.duration)
-                self.teamcity.testFinished(test_id, testDuration=duration)  # report finished after the failure
+                self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)  # report finished after the failure
             elif report.when == "teardown":
                 name = test_id + "_teardown"
-                self.teamcity.testStarted(name)
-                self.teamcity.testFailed(name, str(report.location), str(report.longrepr))
-                self.teamcity.testFinished(name)
+                self.teamcity.testStarted(name, flowId=test_id)
+                self.teamcity.testFailed(name, str(report.location), str(report.longrepr), flowId=test_id)
+                self.teamcity.testFinished(name, flowId=test_id)
         elif report.skipped:
             if type(report.longrepr) is tuple and len(report.longrepr) == 3:
                 reason = report.longrepr[2]
             else:
                 reason = str(report.longrepr)
-            self.teamcity.testIgnored(test_id, reason)
-            self.teamcity.testFinished(test_id)  # report finished after the skip
+            self.teamcity.testIgnored(test_id, reason, flowId=test_id)
+            self.teamcity.testFinished(test_id, flowId=test_id)  # report finished after the skip
 
     def pytest_collectreport(self, report):
         if report.failed:
             test_id = self.format_test_id(report.nodeid) + "_collect"
 
-            self.teamcity.testStarted(test_id)
-            self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr))
-            self.teamcity.testFinished(test_id)
+            self.teamcity.testStarted(test_id, flowId=test_id)
+            self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
+            self.teamcity.testFinished(test_id, flowId=test_id)
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
         if self.currentSuite:
