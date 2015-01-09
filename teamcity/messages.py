@@ -29,39 +29,38 @@ class TeamcityServiceMessages(object):
     def _single_value_message(self, messageName, value):
         self.output.write("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
 
-    def testSuiteStarted(self, suiteName):
-        self.message('testSuiteStarted', name=suiteName)
+    def testSuiteStarted(self, suiteName, flowId=None):
+        self.message('testSuiteStarted', name=suiteName, flowId=flowId)
 
-    def testSuiteFinished(self, suiteName):
-        self.message('testSuiteFinished', name=suiteName)
+    def testSuiteFinished(self, suiteName, flowId=None):
+        self.message('testSuiteFinished', name=suiteName, flowId=flowId)
 
-    def testStarted(self, testName, captureStandardOutput=None):
-        self.message('testStarted', name=testName, captureStandardOutput=captureStandardOutput)
+    def testStarted(self, testName, captureStandardOutput=None, flowId=None):
+        self.message('testStarted', name=testName, captureStandardOutput=captureStandardOutput, flowId=flowId)
 
-    def testFinished(self, testName, testDuration=None):
+    def testFinished(self, testName, testDuration=None, flowId=None):
         if testDuration is not None:
             duration_ms = testDuration.days * 86400000 + \
                 testDuration.seconds * 1000 + \
                 int(testDuration.microseconds / 1000)
-            self.message('testFinished', name=testName, duration=str(duration_ms))
+            self.message('testFinished', name=testName, duration=str(duration_ms), flowId=flowId)
         else:
-            self.message('testFinished', name=testName)
+            self.message('testFinished', name=testName, flowId=flowId)
 
-    def testIgnored(self, testName, message=''):
-        self.message('testIgnored', name=testName, message=message)
+    def testIgnored(self, testName, message='', flowId=None):
+        self.message('testIgnored', name=testName, message=message, flowId=flowId)
 
-    def testFailed(self, testName, message='', details=''):
-        self.message('testFailed', name=testName,
-                     message=message, details=details)
+    def testFailed(self, testName, message='', details='', flowId=None):
+        self.message('testFailed', name=testName, message=message, details=details, flowId=flowId)
 
-    def testStdOut(self, testName, out):
-        self.message('testStdOut', name=testName, out=out)
+    def testStdOut(self, testName, out, flowId=None):
+        self.message('testStdOut', name=testName, out=out, flowId=flowId)
 
-    def testStdErr(self, testName, out):
-        self.message('testStdErr', name=testName, out=out)
+    def testStdErr(self, testName, out, flowId=None):
+        self.message('testStdErr', name=testName, out=out, flowId=flowId)
 
-    def publishArtifacts(self, path):
-        self._single_value_message('publishArtifacts', path)
+    def publishArtifacts(self, path, flowId=None):
+        self._single_value_message('publishArtifacts', path, flowId=flowId)
 
-    def customMessage(self, text, status, errorDetails=''):
-        self.message('message', text=text, status=status, errorDetails=errorDetails)
+    def customMessage(self, text, status, errorDetails='', flowId=None):
+        self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
