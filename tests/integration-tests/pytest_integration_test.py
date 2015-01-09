@@ -79,20 +79,57 @@ def test_unittest_error(venv):
 
 def test_fixture_error(venv):
     output = run(venv, 'fixture_error_test.py')
+
+    test1_name = 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error1'
+    test1_setup = test1_name + '_setup'
+    test2_name = 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error2'
+    test2_setup = test2_name + '_setup'
+
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error1'}),
-            ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error1'}),
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error2'}),
-            ServiceMessage('testFailed', {}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.fixture_error_test_py.test_error2'}),
+            ServiceMessage('testStarted', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testStarted', {'name': test1_setup}),
+            ServiceMessage('testFailed', {'name': test1_setup, 'flowId': test1_setup}),
+            ServiceMessage('testFinished', {'name': test1_setup}),
+            ServiceMessage('testFailed', {'name': test1_name, 'message': 'test setup failed, see ' + test1_setup + ' test failure', 'flowId': test1_name}),
+            ServiceMessage('testFinished', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testStarted', {'name': test2_name, 'flowId': test2_name}),
+            ServiceMessage('testStarted', {'name': test2_setup, 'flowId': test2_setup}),
+            ServiceMessage('testFailed', {'name': test2_setup, 'flowId': test2_setup}),
+            ServiceMessage('testFinished', {'name': test2_setup, 'flowId': test2_setup}),
+            ServiceMessage('testFailed', {'name': test2_name, 'flowId': test2_name, 'message': 'test setup failed, see ' + test2_setup + ' test failure'}),
+            ServiceMessage('testFinished', {'name': test2_name, 'flowId': test2_name}),
         ])
-    assert ms[1].params["details"].find("raise Exception") > 0
-    assert ms[1].params["details"].find("oops") > 0
-    assert ms[4].params["details"].find("raise Exception") > 0
-    assert ms[4].params["details"].find("oops") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[8].params["details"].find("raise Exception") > 0
+    assert ms[8].params["details"].find("oops") > 0
+
+
+def test_output(venv):
+    output = run(venv, 'output_test.py')
+
+    test_name = 'tests.guinea-pigs.pytest.output_test_py.test_out'
+    test_setup = test_name + '_setup'
+    test_teardown = test_name + '_teardown'
+
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStarted', {'name': test_setup, 'flowId': test_setup}),
+            ServiceMessage('testStdOut', {'name': test_setup, 'flowId': test_setup, 'out': 'setup stdout|n'}),
+            ServiceMessage('testStdErr', {'name': test_setup, 'flowId': test_setup, 'out': 'setup stderr|n'}),
+            ServiceMessage('testFinished', {'name': test_setup}),
+            ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'test stdout|n'}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name, 'out': 'test stderr|n'}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStarted', {'name': test_teardown, 'flowId': test_teardown}),
+            ServiceMessage('testStdOut', {'name': test_teardown, 'flowId': test_teardown, 'out': 'teardown stdout|n'}),
+            ServiceMessage('testStdErr', {'name': test_teardown, 'flowId': test_teardown, 'out': 'teardown stderr|n'}),
+            ServiceMessage('testFinished', {'name': test_teardown, 'flowId': test_teardown}),
+        ])
 
 
 def test_teardown_error(venv):
