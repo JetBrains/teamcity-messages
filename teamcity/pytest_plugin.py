@@ -69,6 +69,17 @@ class EchoTeamCityMessages(object):
         :type report: _pytest.runner.TestReport
         """
         test_id = self.format_test_id(report.nodeid)
+
+        # Report captured output to TeamCity if any
+        if report.when == "call":
+            for (secname, data) in report.sections:
+                if 'stdout' in secname:
+                    self.ensure_test_start_reported(test_id)
+                    self.teamcity.testStdOut(test_id, out=data, flowId=test_id)
+                elif 'stderr' in secname:
+                    self.ensure_test_start_reported(test_id)
+                    self.teamcity.testStdErr(test_id, out=data, flowId=test_id)
+        
         if report.passed:
             if report.when == "call":  # ignore setup/teardown
                 duration = timedelta(seconds=report.duration)
