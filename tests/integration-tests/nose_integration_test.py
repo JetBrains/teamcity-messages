@@ -151,13 +151,10 @@ def test_fail_output(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n'}),
             ServiceMessage('testFailed', {'name': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-
-    assert ms[1].params['details'].find('Output line 1') > 0
-    assert ms[1].params['details'].find('Output line 2') > 0
-    assert ms[1].params['details'].find('Output line 3') > 0
 
 
 def run(venv, file, clazz=None, test=None, options=""):

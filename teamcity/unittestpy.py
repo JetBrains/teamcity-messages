@@ -6,13 +6,7 @@ import datetime
 import re
 
 from teamcity.messages import TeamcityServiceMessages
-
-
-def _is_string(obj):
-    if sys.version_info >= (3, 0):
-        return isinstance(obj, str)
-    else:
-        return isinstance(obj, basestring)
+from teamcity.common import is_string
 
 
 # Added *k to some methods to get compatibility with nosetests
@@ -28,7 +22,7 @@ class TeamcityTestResult(TestResult):
     def create_messages(self):
         self.messages = TeamcityServiceMessages(self.output)
 
-    def formatErr(self, err):
+    def convert_error_to_string(self, err):
         try:
             exctype, value, tb = err
             return ''.join(traceback.format_exception(exctype, value, tb))
@@ -46,6 +40,9 @@ class TeamcityTestResult(TestResult):
         return fqn == "doctest.DocTestCase"
 
     def get_test_id(self, test):
+        if is_string(test):
+            return test
+
         # Force test_id for doctests
         if not self.is_doctest_class_name(self._class_fullname(test)):
             desc = test.shortDescription()
@@ -59,12 +56,10 @@ class TeamcityTestResult(TestResult):
 
     def addExpectedFailure(self, test, err):
         # workaround nose bug on python 3
-        if _is_string(err[1]):
-            err = (err[0], Exception(err[1]), err[2])
 
         super(TeamcityTestResult, self).addExpectedFailure(test, err)
 
-        err = self.formatErr(err)
+        err = self.convert_error_to_string(err)
 
         self.messages.testIgnored(self.get_test_id(test), message="Expected failure: " + err)
 
@@ -81,13 +76,7 @@ class TeamcityTestResult(TestResult):
                                  details="Test should not succeed since it's marked with @unittest.expectedFailure")
 
     def addError(self, test, err, *k):
-        # workaround nose bug on python 3
-        if _is_string(err[1]):
-            err = (err[0], Exception(err[1]), err[2])
-
         super(TeamcityTestResult, self).addError(test, err)
-
-        err = self.formatErr(err)
 
         if self._class_fullname(test) == "unittest.suite._ErrorHolder":
             # This is a standalone error
@@ -97,21 +86,20 @@ class TeamcityTestResult(TestResult):
             test_name = re.sub(r'^(.*) \((.*)\)$', r'\2.\1', test_name)
 
             self.messages.testStarted(test_name)
-            self.messages.testFailed(test_name, message='Failure', details=err)
+            self.report_fail(test_name, 'Failure', err)
             self.messages.testFinished(test_name)
+
             return
 
-        self.messages.testFailed(self.get_test_id(test), message='Error', details=err)
+        self.report_fail(test, 'Error', err)
 
     def addFailure(self, test, err, *k):
-        # workaround nose bug on python 3
-        if _is_string(err[1]):
-            err = (err[0], Exception(err[1]), err[2])
-
         super(TeamcityTestResult, self).addFailure(test, err)
 
-        err = self.formatErr(err)
-        self.messages.testFailed(self.get_test_id(test), message='Failure', details=err)
+        self.report_fail(test, 'Failure', err)
+
+    def report_fail(self, test, fail_type, err):
+        self.messages.testFailed(self.get_test_id(test), message=fail_type, details=self.convert_error_to_string(err))
 
     def startTest(self, test):
         test_id = self.get_test_id(test)
