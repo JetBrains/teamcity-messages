@@ -26,7 +26,7 @@ def test_nested_suits(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': '__main__.TestXXX.runTest', 'captureStandardOutput': 'true'}),
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.runTest'}),
         ])
 

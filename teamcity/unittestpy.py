@@ -105,7 +105,7 @@ class TeamcityTestResult(TestResult):
         test_id = self.get_test_id(test)
 
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
-        self.messages.testStarted(test_id)
+        self.messages.testStarted(test_id, captureStandardOutput='true')
 
     def stopTest(self, test):
         test_id = self.get_test_id(test)

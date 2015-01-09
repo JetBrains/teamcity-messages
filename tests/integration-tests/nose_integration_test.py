@@ -23,7 +23,7 @@ def test_hierarchy(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'namespace1.namespace2.testmyzz.test'}),
+            ServiceMessage('testStarted', {'name': 'namespace1.namespace2.testmyzz.test', 'captureStandardOutput': 'true'}),
             ServiceMessage('testFinished', {'name': 'namespace1.namespace2.testmyzz.test'}),
         ])
 
