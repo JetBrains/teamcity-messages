@@ -30,6 +30,12 @@ class TeamcityTestResult(TestResult):
             tb = traceback.format_exc()
             return "*FAILED TO GET TRACEBACK*: " + tb
 
+    def fix_err_tuple(self, err):
+        # workaround nose bug on python 3
+        if is_string(err[1]):
+            err = (err[0], Exception(err[1]), err[2])
+        return err
+
     def _class_fullname(self, o):
         module = o.__class__.__module__
         if module is None or module == str.__class__.__module__:
@@ -55,7 +61,7 @@ class TeamcityTestResult(TestResult):
         super(TeamcityTestResult, self).addSuccess(test)
 
     def addExpectedFailure(self, test, err):
-        # workaround nose bug on python 3
+        err = self.fix_err_tuple(err)
 
         super(TeamcityTestResult, self).addExpectedFailure(test, err)
 
@@ -80,6 +86,8 @@ class TeamcityTestResult(TestResult):
                                  flowId=test_id)
 
     def addError(self, test, err, *k):
+        err = self.fix_err_tuple(err)
+
         super(TeamcityTestResult, self).addError(test, err)
 
         if self._class_fullname(test) == "unittest.suite._ErrorHolder":
@@ -98,6 +106,8 @@ class TeamcityTestResult(TestResult):
         self.report_fail(test, 'Error', err)
 
     def addFailure(self, test, err, *k):
+        err = self.fix_err_tuple(err)
+
         super(TeamcityTestResult, self).addFailure(test, err)
 
         self.report_fail(test, 'Failure', err)

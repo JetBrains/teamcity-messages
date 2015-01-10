@@ -36,13 +36,6 @@ class TeamcityReport(TeamcityTestResult):
     def options(self, parser, env=os.environ):
         pass
 
-    def convert_error_to_string(self, err):
-        # workaround nose bug on python 3
-        if is_string(err[1]):
-            err = (err[0], Exception(err[1]), err[2])
-
-        return super(TeamcityReport, self).convert_error_to_string(err)
-
     def report_fail(self, test, fail_type, err):
         test_id = self.get_test_id(test)
 
