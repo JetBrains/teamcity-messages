@@ -117,12 +117,16 @@ class TeamcityTestResult(TestResult):
         self.messages.testFailed(test_id, message=fail_type, details=self.convert_error_to_string(err), flowId=test_id)
 
     def startTest(self, test):
+        super(TeamcityTestResult, self).startTest(test)
+
         test_id = self.get_test_id(test)
 
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
         self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
 
     def stopTest(self, test):
+        super(TeamcityTestResult, self).stopTest(test)
+
         test_id = self.get_test_id(test)
 
         time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
