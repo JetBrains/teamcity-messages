@@ -17,8 +17,8 @@ def _ln(label):
     return out
 
 
-_captured_output_start_marker = _ln(u'>> begin captured stdout <<') + "\n"
-_captured_output_end_marker = "\n" + _ln(u'>> end captured stdout <<')
+_captured_output_start_marker = _ln('>> begin captured stdout <<') + "\n"
+_captured_output_end_marker = "\n" + _ln('>> end captured stdout <<')
 
 
 class TeamcityReport(TeamcityTestResult):
