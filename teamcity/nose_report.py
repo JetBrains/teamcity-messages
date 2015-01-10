@@ -51,7 +51,7 @@ class TeamcityReport(TeamcityTestResult):
         start_index = details.find(_captured_output_start_marker)
         end_index = details.find(_captured_output_end_marker)
 
-        if start_index >= 0 and end_index >= 0:
+        if 0 <= start_index < end_index:
             captured_output = details[start_index + len(_captured_output_start_marker):end_index]
             details = details[:start_index] + details[end_index + len(_captured_output_end_marker):]
 
