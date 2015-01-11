@@ -3,11 +3,14 @@ environment:
   matrix:
   - PYTHON_HOME: C:\Python26
   - PYTHON_HOME: C:\Python27
+  - PYTHON_HOME: C:\Python32
   - PYTHON_HOME: C:\Python33
   - PYTHON_HOME: C:\Python34
 install:
 - IF [%PYTHON_HOME%]==[C:\Python26] appveyor DownloadFile https://www.python.org/ftp/python/2.6.6/python-2.6.6.msi
 - IF [%PYTHON_HOME%]==[C:\Python26] msiexec /i python-2.6.6.msi /qn
+- IF [%PYTHON_HOME%]==[C:\Python32] appveyor DownloadFile https://www.python.org/ftp/python/3.2.5/python-3.2.5.msi
+- IF [%PYTHON_HOME%]==[C:\Python32] msiexec /i python-3.2.5.msi /qn
 - appveyor DownloadFile https://bootstrap.pypa.io/get-pip.py
 - '%PYTHON_HOME%\python get-pip.py'
 build_script:
