@@ -6,7 +6,7 @@ import datetime
 import re
 
 from teamcity.messages import TeamcityServiceMessages
-from teamcity.common import is_string
+from teamcity.common import is_string, get_class_fullname
 
 
 # Added *k to some methods to get compatibility with nosetests
@@ -36,12 +36,6 @@ class TeamcityTestResult(TestResult):
             err = (err[0], Exception(err[1]), err[2])
         return err
 
-    def _class_fullname(self, o):
-        module = o.__class__.__module__
-        if module is None or module == str.__class__.__module__:
-            return o.__class__.__name__
-        return module + '.' + o.__class__.__name__
-
     def is_doctest_class_name(self, fqn):
         return fqn == "doctest.DocTestCase"
 
@@ -50,7 +44,7 @@ class TeamcityTestResult(TestResult):
             return test
 
         # Force test_id for doctests
-        if not self.is_doctest_class_name(self._class_fullname(test)):
+        if not self.is_doctest_class_name(get_class_fullname(test)):
             desc = test.shortDescription()
             if desc and desc != test.id():
                 return "%s (%s)" % (test.id(), desc)
@@ -90,7 +84,7 @@ class TeamcityTestResult(TestResult):
 
         super(TeamcityTestResult, self).addError(test, err)
 
-        if self._class_fullname(test) == "unittest.suite._ErrorHolder":
+        if get_class_fullname(test) == "unittest.suite._ErrorHolder":
             # This is a standalone error
 
             test_name = test.id()

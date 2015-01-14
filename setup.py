@@ -63,8 +63,8 @@ ChangeLog: https://github.com/JetBrains/teamcity-python/blob/master/CHANGELOG.tx
     cmdclass={'test': PyTest},
 
     entry_points={
-        'nose.plugins': [
-            'nose-teamcity = teamcity.nose_report:TeamcityReport'
+        'nose.plugins.0.10': [
+            'teamcity-report = teamcity.nose_report:TeamcityReport'
         ],
 
         'pytest11': [
