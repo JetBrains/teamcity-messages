@@ -52,6 +52,9 @@ class TeamcityReport(object):
             if inspect.ismodule(test.context):
                 module_name = test.context.__name__
                 return module_name + "." + test.error_context
+            elif inspect.isclass(test.context):
+                class_name = get_class_fullname(test.context)
+                return class_name + "." + test.error_context
 
         # Force test_id for doctests
         real_test = getattr(test, "test", test)

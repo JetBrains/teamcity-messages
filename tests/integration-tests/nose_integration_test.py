@@ -150,6 +150,48 @@ def test_setup_module_error(venv):
     assert ms[1].params['details'].find("AssertionError") > 0
 
 
+def test_setup_class_error(venv):
+    output = run(venv, 'setup_class_error')
+    test_name = 'testa.TestXXX.setup'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[1].params['details'].find("Traceback") == 0
+    assert ms[1].params['details'].find("RRR") > 0
+
+
+def test_setup_package_error(venv):
+    output = run(venv, 'setup_package_error')
+    test_name = 'namespace2.setup'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[1].params['details'].find("Traceback") == 0
+    assert ms[1].params['details'].find("AssertionError") > 0
+
+
+def test_setup_function_error(venv):
+    output = run(venv, 'setup_function_error')
+    test_name = 'testa.test'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[1].params['details'].find("Traceback") == 0
+    assert ms[1].params['details'].find("AssertionError") > 0
+
+
 def test_fail_with_msg(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_with_msg')
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_with_msg'
