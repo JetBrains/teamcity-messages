@@ -157,7 +157,7 @@ def test_setup_class_error(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in setup context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[1].params['details'].find("Traceback") == 0
@@ -171,7 +171,7 @@ def test_setup_package_error(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in setup context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[1].params['details'].find("Traceback") == 0
@@ -180,6 +180,68 @@ def test_setup_package_error(venv):
 
 def test_setup_function_error(venv):
     output = run(venv, 'setup_function_error')
+    test_name = 'testa.test'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'Error'}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[1].params['details'].find("Traceback") == 0
+    assert ms[1].params['details'].find("AssertionError") > 0
+
+
+def test_teardown_module_error(venv):
+    output = run(venv, 'teardown_module_error')
+    test_name = 'namespace2.testa.teardown'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': 'namespace2.testa.test_mycode'}),
+            ServiceMessage('testFinished', {'name': 'namespace2.testa.test_mycode'}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[3].params['details'].find("Traceback") == 0
+    assert ms[3].params['details'].find("AssertionError") > 0
+
+
+def test_teardown_class_error(venv):
+    output = run(venv, 'teardown_class_error')
+    test_name = 'testa.TestXXX.teardown'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': 'testa.TestXXX.runTest'}),
+            ServiceMessage('testFinished', {'name': 'testa.TestXXX.runTest'}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[3].params['details'].find("Traceback") == 0
+    assert ms[3].params['details'].find("RRR") > 0
+
+
+def test_teardown_package_error(venv):
+    output = run(venv, 'teardown_package_error')
+    test_name = 'namespace2.teardown'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': 'namespace2.testa.test_mycode'}),
+            ServiceMessage('testFinished', {'name': 'namespace2.testa.test_mycode'}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[3].params['details'].find("Traceback") == 0
+    assert ms[3].params['details'].find("AssertionError") > 0
+
+
+def test_teardown_function_error(venv):
+    output = run(venv, 'teardown_function_error')
     test_name = 'testa.test'
     ms = assert_service_messages(
         output,
