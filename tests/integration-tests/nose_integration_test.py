@@ -185,7 +185,7 @@ def test_setup_function_error(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'Error'}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[1].params['details'].find("Traceback") == 0
@@ -247,7 +247,7 @@ def test_teardown_function_error(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'Error'}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[1].params['details'].find("Traceback") == 0
