@@ -201,7 +201,7 @@ def test_teardown_module_error(venv):
             ServiceMessage('testStarted', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testFinished', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in teardown context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[3].params['details'].find("Traceback") == 0
@@ -217,7 +217,7 @@ def test_teardown_class_error(venv):
             ServiceMessage('testStarted', {'name': 'testa.TestXXX.runTest'}),
             ServiceMessage('testFinished', {'name': 'testa.TestXXX.runTest'}),
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in teardown context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[3].params['details'].find("Traceback") == 0
@@ -233,7 +233,7 @@ def test_teardown_package_error(venv):
             ServiceMessage('testStarted', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testFinished', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in teardown context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[3].params['details'].find("Traceback") == 0
@@ -247,7 +247,7 @@ def test_teardown_function_error(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'Error'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
     assert ms[1].params['details'].find("Traceback") == 0
