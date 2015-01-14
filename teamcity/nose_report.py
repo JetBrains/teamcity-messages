@@ -1,12 +1,11 @@
 # coding=utf-8
 import os
 import sys
-import traceback
 import datetime
 from messages import TeamcityServiceMessages
 
 from teamcity import is_running_under_teamcity
-from teamcity.common import is_string, split_output, limit_output, get_class_fullname
+from teamcity.common import is_string, split_output, limit_output, get_class_fullname, convert_error_to_string
 
 from nose.exc import SkipTest, DeprecatedTest
 
@@ -45,7 +44,8 @@ class TeamcityReport(object):
 
         # Force test_id for doctests
         real_test = getattr(test, "test", test)
-        if not self.is_doctest_class_name(get_class_fullname(real_test)):
+        real_test_class_name = get_class_fullname(real_test)
+        if real_test_class_name != "doctest.DocTestCase" and real_test_class_name != "nose.plugins.doctests.DocTestCase":
             desc = test.shortDescription()
             if desc and desc != test.id():
                 return "%s (%s)" % (test.id(), desc)
@@ -59,9 +59,13 @@ class TeamcityReport(object):
         pass
 
     def report_fail(self, test, fail_type, err):
+        # workaround nose bug on python 3
+        if is_string(err[1]):
+            err = (err[0], Exception(err[1]), err[2])
+
         test_id = self.get_test_id(test)
 
-        details = self.convert_error_to_string(err)
+        details = convert_error_to_string(err)
 
         start_index = details.find(_captured_output_start_marker)
         end_index = details.find(_captured_output_end_marker)
@@ -75,26 +79,7 @@ class TeamcityReport(object):
 
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
-    def convert_error_to_string(self, err):
-        try:
-            exctype, value, tb = err
-            return ''.join(traceback.format_exception(exctype, value, tb))
-        except:
-            tb = traceback.format_exc()
-            return "*FAILED TO GET TRACEBACK*: " + tb
-
-    def is_doctest_class_name(self, fqn):
-        return fqn == "doctest.DocTestCase" or fqn == "nose.plugins.doctests.DocTestCase"
-
-    def fix_err_tuple(self, err):
-        # workaround nose bug on python 3
-        if is_string(err[1]):
-            err = (err[0], Exception(err[1]), err[2])
-        return err
-
-    def addError(self, test, err, *k):
-        err = self.fix_err_tuple(err)
-
+    def addError(self, test, err):
         if issubclass(err[0], SkipTest):
             test_id = self.get_test_id(test)
             self.messages.testIgnored(test_id, message="Skipped", flowId=test_id)
@@ -104,8 +89,7 @@ class TeamcityReport(object):
         else:
             self.report_fail(test, 'Error', err)
 
-    def addFailure(self, test, err, *k):
-        err = self.fix_err_tuple(err)
+    def addFailure(self, test, err):
         self.report_fail(test, 'Failure', err)
 
     def startTest(self, test):
@@ -116,5 +100,6 @@ class TeamcityReport(object):
 
     def stopTest(self, test):
         test_id = self.get_test_id(test)
+
         time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
         self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)

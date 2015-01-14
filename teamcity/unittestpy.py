@@ -1,15 +1,13 @@
 # coding=utf-8
-import traceback
 import sys
 from unittest import TestResult
 import datetime
 import re
 
 from teamcity.messages import TeamcityServiceMessages
-from teamcity.common import is_string, get_class_fullname
+from teamcity.common import is_string, get_class_fullname, convert_error_to_string
 
 
-# Added *k to some methods to get compatibility with nosetests
 class TeamcityTestResult(TestResult):
     def __init__(self, stream=sys.stdout):
         super(TeamcityTestResult, self).__init__()
@@ -21,20 +19,6 @@ class TeamcityTestResult(TestResult):
 
     def create_messages(self):
         self.messages = TeamcityServiceMessages(self.output)
-
-    def convert_error_to_string(self, err):
-        try:
-            exctype, value, tb = err
-            return ''.join(traceback.format_exception(exctype, value, tb))
-        except:
-            tb = traceback.format_exc()
-            return "*FAILED TO GET TRACEBACK*: " + tb
-
-    def fix_err_tuple(self, err):
-        # workaround nose bug on python 3
-        if is_string(err[1]):
-            err = (err[0], Exception(err[1]), err[2])
-        return err
 
     def is_doctest_class_name(self, fqn):
         return fqn == "doctest.DocTestCase"
@@ -51,20 +35,18 @@ class TeamcityTestResult(TestResult):
 
         return test.id()
 
-    def addSuccess(self, test, *k):
+    def addSuccess(self, test):
         super(TeamcityTestResult, self).addSuccess(test)
 
     def addExpectedFailure(self, test, err):
-        err = self.fix_err_tuple(err)
-
         super(TeamcityTestResult, self).addExpectedFailure(test, err)
 
-        err = self.convert_error_to_string(err)
+        err = convert_error_to_string(err)
         test_id = self.get_test_id(test)
 
         self.messages.testIgnored(test_id, message="Expected failure: " + err, flowId=test_id)
 
-    def addSkip(self, test, reason="", *k):
+    def addSkip(self, test, reason=""):
         if sys.version_info >= (2, 7):
             super(TeamcityTestResult, self).addSkip(test, reason)
 
@@ -80,8 +62,6 @@ class TeamcityTestResult(TestResult):
                                  flowId=test_id)
 
     def addError(self, test, err, *k):
-        err = self.fix_err_tuple(err)
-
         super(TeamcityTestResult, self).addError(test, err)
 
         if get_class_fullname(test) == "unittest.suite._ErrorHolder":
@@ -100,15 +80,13 @@ class TeamcityTestResult(TestResult):
         self.report_fail(test, 'Error', err)
 
     def addFailure(self, test, err, *k):
-        err = self.fix_err_tuple(err)
-
         super(TeamcityTestResult, self).addFailure(test, err)
 
         self.report_fail(test, 'Failure', err)
 
     def report_fail(self, test, fail_type, err):
         test_id = self.get_test_id(test)
-        self.messages.testFailed(test_id, message=fail_type, details=self.convert_error_to_string(err), flowId=test_id)
+        self.messages.testFailed(test_id, message=fail_type, details=convert_error_to_string(err), flowId=test_id)
 
     def startTest(self, test):
         super(TeamcityTestResult, self).startTest(test)

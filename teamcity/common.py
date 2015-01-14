@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import sys
+import traceback
 
 
 _max_reported_output_size = 1 * 1024 * 1024
@@ -33,3 +34,12 @@ def get_class_fullname(obj):
     if module is None or module == str.__class__.__module__:
         return obj.__class__.__name__
     return module + '.' + obj.__class__.__name__
+
+
+def convert_error_to_string(err):
+    try:
+        exctype, value, tb = err
+        return ''.join(traceback.format_exception(exctype, value, tb))
+    except:
+        tb = traceback.format_exc()
+        return "*FAILED TO GET TRACEBACK*: " + tb
