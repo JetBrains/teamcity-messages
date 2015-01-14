@@ -136,6 +136,20 @@ def test_fail(venv):
     assert ms[1].params['details'].find("2 * 2 == 5") > 0
 
 
+def test_setup_module_error(venv):
+    output = run(venv, 'setup_module_error')
+    test_name = 'namespace2.testa.setup'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert ms[1].params['details'].find("Traceback") == 0
+    assert ms[1].params['details'].find("AssertionError") > 0
+
+
 def test_fail_with_msg(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_with_msg')
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_with_msg'

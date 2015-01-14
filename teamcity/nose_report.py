@@ -2,12 +2,16 @@
 import os
 import sys
 import datetime
-from messages import TeamcityServiceMessages
+import inspect
 
 from teamcity import is_running_under_teamcity
 from teamcity.common import is_string, split_output, limit_output, get_class_fullname, convert_error_to_string
+from teamcity.messages import TeamcityServiceMessages
 
 from nose.exc import SkipTest, DeprecatedTest
+
+
+CONTEXT_SUITE_FQN = "nose.suite.ContextSuite"
 
 
 # from nose.util.ln
@@ -41,6 +45,13 @@ class TeamcityReport(object):
     def get_test_id(self, test):
         if is_string(test):
             return test
+
+        # Handle special "tests"
+        test_class_name = get_class_fullname(test)
+        if test_class_name == CONTEXT_SUITE_FQN:
+            if inspect.ismodule(test.context):
+                module_name = test.context.__name__
+                return module_name + "." + test.error_context
 
         # Force test_id for doctests
         real_test = getattr(test, "test", test)
@@ -80,12 +91,17 @@ class TeamcityReport(object):
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
     def addError(self, test, err):
+        test_class_name = get_class_fullname(test)
+        test_id = self.get_test_id(test)
+
         if issubclass(err[0], SkipTest):
-            test_id = self.get_test_id(test)
             self.messages.testIgnored(test_id, message="Skipped", flowId=test_id)
         elif issubclass(err[0], DeprecatedTest):
-            test_id = self.get_test_id(test)
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
+        elif test_class_name == CONTEXT_SUITE_FQN and test.error_context == "setup":
+            self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
+            self.report_fail(test, 'setup error', err)
+            self.messages.testFinished(test_id, flowId=test_id)
         else:
             self.report_fail(test, 'Error', err)
 
