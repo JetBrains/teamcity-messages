@@ -68,7 +68,7 @@ ChangeLog: https://github.com/JetBrains/teamcity-python/blob/master/CHANGELOG.tx
         ],
 
         'pytest11': [
-            'name_of_plugin = teamcity.pytest_plugin',
+            'pytest-teamcity = teamcity.pytest_plugin',
         ],
     },
 )
