@@ -7,28 +7,22 @@ import re
 from teamcity.messages import TeamcityServiceMessages
 from teamcity.common import is_string, get_class_fullname, convert_error_to_string
 
+_real_stdout = sys.stdout
+
 
 class TeamcityTestResult(TestResult):
-    def __init__(self, stream=sys.stdout):
+    def __init__(self, stream=_real_stdout, descriptions=None, verbosity=None):
         super(TeamcityTestResult, self).__init__()
 
-        self.output = stream
         self.test_started_datetime_map = {}
-
-        self.create_messages()
-
-    def create_messages(self):
-        self.messages = TeamcityServiceMessages(self.output)
-
-    def is_doctest_class_name(self, fqn):
-        return fqn == "doctest.DocTestCase"
+        self.messages = TeamcityServiceMessages(stream)
 
     def get_test_id(self, test):
         if is_string(test):
             return test
 
         # Force test_id for doctests
-        if not self.is_doctest_class_name(get_class_fullname(test)):
+        if get_class_fullname(test) != "doctest.DocTestCase":
             desc = test.shortDescription()
             if desc and desc != test.id():
                 return "%s (%s)" % (test.id(), desc)
