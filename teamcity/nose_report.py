@@ -101,9 +101,9 @@ class TeamcityReport(object):
             self.messages.testIgnored(test_id, message="Skipped", flowId=test_id)
         elif issubclass(err[0], DeprecatedTest):
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
-        elif test_class_name == CONTEXT_SUITE_FQN and test.error_context == "setup":
+        elif test_class_name == CONTEXT_SUITE_FQN:
             self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
-            self.report_fail(test, 'setup error', err)
+            self.report_fail(test, 'error in ' + test.error_context + ' context', err)
             self.messages.testFinished(test_id, flowId=test_id)
         else:
             self.report_fail(test, 'Error', err)
