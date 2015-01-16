@@ -134,7 +134,6 @@ class EchoTeamCityMessages(object):
         self.output_capture_enabled = output_capture_enabled
 
         self.teamcity = TeamcityServiceMessages()
-        self.currentSuite = None
         self.test_start_reported_mark = set()
 
         self.max_reported_output_size = 1 * 1024 * 1024
@@ -225,7 +224,3 @@ class EchoTeamCityMessages(object):
             self.teamcity.testStarted(test_id, flowId=test_id)
             self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
             self.teamcity.testFinished(test_id, flowId=test_id)
-
-    def pytest_sessionfinish(self, session, exitstatus, __multicall__):
-        if self.currentSuite:
-            self.teamcity.testSuiteFinished(self.currentSuite)
