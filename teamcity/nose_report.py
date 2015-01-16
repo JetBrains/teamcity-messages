@@ -62,7 +62,7 @@ class TeamcityReport(object):
         if real_test_class_name != "doctest.DocTestCase" and real_test_class_name != "nose.plugins.doctests.DocTestCase":
             desc = test.shortDescription()
             if desc and desc != test.id():
-                return "%s (%s)" % (test.id(), desc)
+                return "%s (%s)" % (test.id(), desc.replace('.', '_'))
 
         return test.id()
 
