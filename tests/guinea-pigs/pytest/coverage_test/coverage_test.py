@@ -1,4 +1,4 @@
-from coverage_test.funcs import covered_func, uncovered_func
+from .funcs import covered_func, uncovered_func
 
 
 def test_covered_func():

@@ -12,10 +12,11 @@ tests under TeamCity build.
 """
 
 import os
+import sys
 from datetime import timedelta
 
 from teamcity.messages import TeamcityServiceMessages
-from teamcity.common import limit_output, split_output
+from teamcity.common import limit_output, split_output, convert_error_to_string
 from teamcity import is_running_under_teamcity
 
 
@@ -38,86 +39,10 @@ def pytest_configure(config):
 
     if enabled:
         output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
-        config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled)
+        coverage_controller = _get_coverage_controller(config)
+
+        config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled, coverage_controller)
         config.pluginmanager.register(config._teamcityReporting)
-
-        # configure cov reporting, if the plugin is enabled
-        _configure_pytest_coverage(config)
-
-
-def _configure_pytest_coverage(config):
-    cov_plugin = config.pluginmanager.getplugin('_cov')
-    if not cov_plugin:
-        return
-
-    cov_controller = cov_plugin.cov_controller
-    if not cov_controller:
-        return
-
-    # shamelessly stolen from https://bitbucket.org/mou/coverage.py/raw/
-    # 18e4dd6ff20c508e3c0f50321564d6004e911fc2/coverage/teamcity.py
-    import sys
-    from coverage.misc import NotPython
-
-    from coverage.report import Reporter
-    from coverage.results import Numbers
-
-    class TeamcityReporter(Reporter):
-        """A reporter for writing the summary report."""
-
-        def __init__(self, coverage, config, teamcity_messages):
-            super(TeamcityReporter, self).__init__(coverage, config)
-            self.branches = coverage.data.has_arcs()
-            self.teamcity_messages = teamcity_messages
-
-        def report(self, morfs, outfile=None):
-            self.find_code_units(morfs)
-
-            if not outfile:
-                outfile = sys.stdout
-
-            total = Numbers()
-
-            for cu in self.code_units:
-                try:
-                    analysis = self.coverage._analyze(cu)
-                    nums = analysis.numbers
-                    total += nums
-                except KeyboardInterrupt:                   # pragma: not covered
-                    raise
-                except:
-                    if not self.config.ignore_errors:
-                        continue
-
-                    typ, msg = sys.exc_info()[:2]
-                    if typ is NotPython and not cu.should_be_python():
-                        continue
-
-                    outfile.write("%s   %s: %s\n" % (cu.name, typ.__name__, msg))
-
-            if total.n_files > 0:
-                covered = total.n_executed + (total.n_executed_branches if self.branches else 0)
-                total_stmts = total.n_statements + (total.n_branches if self.branches else 0)
-                self.teamcity_messages.buildStatisticLinesCovered(covered)
-                self.teamcity_messages.buildStatisticTotalLines(total_stmts)
-                self.teamcity_messages.buildStatisticLinesUncovered(total_stmts - covered)
-
-            return total.pc_covered
-
-    original_print_summary = cov_controller.summary
-
-    def teamcity_print_summary(stream):
-        original_print_summary(stream)
-
-        reporter = TeamcityReporter(
-            cov_controller.cov,
-            cov_controller.cov.config,
-            config._teamcityReporting.teamcity,
-        )
-
-        reporter.report(None, stream)
-
-    setattr(cov_controller, 'summary', teamcity_print_summary)
 
 
 def pytest_unconfigure(config):
@@ -126,11 +51,21 @@ def pytest_unconfigure(config):
         del config._teamcityReporting
         config.pluginmanager.unregister(teamcity_reporting)
 
+
+def _get_coverage_controller(config):
+    cov_plugin = config.pluginmanager.getplugin('_cov')
+    if not cov_plugin:
+        return None
+
+    return cov_plugin.cov_controller
+
+
 # The following code relies on py.test nodeid uniqueness
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, output_capture_enabled):
+    def __init__(self, output_capture_enabled, coverage_controller):
+        self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
 
         self.teamcity = TeamcityServiceMessages()
@@ -224,3 +159,60 @@ class EchoTeamCityMessages(object):
             self.teamcity.testStarted(test_id, flowId=test_id)
             self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
             self.teamcity.testFinished(test_id, flowId=test_id)
+
+    def pytest_terminal_summary(self):
+        if self.coverage_controller is not None:
+            self._report_coverage()
+
+    def _report_coverage(self):
+        from coverage.misc import NotPython
+        from coverage.report import Reporter
+        from coverage.results import Numbers
+
+        class _CoverageReporter(Reporter):
+            def __init__(self, coverage, config, messages):
+                super(_CoverageReporter, self).__init__(coverage, config)
+
+                self.branches = coverage.data.has_arcs()
+                self.messages = messages
+
+            def report(self, morfs, outfile=None):
+                self.find_code_units(morfs)
+
+                total = Numbers()
+
+                for cu in self.code_units:
+                    try:
+                        analysis = self.coverage._analyze(cu)
+                        nums = analysis.numbers
+                        total += nums
+                    except KeyboardInterrupt:
+                        raise
+                    except:
+                        if self.config.ignore_errors:
+                            continue
+
+                        err = sys.exc_info()
+                        typ, msg = err[:2]
+                        if typ is NotPython and not cu.should_be_python():
+                            continue
+
+                        test_id = cu.name
+                        details = convert_error_to_string(err)
+
+                        self.messages.testStarted(test_id, flowId=test_id)
+                        self.messages.testFailed(test_id, message="Coverage analysis failed", details=details, flowId=test_id)
+                        self.messages.testFinished(test_id, flowId=test_id)
+
+                if total.n_files > 0:
+                    covered = total.n_executed + (total.n_executed_branches if self.branches else 0)
+                    total_statements = total.n_statements + (total.n_branches if self.branches else 0)
+                    self.messages.buildStatisticLinesCovered(covered)
+                    self.messages.buildStatisticTotalLines(total_statements)
+                    self.messages.buildStatisticLinesUncovered(total_statements - covered)
+        reporter = _CoverageReporter(
+            self.coverage_controller.cov,
+            self.coverage_controller.cov.config,
+            self.teamcity,
+        )
+        reporter.report(None)
