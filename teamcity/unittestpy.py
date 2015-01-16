@@ -15,6 +15,8 @@ class TeamcityTestResult(TestResult):
         super(TeamcityTestResult, self).__init__()
 
         self.test_started_datetime_map = {}
+        self.failed_tests = set()
+        self.subtest_failures = {}
         self.messages = TeamcityServiceMessages(stream)
 
     def get_test_id(self, test):
@@ -79,9 +81,44 @@ class TeamcityTestResult(TestResult):
 
         self.report_fail(test, 'Failure', err)
 
+    def addSubTest(self, test, subtest, err):
+        super(TeamcityTestResult, self).addSubTest(test, subtest, err)
+
+        test_id = self.get_test_id(test)
+
+        if err is not None:
+            if issubclass(err[0], test.failureException):
+                self.add_subtest_failure(test_id, self.get_test_id(subtest), err)
+                self.messages.testStdErr(test_id, out="%s: failure\n" % self.get_test_id(subtest), flowId=test_id)
+            else:
+                self.add_subtest_failure(test_id, self.get_test_id(subtest), err)
+                self.messages.testStdErr(test_id, out="%s: error\n" % self.get_test_id(subtest), flowId=test_id)
+        else:
+            self.messages.testStdOut(test_id, out="%s: ok\n" % self.get_test_id(subtest), flowId=test_id)
+
+    def add_subtest_failure(self, test_id, subtest_id, err):
+        fail_array = self.subtest_failures.get(test_id, [])
+        fail_array.append("%s:\n%s" % (subtest_id, convert_error_to_string(err)))
+        self.subtest_failures[test_id] = fail_array
+
+    def get_subtest_failure(self, test_id):
+        fail_array = self.subtest_failures.get(test_id, [])
+        return "\n".join(fail_array)
+
     def report_fail(self, test, fail_type, err):
         test_id = self.get_test_id(test)
-        self.messages.testFailed(test_id, message=fail_type, details=convert_error_to_string(err), flowId=test_id)
+
+        if is_string(err):
+            details = err
+        else:
+            details = convert_error_to_string(err)
+
+        subtest_failure = self.get_subtest_failure(test_id)
+        if subtest_failure:
+            details = subtest_failure + "\n" + details
+
+        self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
+        self.failed_tests.add(test_id)
 
     def startTest(self, test):
         super(TeamcityTestResult, self).startTest(test)
@@ -95,6 +132,9 @@ class TeamcityTestResult(TestResult):
         super(TeamcityTestResult, self).stopTest(test)
 
         test_id = self.get_test_id(test)
+
+        if test_id not in self.failed_tests and self.subtest_failures.get(test_id, []):
+            self.report_fail(test, "Subtest failed", "")
 
         time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
         self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)

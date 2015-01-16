@@ -142,6 +142,78 @@ def test_expected_failure(venv):
     assert ms[1].params['message'].find("this should happen unfortunately") > 0
 
 
+@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+def test_subtest_ok(venv):
+    output = run_directly(venv, 'subtest_ok.py')
+    test_name = '__main__.TestXXX.testSubtestSuccess'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': test_name + ' (i=1): ok|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
+@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+def test_subtest_error(venv):
+    output = run_directly(venv, 'subtest_error.py')
+    test_name = '__main__.TestXXX.testSubtestError'
+    subtest_name = test_name + ' (i=|\'abc.xxx|\')'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'out': subtest_name + ': error|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'message': 'Subtest failed', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+    assert ms[3].params['details'].find(subtest_name) == 0
+    assert ms[3].params['details'].find("RuntimeError") > 0
+    assert ms[3].params['details'].find("RRR") > 0
+
+
+@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+def test_subtest_failure(venv):
+    output = run_directly(venv, 'subtest_failure.py')
+    test_name = '__main__.TestXXX.testSubtestFailure'
+    subtest_name = test_name + ' (i=|\'abc.xxx|\')'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'out': subtest_name + ': failure|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'message': 'Subtest failed', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+    assert ms[3].params['details'].find(subtest_name) == 0
+    assert ms[3].params['details'].find("AssertionError") > 0
+    assert ms[3].params['details'].find("1 == 0") > 0
+
+
+@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+def test_subtest_mixed_failure(venv):
+    output = run_directly(venv, 'subtest_mixed_failure.py')
+    test_name = '__main__.TestXXX.testSubtestFailure'
+    subtest_name = test_name + ' (i=|\'abc.xxx|\')'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'out': subtest_name + ': failure|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'message': 'Failure', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+    assert ms[3].params['details'].find(subtest_name) == 0
+    assert ms[3].params['details'].find("AssertionError") > 0
+    assert ms[3].params['details'].find("1 == 0") > 0
+    assert ms[3].params['details'].find("6 == 1") > 0
+
+
 @pytest.mark.skipif(sys.version_info < (2, 7), reason="unexpected_success requires Python 2.7+")
 def test_unexpected_success(venv):
     output = run_directly(venv, 'unexpected_success.py')
