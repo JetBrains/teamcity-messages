@@ -112,8 +112,10 @@ def test_doctests(venv):
         ])
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="skip requires Python 2.7+")
 def test_skip(venv):
+    if sys.version_info < (2, 7):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2==0.8.0"])
+
     output = run_directly(venv, 'skip_test.py')
     test_name = '__main__.TestSkip.test_skip_me'
     assert_service_messages(
