@@ -1,6 +1,6 @@
 # coding=utf-8
 import sys
-from unittest import TestResult
+from unittest import TestResult, TextTestRunner
 import datetime
 import re
 
@@ -100,17 +100,8 @@ class TeamcityTestResult(TestResult):
         self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)
 
 
-class TeamcityTestRunner(object):
-    def __init__(self, stream=sys.stderr, *args, **kwargs):
-        self.stream = stream
-
-    def _makeResult(self):
-        return TeamcityTestResult(self.stream)
-
-    def run(self, test):
-        result = self._makeResult()
-        test(result)
-        return result
+class TeamcityTestRunner(TextTestRunner):
+    resultclass = TeamcityTestResult
 
 
 if __name__ == '__main__':
