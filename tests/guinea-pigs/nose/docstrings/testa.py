@@ -1,3 +1,3 @@
 def test_func():
-    """ My cool test name """
+    """ My cool test.name """
     assert True

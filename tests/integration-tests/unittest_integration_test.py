@@ -34,7 +34,7 @@ def test_nested_suits(venv):
 
 def test_docstring(venv):
     output = run_directly(venv, 'docstring.py')
-    test_name = '__main__.TestXXX.runTest (A test)'
+    test_name = '__main__.TestXXX.runTest (A test_)'
     assert_service_messages(
         output,
         [

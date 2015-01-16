@@ -42,7 +42,7 @@ def test_doctests(venv):
 
 def test_docstrings(venv):
     output = run(venv, 'docstrings')
-    test_name = 'testa.test_func (My cool test name)'
+    test_name = 'testa.test_func (My cool test_name)'
     assert_service_messages(
         output,
         [
