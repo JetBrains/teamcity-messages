@@ -25,7 +25,7 @@ class TeamcityTestResult(TestResult):
         if get_class_fullname(test) != "doctest.DocTestCase":
             desc = test.shortDescription()
             if desc and desc != test.id():
-                return "%s (%s)" % (test.id(), desc)
+                return "%s (%s)" % (test.id(), desc.replace('.', '_'))
 
         return test.id()
 
