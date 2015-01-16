@@ -63,13 +63,13 @@ class TeamcityServiceMessages(object):
         self._single_value_message('publishArtifacts', path, flowId=flowId)
 
     def buildStatisticLinesCovered(self, linesCovered):
-        self.message('buildStatisticValue', key='CodeCoverageAbsLCovered', value=str(linesCovered))
+        self.message('buildStatisticValue', key='CodeCoverageLinesCovered', value=str(linesCovered))
 
     def buildStatisticTotalLines(self, totalLines):
-        self.message('buildStatisticValue', key='CodeCoverageAbsLTotal', value=str(totalLines))
+        self.message('buildStatisticValue', key='CodeCoverageLinesTotal', value=str(totalLines))
 
     def buildStatisticLinesUncovered(self, linesUncovered):
-        self.message('buildStatisticValue', key='CodeCoverageAbsLUncovered', value=str(linesUncovered))
+        self.message('buildStatisticValue', key='CodeCoverageLinesUncovered', value=str(linesUncovered))
 
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
