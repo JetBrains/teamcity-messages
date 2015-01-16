@@ -11,6 +11,8 @@ _real_stdout = sys.stdout
 
 
 class TeamcityTestResult(TestResult):
+    separator2 = "\n"
+
     def __init__(self, stream=_real_stdout, descriptions=None, verbosity=None):
         super(TeamcityTestResult, self).__init__()
 
@@ -139,9 +141,16 @@ class TeamcityTestResult(TestResult):
         time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
         self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)
 
+    def printErrors(self):
+        pass
+
 
 class TeamcityTestRunner(TextTestRunner):
     resultclass = TeamcityTestResult
+
+    if sys.version_info < (2, 7):
+        def _makeResult(self):
+            return TeamcityTestResult(self.stream, self.descriptions, self.verbosity)
 
 
 if __name__ == '__main__':
