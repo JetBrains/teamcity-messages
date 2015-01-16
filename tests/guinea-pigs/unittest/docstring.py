@@ -5,7 +5,7 @@ from teamcity.unittestpy import TeamcityTestRunner
 
 class TestXXX(unittest.TestCase):
     def runTest(self):
-        """ A test """
+        """ A test. """
         assert 1 == 1
 
 
