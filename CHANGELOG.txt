@@ -1,3 +1,7 @@
+Version 1.12 Fri Jan 16 2015
+
+  - unittest: fix 2.6 compat
+
 Version 1.11 Fri Jan 16 2015
 
   - nose: handle errors/failures in teardown/setup
