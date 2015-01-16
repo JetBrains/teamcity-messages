@@ -1,3 +1,11 @@
+Version 1.11 Fri Jan 16 2015
+
+  - nose: handle errors/failures in teardown/setup
+  - nose: support multiprocess mode
+  - nose: correctly report captured output
+  - unittest: support skipped tests in Python 2.6 (by unittest2)
+  - unittest: support subtests (Python 3.4+)
+
 Version 1.10 Fri Jan 09 2015
 
   - py.test: limit captured stdout/stderr by 1M per test and send it to TeamCity in chunks of 50K chars
