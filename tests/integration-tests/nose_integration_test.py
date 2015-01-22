@@ -111,6 +111,20 @@ def test_generators(venv):
         ])
 
 
+def test_generators_class(venv):
+    output = run(venv, 'generators_class')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': 'testa.TestA.test_evens(0, 0, |\'_|\')'}),
+            ServiceMessage('testFinished', {'name': 'testa.TestA.test_evens(0, 0, |\'_|\')'}),
+            ServiceMessage('testStarted', {'name': "testa.TestA.test_evens(1, 3, |'_|')"}),
+            ServiceMessage('testFinished', {'name': "testa.TestA.test_evens(1, 3, |'_|')"}),
+            ServiceMessage('testStarted', {'name': "testa.TestA.test_evens(2, 6, |'_|')"}),
+            ServiceMessage('testFinished', {'name': "testa.TestA.test_evens(2, 6, |'_|')"}),
+        ])
+
+
 def test_pass(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
     assert_service_messages(
