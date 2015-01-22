@@ -56,15 +56,26 @@ class TeamcityReport(object):
                 class_name = get_class_fullname(test.context)
                 return class_name + "." + test.error_context
 
-        # Force test_id for doctests
+        test_id = test.id()
+
         real_test = getattr(test, "test", test)
         real_test_class_name = get_class_fullname(real_test)
+
+        test_arg = getattr(real_test, "arg", tuple())
+        if (type(test_arg) is tuple or type(test_arg) is list) and len(test_arg) > 0:
+            # As written in nose.case.FunctionTestCase#__str__ or nose.case.MethodTestCase#__str__
+            test_arg_str = "%s" % (test_arg,)
+            if test_id.endswith(test_arg_str):
+                # Replace '.' in test args with '_' to preserve test hierarchy on TeamCity
+                test_id = test_id[:len(test_id) - len(test_arg_str)] + test_arg_str.replace('.', '_')
+
+        # Force test_id for doctests
         if real_test_class_name != "doctest.DocTestCase" and real_test_class_name != "nose.plugins.doctests.DocTestCase":
             desc = test.shortDescription()
             if desc and desc != test.id():
-                return "%s (%s)" % (test.id(), desc.replace('.', '_'))
+                return "%s (%s)" % (test_id, desc.replace('.', '_'))
 
-        return test.id()
+        return test_id
 
     def configure(self, options, conf):
         self.enabled = is_running_under_teamcity()

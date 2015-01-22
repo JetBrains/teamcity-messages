@@ -102,12 +102,12 @@ def test_generators(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'testa.test_evens(0, 0)'}),
-            ServiceMessage('testFinished', {'name': 'testa.test_evens(0, 0)'}),
-            ServiceMessage('testStarted', {'name': 'testa.test_evens(1, 3)'}),
-            ServiceMessage('testFinished', {'name': 'testa.test_evens(1, 3)'}),
-            ServiceMessage('testStarted', {'name': 'testa.test_evens(2, 6)'}),
-            ServiceMessage('testFinished', {'name': 'testa.test_evens(2, 6)'}),
+            ServiceMessage('testStarted', {'name': 'testa.test_evens(0, 0, |\'_|\')'}),
+            ServiceMessage('testFinished', {'name': 'testa.test_evens(0, 0, |\'_|\')'}),
+            ServiceMessage('testStarted', {'name': "testa.test_evens(1, 3, |'_|')"}),
+            ServiceMessage('testFinished', {'name': "testa.test_evens(1, 3, |'_|')"}),
+            ServiceMessage('testStarted', {'name': "testa.test_evens(2, 6, |'_|')"}),
+            ServiceMessage('testFinished', {'name': "testa.test_evens(2, 6, |'_|')"}),
         ])
 
 
