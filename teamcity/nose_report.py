@@ -104,7 +104,7 @@ class TeamcityReport(object):
 
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
-    def addError(self, test, err):
+    def addError(self, test, err, *k):  # nose gives 4 arguments
         test_class_name = get_class_fullname(test)
         test_id = self.get_test_id(test)
 
@@ -119,7 +119,7 @@ class TeamcityReport(object):
         else:
             self.report_fail(test, 'Error', err)
 
-    def addFailure(self, test, err):
+    def addFailure(self, test, err, *k):  # nose gives 5 arguments
         self.report_fail(test, 'Failure', err)
 
     def startTest(self, test):
