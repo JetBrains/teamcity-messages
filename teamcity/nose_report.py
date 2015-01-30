@@ -26,7 +26,7 @@ def _ln(label):
 
 
 _captured_output_start_marker = _ln('>> begin captured stdout <<') + "\n"
-_captured_output_end_marker = "\n" + _ln('>> end captured stdout <<')
+_captured_output_end_marker = "\n" + _ln('>> end captured logging <<')
 
 _real_stdout = sys.stdout
 
