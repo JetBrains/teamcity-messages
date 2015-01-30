@@ -13,6 +13,7 @@ tests under TeamCity build.
 
 import os
 import sys
+import traceback
 from datetime import timedelta
 
 from teamcity.messages import TeamcityServiceMessages
@@ -162,7 +163,11 @@ class EchoTeamCityMessages(object):
 
     def pytest_terminal_summary(self):
         if self.coverage_controller is not None:
-            self._report_coverage()
+            try:
+                self._report_coverage()
+            except:
+                tb = traceback.format_exc()
+                self.teamcity.customMessage("Coverage statistics reporting failed", "ERROR", errorDetails=tb)
 
     def _report_coverage(self):
         from coverage.misc import NotPython
