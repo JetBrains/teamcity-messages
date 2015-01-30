@@ -63,6 +63,22 @@ def test_custom_test_items(venv):
         ])
 
 
+def test_coverage(venv):
+    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ["pytest-cov==1.8.1"])
+
+    output = run(venv_with_coverage, 'coverage_test', options="--cov coverage_test")
+    test_name = "tests.guinea-pigs.pytest.coverage_test.coverage_test_py.test_covered_func"
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageLinesCovered', 'value': '9'}),
+            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageLinesTotal', 'value': '13'}),
+            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageLinesUncovered', 'value': '4'}),
+        ])
+
+
 def test_runtime_error(venv):
     output = run(venv, 'runtime_error_test.py')
     ms = assert_service_messages(
