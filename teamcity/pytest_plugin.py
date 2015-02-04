@@ -13,6 +13,7 @@ tests under TeamCity build.
 
 import os
 import sys
+import re
 import traceback
 from datetime import timedelta
 
@@ -82,7 +83,7 @@ class EchoTeamCityMessages(object):
             test_id += "::top_level"
 
         test_id = test_id.replace("::()::", "::")
-
+        test_id = re.sub(r"\.pyc?::", r"::", test_id)
         test_id = test_id.replace(".", "_").replace(os.sep, ".").replace("/", ".").replace('::', '.')
 
         return test_id
