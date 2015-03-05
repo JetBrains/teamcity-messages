@@ -11,5 +11,5 @@ python:
 install:
   - pip install flake8
 script:
-  - flake8 --ignore=E501 --exclude=tests/guinea-pigs
+  - flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs
   - python setup.py test
