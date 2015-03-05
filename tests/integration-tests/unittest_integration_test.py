@@ -144,7 +144,7 @@ def test_expected_failure(venv):
 def test_subtest_ok(venv):
     output = run_directly(venv, 'subtest_ok.py')
     test_name = '__main__.TestXXX.testSubtestSuccess'
-    ms = assert_service_messages(
+    assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),

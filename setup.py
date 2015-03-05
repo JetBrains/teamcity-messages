@@ -1,7 +1,7 @@
 # coding=utf-8
 from setuptools import setup
-
 from setuptools.command.test import test as TestCommand
+
 
 class PyTest(TestCommand):
     def finalize_options(self):
@@ -10,9 +10,8 @@ class PyTest(TestCommand):
         self.test_suite = True
 
     def run_tests(self):
-        #import here, cause outside the eggs aren't loaded
         import pytest
-        import sys 
+        import sys
         errno = pytest.main(["-l", "--junitxml=test-result.xml", "tests/unit-tests", "tests/integration-tests"])
         sys.exit(errno)
 

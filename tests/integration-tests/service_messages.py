@@ -1,5 +1,4 @@
 import pprint
-import sys
 
 
 class ServiceMessage:

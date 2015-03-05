@@ -234,7 +234,7 @@ def test_module_error(venv):
 def test_skip(venv):
     output = run(venv, 'skip_test.py')
     test_name = 'tests.guinea-pigs.pytest.skip_test.test_function'
-    ms = assert_service_messages(
+    assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name}),
