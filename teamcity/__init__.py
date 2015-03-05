@@ -1,7 +1,7 @@
 # coding=utf-8
-__all__ = ['is_running_under_teamcity']
-
 import os
+
+__all__ = ['is_running_under_teamcity']
 
 teamcity_presence_env_var = "TEAMCITY_VERSION"
 

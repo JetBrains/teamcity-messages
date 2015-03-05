@@ -1,5 +1,3 @@
-__author__ = 'Leonid.Bushuev'
-
 import os
 import subprocess
 

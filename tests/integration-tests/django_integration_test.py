@@ -1,7 +1,4 @@
 import sys
-
-__author__ = 'Leonid.Shalupov'
-
 import os
 import subprocess
 
