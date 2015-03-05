@@ -9,7 +9,7 @@ python:
   - "3.3"
   - "3.4"
 install:
-  - pip install pep8
+  - pip install flake8
 script:
-  - pep8 --ignore E501 teamcity examples tests/unit-tests tests/integration-tests
+  - flake8 --ignore=E501 --exclude=tests/guinea-pigs
   - python setup.py test
