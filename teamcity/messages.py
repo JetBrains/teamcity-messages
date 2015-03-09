@@ -60,7 +60,7 @@ class TeamcityServiceMessages(object):
         self.message('testStdErr', name=testName, out=out, flowId=flowId)
 
     def publishArtifacts(self, path, flowId=None):
-        self._single_value_message('publishArtifacts', path, flowId=flowId)
+        self._single_value_message('publishArtifacts', path)
 
     def buildStatisticLinesCovered(self, linesCovered):
         self.message('buildStatisticValue', key='CodeCoverageLinesCovered', value=str(linesCovered))
