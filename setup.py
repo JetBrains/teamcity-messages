@@ -73,7 +73,7 @@ Issue Tracker: https://github.com/JetBrains/teamcity-python/issues
         ],
 
         'flake8.extension': [
-            'P999 = teamcity.flake8:Pep8MonkeyPatcher',
+            'P999 = teamcity.flake8_plugin',
         ]
     },
 )
