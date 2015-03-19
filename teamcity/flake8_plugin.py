@@ -1,7 +1,6 @@
 import pep8
 import re
 
-from teamcity import is_running_under_teamcity
 from teamcity.messages import TeamcityServiceMessages
 
 
