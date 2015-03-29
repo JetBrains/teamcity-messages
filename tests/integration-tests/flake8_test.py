@@ -4,7 +4,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import ServiceMessage, assert_service_messages
+from service_messages import ServiceMessage, assert_service_messages, parse_service_messages
 
 
 @pytest.fixture(scope='module', params=["flake8==2.0.0", "flake8==2.4.0", "flake8"])
@@ -13,7 +13,7 @@ def venv(request):
 
 
 def test_smoke(venv):
-    output = run(venv)
+    output = run(venv, options="--teamcity")
 
     file_name = "tests/guinea-pigs/flake8/smoke.py"
     test1_name = "E302: " + file_name + ":3:1"
@@ -36,13 +36,23 @@ def test_smoke(venv):
         ])
 
 
-def run(venv):
+def test_no_reporting_without_explicit_option(venv):
+    output = run(venv, options="")
+
+    ms = parse_service_messages(output)
+    assert len(ms) == 0
+
+    assert output.find("E302") > 0
+    assert output.find("W391") > 0
+
+
+def run(venv, options):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
     command = os.path.join(
         os.getcwd(), venv.bin,
-        'flake8' + virtual_environments.get_exe_suffix()) + " --teamcity " + os.path.join("tests", "guinea-pigs", "flake8")
+        'flake8' + virtual_environments.get_exe_suffix()) + " " + options + " " + os.path.join("tests", "guinea-pigs", "flake8")
 
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
