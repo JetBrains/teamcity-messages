@@ -35,11 +35,13 @@ class TeamcityReport(pep8.StandardReport):
 
         messages = TeamcityServiceMessages()
 
-        suite_name = 'pep8: %s' % self.filename
+        normalized_filename = self.filename.replace("\\", "/")
+
+        suite_name = 'pep8: %s' % normalized_filename
         messages.testSuiteStarted(suite_name)
         for line_number, offset, code, text, doc in self._deferred_print:
             position = '%(path)s:%(row)d:%(col)d' % {
-                'path': self.filename,
+                'path': normalized_filename,
                 'row': self.line_offset + line_number,
                 'col': offset + 1,
             }
