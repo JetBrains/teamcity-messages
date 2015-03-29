@@ -57,6 +57,9 @@ For Django 1.6+: Use the Teamcity runner instead of the default DiscoverRunner b
 
 If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
 
+### flake8
+Add the `--teamcity` command line option.
+
 
 Contact information
 -------------------

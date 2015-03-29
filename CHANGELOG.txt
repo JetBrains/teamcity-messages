@@ -1,3 +1,7 @@
+Version 1.13 Sun Mar 29 2015
+
+  - flake8 support (Joseph Lombrozo, https://github.com/djeebus)
+
 Version 1.12 Fri Jan 16 2015
 
   - unittest: fix 2.6 compat

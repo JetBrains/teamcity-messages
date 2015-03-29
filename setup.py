@@ -37,6 +37,8 @@ under TeamCity and prints usual diagnostics without it.
 TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
 If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
 
+**flake8**: add `--teamcity` option to flake8 command line to report errors and warning as TeamCity failed tests
+
 ChangeLog: https://github.com/JetBrains/teamcity-python/blob/master/CHANGELOG.txt
 
 Issue Tracker: https://github.com/JetBrains/teamcity-python/issues
