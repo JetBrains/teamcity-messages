@@ -40,7 +40,10 @@ def run(venv):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
-    command = os.path.join(os.getcwd(), venv.bin, 'flake8.exe') + " --teamcity " + os.path.join("tests", "guinea-pigs", "flake8")
+    command = os.path.join(
+        os.getcwd(), venv.bin,
+        'flake8' + virtual_environments.get_exe_suffix()) + " --teamcity " + os.path.join("tests", "guinea-pigs", "flake8")
+
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
                             cwd=os.path.join(os.getcwd()), shell=True)

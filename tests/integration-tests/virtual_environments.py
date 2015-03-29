@@ -18,6 +18,10 @@ class VirtualEnvDescription:
         self.packages = packages
 
 
+def get_exe_suffix():
+    return ("", ".exe")[_windows]
+
+
 def prepare_virtualenv(packages=()):
     """
     Prepares a virtual environment.
@@ -28,9 +32,8 @@ def prepare_virtualenv(packages=()):
     vdir = os.path.join(vroot, env_key)
 
     vbin = os.path.join(vdir, ('bin', 'Scripts')[_windows])
-    exe_suffix = ("", ".exe")[_windows]
-    vpython = os.path.join(vbin, 'python' + exe_suffix)
-    vpip = os.path.join(vbin, 'pip' + exe_suffix)
+    vpython = os.path.join(vbin, 'python' + get_exe_suffix())
+    vpip = os.path.join(vbin, 'pip' + get_exe_suffix())
     venv_description = VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip, packages=packages)
 
     env = get_clean_system_environment()
