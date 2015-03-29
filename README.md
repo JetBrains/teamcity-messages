@@ -45,10 +45,10 @@ See `examples/simple.py` for a full example.
 If you are used to running unittest from the command line, instead of using `python -m unittest`, you could use `python -m teamcity.unittestpy`. 
 
 ### nose
-Test status reporting is enabled automatically when under TeamCity build.
+Test status reporting is enabled automatically under TeamCity build.
 
 ### py.test
-Add the `--teamcity` command line option.
+Test status reporting is enabled automatically under TeamCity build.
 
 ### Django
 For Django 1.6+: Use the Teamcity runner instead of the default DiscoverRunner by changing the following setting in your settings.py:
