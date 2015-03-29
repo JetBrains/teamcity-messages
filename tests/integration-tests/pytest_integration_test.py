@@ -71,9 +71,9 @@ def test_coverage(venv):
         [
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
-            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageLinesCovered', 'value': '9'}),
-            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageLinesTotal', 'value': '13'}),
-            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageLinesUncovered', 'value': '4'}),
+            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLCovered', 'value': '9'}),
+            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLTotal', 'value': '13'}),
+            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLUncovered', 'value': '4'}),
         ])
 
 
