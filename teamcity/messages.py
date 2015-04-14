@@ -6,6 +6,11 @@ import multiprocessing
 globalmanager = multiprocessing.Manager()
 writelock = globalmanager.Lock()
 
+def writeWithLock(stream, message):
+    writelock.acquire()
+    stream.write(message)
+    writelock.release()
+
 
 class TeamcityServiceMessages(object):
     quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
@@ -18,29 +23,21 @@ class TeamcityServiceMessages(object):
         return "".join([self.quote.get(x, x) for x in value])
 
     def message(self, messageName, **properties):
-        writelock.acquire()
-        self.output.write("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]))
-        writelock.release()
+        writeWithLock("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]))
         for k in sorted(properties.keys()):
             value = properties[k]
             if value is None:
                 continue
 
-            writelock.acquire()
-            self.output.write(" %s='%s'" % (k, self.escapeValue(value)))
-            writelock.release()
+            writeWithLock(" %s='%s'" % (k, self.escapeValue(value)))
 
-        writelock.acquire()
-        self.output.write("]\n")
-        writelock.release()
+        writeWithLock("]\n")
 
         # Python may buffer it for a long time, flushing helps to see real-time result
         self.output.flush()
 
     def _single_value_message(self, messageName, value):
-        writelock.acquire()
-        self.output.write("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
-        writelock.release()
+        writeWithLock("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
 
     def testSuiteStarted(self, suiteName, flowId=None):
         self.message('testSuiteStarted', name=suiteName, flowId=flowId)
