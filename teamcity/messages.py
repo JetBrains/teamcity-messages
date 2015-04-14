@@ -1,15 +1,6 @@
 # coding=utf-8
 import sys
 import datetime
-import multiprocessing
-
-globalmanager = multiprocessing.Manager()
-writelock = globalmanager.Lock()
-
-def writeWithLock(stream, message):
-    writelock.acquire()
-    stream.write(message)
-    writelock.release()
 
 
 class TeamcityServiceMessages(object):
@@ -23,21 +14,22 @@ class TeamcityServiceMessages(object):
         return "".join([self.quote.get(x, x) for x in value])
 
     def message(self, messageName, **properties):
-        writeWithLock("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]))
+        message = ("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]))
         for k in sorted(properties.keys()):
             value = properties[k]
             if value is None:
                 continue
 
-            writeWithLock(" %s='%s'" % (k, self.escapeValue(value)))
+            message += (" %s='%s'" % (k, self.escapeValue(value)))
 
-        writeWithLock("]\n")
+        message += ("]\n")
 
         # Python may buffer it for a long time, flushing helps to see real-time result
+        self.output.write(message)
         self.output.flush()
 
     def _single_value_message(self, messageName, value):
-        writeWithLock("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
+        self.output.write("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
 
     def testSuiteStarted(self, suiteName, flowId=None):
         self.message('testSuiteStarted', name=suiteName, flowId=flowId)
