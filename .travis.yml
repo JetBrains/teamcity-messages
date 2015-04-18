@@ -18,17 +18,20 @@ matrix:
     - python: 2.7
       env: TEST_PY25="true"
 install:
+  - mkdir builds
+  - pushd builds
   - if [ "${TEST_PY24}" == "true" ]; then
       deactivate;
-      /bin/sh ./.travis-make-py24-virtualenv.sh $PWD/py24-ve;
+      /bin/sh ../.travis-make-py24-virtualenv.sh $PWD/py24-ve;
       source $PWD/py24-ve/bin/activate;
       fi
   - if [ "${TEST_PY25}" == "true" ]; then
       deactivate;
-      /bin/sh ./.travis-make-py25-virtualenv.sh $PWD/py25-ve;
+      /bin/sh ../.travis-make-py25-virtualenv.sh $PWD/py25-ve;
       source $PWD/py25-ve/bin/activate;
       fi
   - pip install flake8
+  - popd
 script:
   - python -V
   - flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs
