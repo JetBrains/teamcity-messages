@@ -11,8 +11,7 @@ python:
   - "pypy"
   - "pypy3"
 env:
-  - TEST_PY24=""
-  - TEST_PY25=""
+  - TEST_PY24="" TEST_PY25=""
 matrix:
   include:
     - python: 2.7
