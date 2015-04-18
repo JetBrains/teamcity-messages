@@ -78,7 +78,11 @@ class TeamcityTestResult(TestResult):
             self.report_fail(test_name, 'Failure', err)
             self.messages.testFinished(test_name, flowId=test_name)
         elif get_class_fullname(err[0]) == "unittest2.case.SkipTest":
-            message = getattr(err[1], "message", '')
+            message = ""
+            if hasattr(err[1], "message"):
+                message = getattr(err[1], "message", "")
+            elif hasattr(err[1], "args"):
+                message = getattr(err[1], "args", [""])[0]
             self.addSkip(test, message)
         else:
             self.report_fail(test, 'Error', err)
