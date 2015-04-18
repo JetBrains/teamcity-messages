@@ -5,7 +5,7 @@
 VIRTENV=$1
 set -x
 set -e
-curl -O http://www.python.org/ftp/python/2.5.6/Python-2.5.6.tar.bz2
+wget -O Python-2.4.6.tar.bz2 http://www.python.org/ftp/python/2.5.6/Python-2.5.6.tar.bz2
 tar xjf Python-2.5.6.tar.bz2
 cd Python-2.5.6
 cat >setup.cfg <<EOF
