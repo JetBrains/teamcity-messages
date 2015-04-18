@@ -48,7 +48,9 @@ def prepare_virtualenv(packages=()):
         virtualenv.create_environment(vdir)
 
         for package_spec in packages:
-            subprocess.call([vpip, "install", package_spec], env=env)
+            rc = subprocess.call([vpip, "install", "--insecure", package_spec], env=env)
+            if rc != 0:
+                raise Exception("Unable to install " + package_spec + " to " + vroot)
 
         open(done_flag_file, 'a').close()
 
