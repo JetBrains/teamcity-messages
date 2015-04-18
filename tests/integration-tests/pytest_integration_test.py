@@ -72,7 +72,7 @@ def test_custom_test_items(venv):
 
 
 def test_coverage(venv):
-    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ["pytest-cov==1.8.1"])
+    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-cov==1.8.1",))
 
     output = run(venv_with_coverage, 'coverage_test', options="--cov coverage_test")
     test_name = "tests.guinea-pigs.pytest.coverage_test.coverage_test.test_covered_func"
