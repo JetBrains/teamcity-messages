@@ -22,12 +22,12 @@ matrix:
 install:
   - if [ "${TEST_PY24}" == "true" ]; then
       deactivate;
-      ../.travis-make-py24-virtualenv.sh $PWD/py24-ve;
+      /bin/sh ./.travis-make-py24-virtualenv.sh $PWD/py24-ve;
       source $PWD/py24-ve/bin/activate;
       fi
   - if [ "${TEST_PY25}" == "true" ]; then
       deactivate;
-      ../.travis-make-py25-virtualenv.sh $PWD/py25-ve;
+      /bin/sh ./.travis-make-py25-virtualenv.sh $PWD/py25-ve;
       source $PWD/py25-ve/bin/activate;
       fi
   - pip install flake8
