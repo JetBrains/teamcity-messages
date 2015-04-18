@@ -11,12 +11,14 @@ python:
   - "3.4"
   - "pypy"
   - "pypy3"
+env:
+  - PYTEST="pytest"
 matrix:
   include:
     - python: 2.7
-      env: TEST_PY24="true" RUN_FLAKE="false"
+      env: TEST_PY24="true" RUN_FLAKE="false" PYTEST="pytest==2.3.3 py==1.4.12"
     - python: 2.7
-      env: TEST_PY25="true" RUN_FLAKE="false"
+      env: TEST_PY25="true" RUN_FLAKE="false" PYTEST="pytest==2.5.0 py==1.4.12"
 install:
   - mkdir builds
   - pushd builds
@@ -31,6 +33,7 @@ install:
       source $PWD/py25-ve/bin/activate;
       fi
   - if [ "${RUN_FLAKE}" != "false" ]; then pip install flake8; fi
+  - pip install ${PYTEST}
   - popd
 script:
   - python -V
