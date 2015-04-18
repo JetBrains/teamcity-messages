@@ -16,10 +16,10 @@ EOF
 make
 make install
 # This is the last version of virtualenv to support python 2.5:
-curl -O https://raw.github.com/pypa/virtualenv/1.9.1/virtualenv.py
+wget -O virtualenv.py https://raw.github.com/pypa/virtualenv/1.9.1/virtualenv.py
 # And this is the last version of pip to support python 2.5. If
 # there's a file matching "^pip-.*(zip|tar.gz|tar.bz2|tgz|tbz)$" in
 # the current directory then virtualenv will take that as the pip
 # source distribution to install
-curl -O http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz
+wget -O pip-1.3.1.tar.gz http://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz
 install/bin/python2.5 ./virtualenv.py --distribute $VIRTENV
