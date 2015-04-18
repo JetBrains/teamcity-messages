@@ -15,8 +15,10 @@ def construct_fixture():
         # latest version
         params.append(("pytest",))
 
-    if sys.version_info < (2, 6):
-        # Versions known to run on 2.4 and 2.5
+    if (2, 5) <= sys.version_info < (2, 6):
+        params.append(("pytest==2.5.0", "py==1.4.19"))
+
+    if (2, 4) <= sys.version_info < (2, 5):
         params.append(("pytest==2.3.3", "py==1.4.12"))
 
     @pytest.fixture(scope='module', params=params)
@@ -71,6 +73,7 @@ def test_custom_test_items(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_coverage(venv):
     venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-cov==1.8.1",))
 
@@ -154,6 +157,7 @@ def test_fixture_error(venv):
     assert ms[8].params["details"].find("oops") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_output(venv):
     output = run(venv, 'output_test.py')
 
@@ -179,6 +183,7 @@ def test_output(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_chunked_output(venv):
     output = run(venv, 'chunked_output_test.py')
 

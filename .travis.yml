@@ -18,7 +18,7 @@ matrix:
     - python: 2.7
       env: TEST_PY24="true" FLAKE8="" PYTEST="pytest==2.3.3 py==1.4.12" VIRTUALENV="virtualenv==1.7.2"
     - python: 2.7
-      env: TEST_PY25="true" FLAKE8="" PYTEST="pytest==2.5.0 py==1.4.12" VIRTUALENV="virtualenv==1.9.1" PIP_OPT="--insecure"
+      env: TEST_PY25="true" FLAKE8="" PYTEST="pytest==2.5.0 py==1.4.19" VIRTUALENV="virtualenv==1.9.1" PIP_OPT="--insecure"
 install:
   - mkdir builds
   - pushd builds
