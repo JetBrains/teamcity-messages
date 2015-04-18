@@ -14,9 +14,9 @@ python:
 matrix:
   include:
     - python: 2.7
-      env: TEST_PY24="true"
+      env: TEST_PY24="true" RUN_FLAKE="false"
     - python: 2.7
-      env: TEST_PY25="true"
+      env: TEST_PY25="true" RUN_FLAKE="false"
 install:
   - mkdir builds
   - pushd builds
@@ -30,9 +30,9 @@ install:
       /bin/sh ../.travis-make-py25-virtualenv.sh $PWD/py25-ve;
       source $PWD/py25-ve/bin/activate;
       fi
-  - pip install flake8
+  - if [ "${RUN_FLAKE}" != "false" ]; then pip install flake8; fi
   - popd
 script:
   - python -V
-  - flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs
+  - if [ "${RUN_FLAKE}" != "false" ]; then flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs; fi
   - python setup.py test
