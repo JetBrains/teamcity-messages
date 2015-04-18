@@ -10,8 +10,28 @@ python:
   - "3.4"
   - "pypy"
   - "pypy3"
+env:
+  - TEST_PY24=""
+  - TEST_PY25=""
+matrix:
+  include:
+    - python: 2.7
+      env: TEST_PY24="true"
+    - python: 2.7
+      env: TEST_PY25="true"
 install:
+  - if [ "${TEST_PY24}" == "true" ]; then
+      deactivate;
+      ../.travis-make-py24-virtualenv.sh $PWD/py24-ve;
+      source $PWD/py24-ve/bin/activate;
+      fi
+  - if [ "${TEST_PY25}" == "true" ]; then
+      deactivate;
+      ../.travis-make-py25-virtualenv.sh $PWD/py25-ve;
+      source $PWD/py25-ve/bin/activate;
+      fi
   - pip install flake8
 script:
+  - python -V
   - flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs
   - python setup.py test
