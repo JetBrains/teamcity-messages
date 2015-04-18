@@ -34,6 +34,11 @@ def prepare_virtualenv(packages=()):
     vbin = os.path.join(vdir, ('bin', 'Scripts')[_windows])
     vpython = os.path.join(vbin, 'python' + get_exe_suffix())
     vpip = os.path.join(vbin, 'pip' + get_exe_suffix())
+
+    vpip_install = [vpip, "install"]
+    if (2, 5) <= sys.version_info < (2, 6):
+        vpip_install.append("--insecure")
+
     venv_description = VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip, packages=packages)
 
     env = get_clean_system_environment()
@@ -48,7 +53,7 @@ def prepare_virtualenv(packages=()):
         virtualenv.create_environment(vdir)
 
         for package_spec in packages:
-            rc = subprocess.call([vpip, "install", "--insecure", package_spec], env=env)
+            rc = subprocess.call(vpip_install + [package_spec], env=env)
             if rc != 0:
                 raise Exception("Unable to install " + package_spec + " to " + vroot)
 
