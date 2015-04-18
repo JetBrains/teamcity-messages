@@ -284,7 +284,11 @@ def run(venv, file, test=None, options='', set_tc_version=True):
     if set_tc_version:
         env['TEAMCITY_VERSION'] = "0.0.0"
 
-    test_suffix = ("::" + test) if test is not None else ""
+    if test is not None:
+        test_suffix = "::" + test
+    else:
+        test_suffix = ""
+
     command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'pytest', file) + test_suffix
     print("RUN: " + command)

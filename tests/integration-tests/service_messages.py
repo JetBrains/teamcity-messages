@@ -1,4 +1,5 @@
 import pprint
+import sys
 
 
 class ServiceMessage:
@@ -65,7 +66,10 @@ def _parse_one_service_message(s):
     b2 = s.rindex(']', b1)
     inner = s[b1 + 1:b2].strip()
     space1 = inner.find(' ')
-    name_len = space1 if space1 >= 0 else inner.__len__()
+    if space1 >= 0:
+        name_len = space1
+    else:
+        name_len = inner.__len__()
     name = inner[0:name_len]
     params = dict()
     beg = name_len + 1
@@ -105,13 +109,13 @@ def assert_service_messages(actual_messages_string, expected_messages):
 
     try:
         if len(actual_messages) != len(expected_messages):
-            raise AssertionError("Expected {0} services messages, but got {1}".format(len(expected_messages), len(actual_messages)))
+            raise AssertionError("Expected %d services messages, but got %d" % (len(expected_messages), len(actual_messages)))
         for index, (actual, expected) in enumerate(zip(actual_messages, expected_messages)):
             assert actual >= expected, "Expected\n%s, but got\n%s\n at index %d" % (pprint.pformat(expected), pprint.pformat(actual), index)
-    except AssertionError as e:
+    except:
         print("Actual:\n" + pprint.pformat(actual_messages) + "\n")
         print("Expected:\n" + pprint.pformat(expected_messages) + "\n")
 
-        raise e
+        raise sys.exc_info()[1]
 
     return actual_messages
