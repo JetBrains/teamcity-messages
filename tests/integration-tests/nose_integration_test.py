@@ -7,7 +7,7 @@ import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages
 
 
-@pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.0"])
+@pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1"])
 def venv(request):
     """
     Prepares a virtual environment for nose.
@@ -313,11 +313,19 @@ def run(venv, file, clazz=None, test=None, options=""):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
+    if clazz:
+        clazz_arg = ":" + clazz
+    else:
+        clazz_arg = ""
+
+    if test:
+        test_arg = "." + test
+    else:
+        test_arg = ""
+
     command = os.path.join(venv.bin, 'nosetests') + \
         " -v " + options + " " + \
-        os.path.join('tests', 'guinea-pigs', 'nose', file) + \
-        ((":" + clazz) if clazz else "") + \
-        (('.' + test) if test else "")
+        os.path.join('tests', 'guinea-pigs', 'nose', file) + clazz_arg + test_arg
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
