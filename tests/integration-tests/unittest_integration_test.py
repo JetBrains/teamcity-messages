@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 import sys
 import subprocess
@@ -112,7 +110,7 @@ def test_doctests(venv):
 
 def test_skip(venv):
     if sys.version_info < (2, 7):
-        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2==0.8.0"])
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2==0.5.1"])
 
     output = run_directly(venv, 'skip_test.py')
     test_name = '__main__.TestSkip.test_skip_me'
@@ -125,7 +123,7 @@ def test_skip(venv):
         ])
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="expectedFailure requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="expectedFailure requires Python 2.7+")
 def test_expected_failure(venv):
     output = run_directly(venv, 'expected_failure.py')
     test_name = '__main__.TestSkip.test_expected_failure'
@@ -140,7 +138,7 @@ def test_expected_failure(venv):
     assert ms[1].params['message'].find("this should happen unfortunately") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_ok(venv):
     output = run_directly(venv, 'subtest_ok.py')
     test_name = '__main__.TestXXX.testSubtestSuccess'
@@ -154,7 +152,7 @@ def test_subtest_ok(venv):
         ])
 
 
-@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_error(venv):
     output = run_directly(venv, 'subtest_error.py')
     test_name = '__main__.TestXXX.testSubtestError'
@@ -173,7 +171,7 @@ def test_subtest_error(venv):
     assert ms[3].params['details'].find("RRR") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_failure(venv):
     output = run_directly(venv, 'subtest_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
@@ -192,7 +190,7 @@ def test_subtest_failure(venv):
     assert ms[3].params['details'].find("1 == 0") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (3, 4), reason="subtests require Python 3.4+")
+@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_mixed_failure(venv):
     output = run_directly(venv, 'subtest_mixed_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
@@ -212,7 +210,7 @@ def test_subtest_mixed_failure(venv):
     assert ms[3].params['details'].find("6 == 1") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="unexpected_success requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="unexpected_success requires Python 2.7+")
 def test_unexpected_success(venv):
     output = run_directly(venv, 'unexpected_success.py')
     test_name = '__main__.TestSkip.test_unexpected_success'
@@ -227,7 +225,7 @@ def test_unexpected_success(venv):
         ])
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="unittest discovery requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="unittest discovery requires Python 2.7+")
 def test_discovery(venv):
     output = run_directly(venv, 'discovery.py')
     assert_service_messages(
@@ -238,7 +236,7 @@ def test_discovery(venv):
         ])
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="unittest discovery requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="unittest discovery requires Python 2.7+")
 def test_discovery_errors(venv):
     output = run_directly(venv, 'discovery_errors.py')
     test_name = 'unittest.loader.ModuleImportFailure.testsimple'
@@ -253,7 +251,7 @@ def test_discovery_errors(venv):
     assert ms[1].params['details'].index("ImportError") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_setup_module_error(venv):
     output = run_directly(venv, 'setup_module_error.py')
     test_name = '__main__.setUpModule'
@@ -268,7 +266,7 @@ def test_setup_module_error(venv):
     assert ms[1].params['details'].index("assert 1 == 0") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_setup_class_error(venv):
     output = run_directly(venv, 'setup_class_error.py')
     test_name = '__main__.TestXXX.setUpClass'
@@ -283,7 +281,7 @@ def test_setup_class_error(venv):
     assert ms[1].params['details'].index("RRR") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_teardown_class_error(venv):
     output = run_directly(venv, 'teardown_class_error.py')
     ms = assert_service_messages(
@@ -299,7 +297,7 @@ def test_teardown_class_error(venv):
     assert ms[3].params['details'].index("RRR") > 0
 
 
-@pytest.mark.skipif(sys.version_info < (2, 7), reason="requires Python 2.7+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_teardown_module_error(venv):
     output = run_directly(venv, 'teardown_module_error.py')
     teardown_test_name = '__main__.tearDownModule'

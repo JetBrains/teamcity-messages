@@ -49,7 +49,12 @@ class TeamcityTestResult(TestResult):
             super(TeamcityTestResult, self).addSkip(test, reason)
 
         test_id = self.get_test_id(test)
-        self.messages.testIgnored(test_id, message="Skipped" + ((": " + reason) if reason else ""), flowId=test_id)
+
+        if reason:
+            reason_str = ": " + reason
+        else:
+            reason_str = ""
+        self.messages.testIgnored(test_id, message="Skipped" + reason_str, flowId=test_id)
 
     def addUnexpectedSuccess(self, test):
         super(TeamcityTestResult, self).addUnexpectedSuccess(test)
@@ -73,7 +78,11 @@ class TeamcityTestResult(TestResult):
             self.report_fail(test_name, 'Failure', err)
             self.messages.testFinished(test_name, flowId=test_name)
         elif get_class_fullname(err[0]) == "unittest2.case.SkipTest":
-            message = getattr(err[1], "message", '')
+            message = ""
+            if hasattr(err[1], "message"):
+                message = getattr(err[1], "message", "")
+            elif hasattr(err[1], "args"):
+                message = getattr(err[1], "args", [""])[0]
             self.addSkip(test, message)
         else:
             self.report_fail(test, 'Error', err)

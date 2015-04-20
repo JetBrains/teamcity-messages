@@ -12,6 +12,7 @@ def venv(request):
     return virtual_environments.prepare_virtualenv([request.param])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_smoke(venv):
     output = run(venv, options="--teamcity")
 
@@ -36,6 +37,7 @@ def test_smoke(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_no_reporting_without_explicit_option(venv):
     output = run(venv, options="")
 

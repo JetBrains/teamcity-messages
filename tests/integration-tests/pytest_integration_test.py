@@ -1,6 +1,5 @@
-from __future__ import print_function
-
 import os
+import sys
 import subprocess
 
 import pytest
@@ -9,13 +8,26 @@ import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, has_service_messages
 
 
-@pytest.fixture(scope='module', params=["pytest"])
-def venv(request):
-    """
-    Prepares a virtual environment for py.test
-    :rtype : virtual_environments.VirtualEnvDescription
-    """
-    return virtual_environments.prepare_virtualenv([request.param])
+def construct_fixture():
+    params = []
+
+    if sys.version_info >= (2, 6):
+        # latest version
+        params.append(("pytest",))
+
+    if (2, 5) <= sys.version_info < (2, 6):
+        params.append(("pytest==2.5.0", "py==1.4.19"))
+
+    if (2, 4) <= sys.version_info < (2, 5):
+        params.append(("pytest==2.3.3", "py==1.4.12"))
+
+    @pytest.fixture(scope='module', params=params)
+    def venv(request):
+        return virtual_environments.prepare_virtualenv(request.param)
+
+    return venv
+
+globals()['venv'] = construct_fixture()
 
 
 def test_hierarchy(venv):
@@ -61,8 +73,9 @@ def test_custom_test_items(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_coverage(venv):
-    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ["pytest-cov==1.8.1"])
+    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-cov==1.8.1",))
 
     output = run(venv_with_coverage, 'coverage_test', options="--cov coverage_test")
     test_name = "tests.guinea-pigs.pytest.coverage_test.coverage_test.test_covered_func"
@@ -126,13 +139,16 @@ def test_fixture_error(venv):
             ServiceMessage('testStarted', {'name': test1_setup}),
             ServiceMessage('testFailed', {'name': test1_setup, 'flowId': test1_setup}),
             ServiceMessage('testFinished', {'name': test1_setup}),
-            ServiceMessage('testFailed', {'name': test1_name, 'message': 'test setup failed, see ' + test1_setup + ' test failure', 'flowId': test1_name}),
+            ServiceMessage('testFailed', {'name': test1_name,
+                                          'message': 'test setup failed, see ' + test1_setup + ' test failure',
+                                          'flowId': test1_name}),
             ServiceMessage('testFinished', {'name': test1_name, 'flowId': test1_name}),
             ServiceMessage('testStarted', {'name': test2_name, 'flowId': test2_name}),
             ServiceMessage('testStarted', {'name': test2_setup, 'flowId': test2_setup}),
             ServiceMessage('testFailed', {'name': test2_setup, 'flowId': test2_setup}),
             ServiceMessage('testFinished', {'name': test2_setup, 'flowId': test2_setup}),
-            ServiceMessage('testFailed', {'name': test2_name, 'flowId': test2_name, 'message': 'test setup failed, see ' + test2_setup + ' test failure'}),
+            ServiceMessage('testFailed', {'name': test2_name, 'flowId': test2_name,
+                                          'message': 'test setup failed, see ' + test2_setup + ' test failure'}),
             ServiceMessage('testFinished', {'name': test2_name, 'flowId': test2_name}),
         ])
     assert ms[2].params["details"].find("raise Exception") > 0
@@ -141,6 +157,7 @@ def test_fixture_error(venv):
     assert ms[8].params["details"].find("oops") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_output(venv):
     output = run(venv, 'output_test.py')
 
@@ -166,6 +183,7 @@ def test_output(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_chunked_output(venv):
     output = run(venv, 'chunked_output_test.py')
 
@@ -278,18 +296,23 @@ def test_xfail(venv):
     assert ms[4].params["message"].find("xfail reason") > 0
 
 
-def run(venv, file, test=None, options='', set_tc_version=True):
+def run(venv, file_name, test=None, options='', set_tc_version=True):
     env = virtual_environments.get_clean_system_environment()
 
     if set_tc_version:
         env['TEAMCITY_VERSION'] = "0.0.0"
 
-    test_suffix = ("::" + test) if test is not None else ""
+    if test is not None:
+        test_suffix = "::" + test
+    else:
+        test_suffix = ""
+
     command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
-        os.path.join('tests', 'guinea-pigs', 'pytest', file) + test_suffix
+        os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
+    # print("OUTPUT: " + output.replace("#", "*"))
     proc.wait()
 
     return output

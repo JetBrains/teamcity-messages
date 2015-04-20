@@ -1,3 +1,4 @@
+sudo: false
 language: python
 os:
   - linux
@@ -10,8 +11,30 @@ python:
   - "3.4"
   - "pypy"
   - "pypy3"
+env:
+  - PYTEST="pytest" VIRTUALENV="virtualenv" FLAKE8="flake8"
+matrix:
+  include:
+    - python: 2.7
+      env: TEST_PY24="true" FLAKE8="" PYTEST="pytest==2.3.3 py==1.4.12" VIRTUALENV="virtualenv==1.7.2"
+    - python: 2.7
+      env: TEST_PY25="true" FLAKE8="" PYTEST="pytest==2.5.0 py==1.4.19" VIRTUALENV="virtualenv==1.9.1" PIP_OPT="--insecure"
 install:
-  - pip install flake8
+  - mkdir builds
+  - pushd builds
+  - if [ "${TEST_PY24}" == "true" ]; then
+      deactivate;
+      /bin/sh ../.travis-make-py24-virtualenv.sh $PWD/py24-ve;
+      source $PWD/py24-ve/bin/activate;
+      fi
+  - if [ "${TEST_PY25}" == "true" ]; then
+      deactivate;
+      /bin/sh ../.travis-make-py25-virtualenv.sh $PWD/py25-ve;
+      source $PWD/py25-ve/bin/activate;
+      fi
+  - pip install ${PIP_OPT} ${FLAKE8} ${PYTEST} ${VIRTUALENV}
+  - popd
 script:
-  - flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs
+  - python -V
+  - if [ -n "${FLAKE8}" ]; then echo "running flake"; flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs; fi
   - python setup.py test

@@ -93,7 +93,11 @@ class EchoTeamCityMessages(object):
 
     def ensure_test_start_reported(self, test_id):
         if test_id not in self.test_start_reported_mark:
-            self.teamcity.testStarted(test_id, flowId=test_id, captureStandardOutput='false' if self.output_capture_enabled else 'true')
+            if self.output_capture_enabled:
+                capture_standard_output = "false"
+            else:
+                capture_standard_output = "true"
+            self.teamcity.testStarted(test_id, flowId=test_id, captureStandardOutput=capture_standard_output)
             self.test_start_reported_mark.add(test_id)
 
     def report_has_output(self, report):
@@ -122,7 +126,11 @@ class EchoTeamCityMessages(object):
         """
         orig_test_id = self.format_test_id(report.nodeid)
 
-        suffix = '' if report.when == 'call' else ('_' + report.when)
+        if report.when == 'call':
+            suffix = ''
+        else:
+            suffix = '_' + report.when
+
         test_id = orig_test_id + suffix
 
         duration = timedelta(seconds=report.duration)
@@ -211,8 +219,13 @@ class EchoTeamCityMessages(object):
                         self.messages.testFinished(test_id, flowId=test_id)
 
                 if total.n_files > 0:
-                    covered = total.n_executed + (total.n_executed_branches if self.branches else 0)
-                    total_statements = total.n_statements + (total.n_branches if self.branches else 0)
+                    covered = total.n_executed
+                    total_statements = total.n_statements
+
+                    if self.branches:
+                        covered += total.n_executed_branches
+                        total_statements += total.n_branches
+
                     self.messages.buildStatisticLinesCovered(covered)
                     self.messages.buildStatisticTotalLines(total_statements)
                     self.messages.buildStatisticLinesUncovered(total_statements - covered)

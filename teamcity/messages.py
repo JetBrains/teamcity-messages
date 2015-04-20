@@ -14,7 +14,9 @@ class TeamcityServiceMessages(object):
         return "".join([self.quote.get(x, x) for x in value])
 
     def message(self, messageName, **properties):
-        message = ("\n##teamcity[%s timestamp='%s'" % (messageName, self.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3]))
+        timestamp = self.now().strftime("%Y-%m-%dT%H:%M:%S.") + "%03d" % (self.now().microsecond / 1000)
+        message = ("\n##teamcity[%s timestamp='%s'" % (messageName, timestamp))
+
         for k in sorted(properties.keys()):
             value = properties[k]
             if value is None:
