@@ -15,17 +15,19 @@ class TeamcityServiceMessages(object):
 
     def message(self, messageName, **properties):
         timestamp = self.now().strftime("%Y-%m-%dT%H:%M:%S.") + "%03d" % (self.now().microsecond / 1000)
-        self.output.write("\n##teamcity[%s timestamp='%s'" % (messageName, timestamp))
+        message = ("\n##teamcity[%s timestamp='%s'" % (messageName, timestamp))
 
         for k in sorted(properties.keys()):
             value = properties[k]
             if value is None:
                 continue
 
-            self.output.write(" %s='%s'" % (k, self.escapeValue(value)))
-        self.output.write("]\n")
+            message += (" %s='%s'" % (k, self.escapeValue(value)))
+
+        message += ("]\n")
 
         # Python may buffer it for a long time, flushing helps to see real-time result
+        self.output.write(message)
         self.output.flush()
 
     def _single_value_message(self, messageName, value):
