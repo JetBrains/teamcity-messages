@@ -40,7 +40,7 @@ class TeamcityReport(object):
 
         self.messages = TeamcityServiceMessages(_real_stdout)
         self.test_started_datetime_map = {}
-        self.enabled = False
+        self.enabled = False 
 
     def get_test_id(self, test):
         if is_string(test):
@@ -109,7 +109,7 @@ class TeamcityReport(object):
         test_id = self.get_test_id(test)
 
         if issubclass(err[0], SkipTest):
-            self.messages.testIgnored(test_id, message="Skipped", flowId=test_id)
+            self.messages.testIgnored(test_id, message=("SKIPPED: %s" % err[1].message), flowId=test_id)
         elif issubclass(err[0], DeprecatedTest):
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
         elif test_class_name == CONTEXT_SUITE_FQN:
