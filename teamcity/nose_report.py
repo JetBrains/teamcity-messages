@@ -109,7 +109,7 @@ class TeamcityReport(object):
         test_id = self.get_test_id(test)
 
         if issubclass(err[0], SkipTest):
-            self.messages.testIgnored(test_id, message=("SKIPPED: %s" % err[1].message), flowId=test_id)
+            self.messages.testIgnored(test_id, message=("SKIPPED: %s" % str(err[1])), flowId=test_id)
         elif issubclass(err[0], DeprecatedTest):
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
         elif test_class_name == CONTEXT_SUITE_FQN:
