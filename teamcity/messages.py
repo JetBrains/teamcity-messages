@@ -52,7 +52,7 @@ class TeamcityServiceMessages(object):
             self.message('testFinished', name=testName, flowId=flowId)
 
     def testIgnored(self, testName, message='', flowId=None):
-        self.message('testIgnored', name=testName, message=message, flowId=flowId)
+        self.message('testIgnored', name=testName, message=message, flowId=flowId, details=message)
 
     def testFailed(self, testName, message='', details='', flowId=None):
         self.message('testFailed', name=testName, message=message, details=details, flowId=flowId)
