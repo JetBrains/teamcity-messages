@@ -40,7 +40,7 @@ class TeamcityReport(object):
 
         self.messages = TeamcityServiceMessages(_real_stdout)
         self.test_started_datetime_map = {}
-        self.enabled = False 
+        self.enabled = False
 
     def get_test_id(self, test):
         if is_string(test):
