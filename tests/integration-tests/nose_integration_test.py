@@ -58,7 +58,7 @@ def test_skip(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped', 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': 'SKIPPED: my skip', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
