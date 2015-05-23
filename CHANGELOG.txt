@@ -1,3 +1,8 @@
+Version 1.14 Sat May 23 2015
+
+  - support python 2.4, 2.5
+  - nose: report skip test reason (Lewis Coates, https://github.com/lewisc)
+
 Version 1.13 Sun Mar 29 2015
 
   - report coverage statistics from py.test pytest-cov plugin (Joseph Lombrozo, https://github.com/djeebus)
