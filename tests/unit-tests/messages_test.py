@@ -45,7 +45,7 @@ def test_unicode():
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     bjork = u'Bj\xf6rk Gu\xf0mundsd\xf3ttir'
     messages.message(bjork)
-    assert stream.observed_output == u"\n##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % bjork
+    assert stream.observed_output == "\n##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % bjork.encode('utf-8')
 
 
 def test_unicode_to_sys_stdout_with_no_encoding():
