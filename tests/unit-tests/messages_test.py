@@ -34,3 +34,11 @@ def test_three_properties():
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     messages.message('dummyMessage', fruit='apple', meat='steak', pie='raspberry')
     assert stream.observed_output == "\n##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556' fruit='apple' meat='steak' pie='raspberry']\n"
+
+
+def test_unicode():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    bjork = u'Bj\xf6rk Gu\xf0mundsd\xf3ttir'
+    messages.message(bjork)
+    assert stream.observed_output == u"\n##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % bjork
