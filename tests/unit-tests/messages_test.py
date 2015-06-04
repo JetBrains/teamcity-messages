@@ -51,6 +51,9 @@ def test_unicode():
 def test_unicode_to_sys_stdout_with_no_encoding():
     with tempfile.NamedTemporaryFile() as tmpf:
         tmpf.write(textwrap.dedent(r"""
+            import sys
+            sys.path = {sys_path}
+
             from teamcity.messages import TeamcityServiceMessages
 
             bjork = u'Bj\xf6rk Gu\xf0mundsd\xf3ttir'
@@ -58,7 +61,7 @@ def test_unicode_to_sys_stdout_with_no_encoding():
             messages = TeamcityServiceMessages()
             messages.message(bjork)
             print("hello")
-            """))
+            """.format(sys_path=sys.path)))
         tmpf.flush()
 
         ret = os.system("%s %s" % (sys.executable, tmpf.name))
