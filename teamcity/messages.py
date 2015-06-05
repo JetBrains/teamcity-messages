@@ -4,8 +4,9 @@ import datetime
 
 if sys.version_info < (3, ):
     # Python 2
-    text_type = unicode
+    text_type = unicode  # flake8: noqa
 else:
+    # Python 3
     text_type = str
 
 
@@ -13,7 +14,10 @@ class TeamcityServiceMessages(object):
     quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
 
     def __init__(self, output=sys.stdout, now=datetime.datetime.now, encoding='auto'):
-        self.output = output
+        if sys.version_info < (3, ) or not hasattr(output, 'buffer'):
+            self.output = output
+        else:
+            self.output = output.buffer
         self.now = now
 
         if getattr(output, 'encoding', None) or encoding == 'auto':
