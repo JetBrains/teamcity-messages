@@ -20,16 +20,15 @@ class TeamcityServiceMessages(object):
             self.output = output.buffer
         self.now = now
 
-        if getattr(output, 'encoding', None) or encoding == 'auto':
+        if encoding and encoding != 'auto':
+            self.encoding = encoding
+        elif getattr(output, 'encoding', None) or encoding == 'auto':
             # Default encoding to 'utf-8' because it sucks if we fail with a
             # `UnicodeEncodeError` simply because LANG didn't get propagated to
             # a subprocess or something and sys.stdout.encoding is None
-            if hasattr(output, 'encoding'):
-                self.encoding = output.encoding or 'utf-8'
-            else:
-                self.encoding = 'utf-8'
+            self.encoding = getattr(output, 'encoding', None) or 'utf-8'
         else:
-            self.encoding = encoding
+            self.encoding = None
 
     def escapeValue(self, value):
         return "".join([self.quote.get(x, x) for x in value])
