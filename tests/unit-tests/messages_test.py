@@ -66,7 +66,7 @@ def test_unicode_to_sys_stdout_with_no_encoding():
     tempdir = tempfile.mkdtemp()
     file_name = os.path.join(tempdir, "testfile.py")
     try:
-        f = open(file_name, "wt")
+        f = open(file_name, "wb")
         f.write((textwrap.dedent(r"""
             import sys
             sys.path = %s
