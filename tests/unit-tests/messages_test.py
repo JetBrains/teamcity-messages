@@ -4,6 +4,7 @@ import os
 import sys
 import tempfile
 import textwrap
+import subprocess
 
 
 if sys.version_info < (3, ):
@@ -62,9 +63,11 @@ def test_unicode():
 
 
 def test_unicode_to_sys_stdout_with_no_encoding():
-    tmpf = tempfile.NamedTemporaryFile()
+    tempdir = tempfile.mkdtemp()
+    file_name = os.path.join(tempdir, "testfile.py")
     try:
-        tmpf.write((textwrap.dedent(r"""
+        f = open(file_name, "wt")
+        f.write((textwrap.dedent(r"""
             import sys
             sys.path = %s
 
@@ -84,9 +87,10 @@ def test_unicode_to_sys_stdout_with_no_encoding():
             messages = TeamcityServiceMessages(encoding='utf-8')
             messages.message(bjork)
             """) % sys.path).encode('utf-8'))
-        tmpf.flush()
+        f.close()
 
-        ret = os.system("%s %s" % (sys.executable, tmpf.name))
+        ret = subprocess.call([sys.executable, file_name])
         assert ret == 0
     finally:
-        tmpf.close()
+        os.unlink(file_name)
+        os.rmdir(tempdir)
