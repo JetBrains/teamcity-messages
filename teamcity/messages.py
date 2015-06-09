@@ -2,13 +2,33 @@
 import sys
 import datetime
 
+if sys.version_info < (3, ):
+    # Python 2
+    text_type = unicode  # flake8: noqa
+else:
+    # Python 3
+    text_type = str
+
 
 class TeamcityServiceMessages(object):
     quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
 
-    def __init__(self, output=sys.stdout, now=datetime.datetime.now):
-        self.output = output
+    def __init__(self, output=sys.stdout, now=datetime.datetime.now, encoding='auto'):
+        if sys.version_info < (3, ) or not hasattr(output, 'buffer'):
+            self.output = output
+        else:
+            self.output = output.buffer
         self.now = now
+
+        if encoding and encoding != 'auto':
+            self.encoding = encoding
+        elif getattr(output, 'encoding', None) or encoding == 'auto':
+            # Default encoding to 'utf-8' because it sucks if we fail with a
+            # `UnicodeEncodeError` simply because LANG didn't get propagated to
+            # a subprocess or something and sys.stdout.encoding is None
+            self.encoding = getattr(output, 'encoding', None) or 'utf-8'
+        else:
+            self.encoding = None
 
     def escapeValue(self, value):
         return "".join([self.quote.get(x, x) for x in value])
@@ -25,6 +45,9 @@ class TeamcityServiceMessages(object):
             message += (" %s='%s'" % (k, self.escapeValue(value)))
 
         message += ("]\n")
+
+        if self.encoding and isinstance(message, text_type):
+            message = message.encode(self.encoding)
 
         # Python may buffer it for a long time, flushing helps to see real-time result
         self.output.write(message)
