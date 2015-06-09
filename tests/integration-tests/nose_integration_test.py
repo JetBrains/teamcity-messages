@@ -50,8 +50,6 @@ def test_docstrings(venv):
 
 
 def test_skip(venv):
-    # Note: skip reason is unavailable, see https://groups.google.com/forum/#!topic/nose-users/MnPwgZG8UbQ
-
     output = run(venv, 'skiptest')
     test_name = 'testa.test_func'
     assert_service_messages(
