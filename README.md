@@ -64,7 +64,7 @@ Add the `--teamcity` command line option.
 Contact information
 -------------------
 
-https://github.com/JetBrains/teamcity-python
+https://github.com/JetBrains/teamcity-messages
 
 TeamCity support: http://www.jetbrains.com/support/teamcity
 
