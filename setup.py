@@ -59,7 +59,7 @@ Issue Tracker: https://github.com/JetBrains/teamcity-python/issues
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Testing'
     ],
-    url="https://github.com/JetBrains/teamcity-python",
+    url="https://github.com/JetBrains/teamcity-messages",
     platforms=["any"],
 
     packages=["teamcity"],
