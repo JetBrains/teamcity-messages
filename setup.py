@@ -39,9 +39,9 @@ If you are using another test runner, you should override the `run_suite` method
 
 **flake8**: add `--teamcity` option to flake8 command line to report errors and warning as TeamCity failed tests
 
-ChangeLog: https://github.com/JetBrains/teamcity-python/blob/master/CHANGELOG.txt
+ChangeLog: https://github.com/JetBrains/teamcity-messages/blob/master/CHANGELOG.txt
 
-Issue Tracker: https://github.com/JetBrains/teamcity-python/issues
+Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
 """,
     license='Apache 2.0',
     keywords='unittest teamcity test nose py.test pytest jetbrains',
@@ -59,7 +59,7 @@ Issue Tracker: https://github.com/JetBrains/teamcity-python/issues
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Testing'
     ],
-    url="https://github.com/JetBrains/teamcity-python",
+    url="https://github.com/JetBrains/teamcity-messages",
     platforms=["any"],
 
     packages=["teamcity"],
