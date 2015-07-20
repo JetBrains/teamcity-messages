@@ -62,11 +62,15 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
     url="https://github.com/JetBrains/teamcity-messages",
     platforms=["any"],
 
-    packages=["teamcity"],
-
+    packages=["teamcity", "twisted.plugins"],
+    zip_safe=False,
+    package_data={
+        'twisted': ['plugins/teamcity_plugin.py'],
+    },
+    
     tests_require=['pytest', 'virtualenv'],
     cmdclass={'test': PyTest},
-
+    
     entry_points={
         'nose.plugins.0.10': [
             'teamcity-report = teamcity.nose_report:TeamcityReport'
@@ -81,3 +85,9 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
         ]
     },
 )
+
+try:
+    from twisted.plugin import IPlugin, getPlugins
+    list(getPlugins(IPlugin))
+except ImportError:
+    pass
