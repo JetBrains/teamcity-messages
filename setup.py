@@ -67,10 +67,10 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
     package_data={
         'twisted': ['plugins/teamcity_plugin.py'],
     },
-    
+
     tests_require=['pytest', 'virtualenv'],
     cmdclass={'test': PyTest},
-    
+
     entry_points={
         'nose.plugins.0.10': [
             'teamcity-report = teamcity.nose_report:TeamcityReport'
