@@ -128,7 +128,7 @@ class TeamcityReport(object):
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
         self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
 
-    def stopTest(self, test):
+    def addSuccess(self, test):
         test_id = self.get_test_id(test)
 
         time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
