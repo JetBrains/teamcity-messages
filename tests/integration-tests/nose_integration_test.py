@@ -290,6 +290,17 @@ def test_fail_output(venv):
         ])
 
 
+def test_multiprocess(venv):
+    output = run(venv, 'multiprocess', options="--processes=10 --process-timeout=2 --nologcapture")
+    test_name = 'xx'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
 def test_fail_big_output(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_big_output')
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_big_output'
