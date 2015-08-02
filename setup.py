@@ -21,8 +21,8 @@ setup(
     author='JetBrains',
     author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +
-                'to TeamCity continuous integration server from unittest, nose and py.test (Python 2.4+)',
-    long_description="""This packages provides unittest, nose and py.test
+                'to TeamCity continuous integration server from unittest, nose, py.test, twisted trial (Python 2.4+)',
+    long_description="""This packages provides unittest, nose, py.test, twisted trial
 plugins for sending test result messages
 to TeamCity continuous integration server
 http://www.jetbrains.com/teamcity/
@@ -38,6 +38,8 @@ TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
 If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
 
 **flake8**: add `--teamcity` option to flake8 command line to report errors and warning as TeamCity failed tests
+
+**twisted trial**: add `--reporter=teamcity` option to trial command line
 
 ChangeLog: https://github.com/JetBrains/teamcity-messages/blob/master/CHANGELOG.txt
 
@@ -86,6 +88,12 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
     },
 )
 
+# Make Twisted regenerate the dropin.cache, if possible.  This is necessary
+# because in a site-wide install, dropin.cache cannot be rewritten by
+# normal users.
+#
+# See https://stackoverflow.com/questions/7275295/how-do-i-write-a-setup-py-for-a-twistd-twisted-plugin-that-works-with-setuptools
+# to discover deepness of this pit.
 try:
     from twisted.plugin import IPlugin, getPlugins
     list(getPlugins(IPlugin))
