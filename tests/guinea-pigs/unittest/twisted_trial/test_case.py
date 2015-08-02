@@ -6,4 +6,5 @@ class CalculationTestCase(unittest.TestCase):
         self.assertEqual(11, 11)
 
     def test_fail(self):
+        """some desc"""
         self.assertEqual(5, 4)

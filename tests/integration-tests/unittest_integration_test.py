@@ -348,10 +348,10 @@ def test_twisted_trial(venv):
 
     print("OUTPUT:" + output.replace("#", "*"))
 
-    test1 = "twisted_trial.test_case.CalculationTestCase.test_fail (test_fail)"
-    test2 = "twisted_trial.test_case.CalculationTestCase.test_ok (test_ok)"
+    test1 = "twisted_trial.test_case.CalculationTestCase.test_fail (some desc)"
+    test2 = "twisted_trial.test_case.CalculationTestCase.test_ok"
 
-    assert_service_messages(
+    ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test1}),
@@ -360,6 +360,7 @@ def test_twisted_trial(venv):
             ServiceMessage('testStarted', {'name': test2}),
             ServiceMessage('testFinished', {'name': test2}),
         ])
+    assert ms[1].params['details'].index("5 != 4") > 0
 
 
 def run_directly(venv, file):
