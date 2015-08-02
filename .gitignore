@@ -9,7 +9,7 @@ dist
 test-result.xml
 teamcity_messages.egg-info
 dropin.cache
-_trial_temp
+_trial_temp*
 *.pyc
 __pycache__
 
