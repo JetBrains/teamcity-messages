@@ -4,7 +4,7 @@ Python Unit Test Reporting to TeamCity
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/vt08bybn8k60a77s/branch/master?svg=true)](https://ci.appveyor.com/project/shalupov/teamcity-python/branch/master)
 [![Travis Build Status](https://travis-ci.org/JetBrains/teamcity-messages.svg?branch=master)](https://travis-ci.org/JetBrains/teamcity-messages)
 
-This packages provides unittest, nose and py.test addons for sending test result messages to TeamCity continuous integration server http://www.jetbrains.com/teamcity/
+This packages provides unittest, nose, py.test, twisted trial addons for sending test result messages to TeamCity continuous integration server http://www.jetbrains.com/teamcity/
 
 Installation
 ------------
@@ -59,6 +59,9 @@ If you are using another test runner, you should override the `run_suite` method
 
 ### flake8
 Add the `--teamcity` command line option.
+
+### Twisted trial
+Add `--reporter=teamcity` option to trial command line
 
 
 Contact information
