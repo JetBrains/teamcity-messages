@@ -314,7 +314,8 @@ def test_teardown_module_error(venv):
     assert ms[3].params['details'].index("assert 1 == 0") > 0
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
+# As of twisted 15.2.1 trial is not available on Python 3
+@pytest.mark.skipif("sys.version_info < (2, 6) or sys.version_info >= (3, 0)", reason="requires Python 2.6 or 2.7")
 def test_twisted_trial(venv):
     packages = list(*venv.packages)
     packages.append("twisted==15.2.1")
