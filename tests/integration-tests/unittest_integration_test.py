@@ -326,7 +326,20 @@ def test_twisted_trial(venv):
     env['PYTHONPATH'] = os.path.join(os.getcwd(), "tests", "guinea-pigs", "unittest")
 
     # Start the process and wait for its output
-    command = os.path.join(venv_with_twisted.bin, 'python') + " " + os.path.join(venv_with_twisted.bin, 'trial.py') + " --reporter=teamcity twisted_trial"
+    trial_file = os.path.join(venv_with_twisted.bin, 'trial')
+    trial_exe_file = os.path.join(venv_with_twisted.bin, 'trial.exe')
+    trial_py_file = os.path.join(venv_with_twisted.bin, 'trial.py')
+
+    if os.path.exists(trial_file):
+        command = trial_file
+    elif os.path.exists(trial_py_file):
+        command = os.path.join(venv_with_twisted.bin, 'python') + " " + trial_py_file
+    elif os.path.exists(trial_exe_file):
+        command = trial_exe_file
+    else:
+        raise Exception("twisted trial is not found at " + trial_py_file + " or " + trial_file + " or " + trial_exe_file)
+
+    command += " --reporter=teamcity twisted_trial"
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
