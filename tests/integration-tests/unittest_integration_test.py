@@ -314,6 +314,40 @@ def test_teardown_module_error(venv):
     assert ms[3].params['details'].index("assert 1 == 0") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
+def test_twisted_trial(venv):
+    packages = list(*venv.packages)
+    packages.append("twisted==15.2.1")
+    if os.name == 'nt':
+        packages.append("pypiwin32==219")
+    venv_with_twisted = virtual_environments.prepare_virtualenv(packages)
+
+    env = virtual_environments.get_clean_system_environment()
+    env['PYTHONPATH'] = os.path.join(os.getcwd(), "tests", "guinea-pigs", "unittest")
+
+    # Start the process and wait for its output
+    command = os.path.join(venv_with_twisted.bin, 'python') + " " + os.path.join(venv_with_twisted.bin, 'trial.py') + " --reporter=teamcity twisted_trial"
+    print("RUN: " + command)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    output = "".join([x.decode() for x in proc.stdout.readlines()])
+    proc.wait()
+
+    print("OUTPUT:" + output.replace("#", "*"))
+
+    test1 = "twisted_trial.test_case.CalculationTestCase.test_fail (test_fail)"
+    test2 = "twisted_trial.test_case.CalculationTestCase.test_ok (test_ok)"
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test1}),
+            ServiceMessage('testFailed', {'name': test1}),
+            ServiceMessage('testFinished', {'name': test1}),
+            ServiceMessage('testStarted', {'name': test2}),
+            ServiceMessage('testFinished', {'name': test2}),
+        ])
+
+
 def run_directly(venv, file):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"

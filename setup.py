@@ -97,5 +97,5 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
 try:
     from twisted.plugin import IPlugin, getPlugins
     list(getPlugins(IPlugin))
-except ImportError:
+except:
     pass
