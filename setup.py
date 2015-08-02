@@ -95,7 +95,6 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
 # See https://stackoverflow.com/questions/7275295/how-do-i-write-a-setup-py-for-a-twistd-twisted-plugin-that-works-with-setuptools
 # to discover deepness of this pit.
 try:
-    import twisted
     from twisted.plugin import IPlugin, getPlugins
     from twisted.python import log
 
