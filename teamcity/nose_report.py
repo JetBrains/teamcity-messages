@@ -104,23 +104,36 @@ class TeamcityReport(object):
 
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
+    def report_finish(self, test):
+        test_id = self.get_test_id(test)
+
+        if test_id in self.test_started_datetime_map:
+            time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
+            self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)
+        else:
+            self.messages.testFinished(test_id, flowId=test_id)
+
     def addError(self, test, err):
         test_class_name = get_class_fullname(test)
         test_id = self.get_test_id(test)
 
         if issubclass(err[0], SkipTest):
             self.messages.testIgnored(test_id, message=("SKIPPED: %s" % str(err[1])), flowId=test_id)
+            self.report_finish(test)
         elif issubclass(err[0], DeprecatedTest):
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
+            self.report_finish(test)
         elif test_class_name == CONTEXT_SUITE_FQN:
             self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
             self.report_fail(test, 'error in ' + test.error_context + ' context', err)
             self.messages.testFinished(test_id, flowId=test_id)
         else:
             self.report_fail(test, 'Error', err)
+            self.report_finish(test)
 
     def addFailure(self, test, err):
         self.report_fail(test, 'Failure', err)
+        self.report_finish(test)
 
     def startTest(self, test):
         test_id = self.get_test_id(test)
@@ -128,8 +141,5 @@ class TeamcityReport(object):
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
         self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
 
-    def stopTest(self, test):
-        test_id = self.get_test_id(test)
-
-        time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]
-        self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)
+    def addSuccess(self, test):
+        self.report_finish(test)
