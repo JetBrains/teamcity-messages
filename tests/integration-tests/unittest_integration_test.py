@@ -320,6 +320,8 @@ def test_twisted_trial(venv):
     packages = list(*venv.packages)
     packages.append("twisted==15.2.1")
     if os.name == 'nt':
+        if sys.version_info < (2, 7):
+            pytest.skip("pypiwin32 is available since Python 2.7")
         packages.append("pypiwin32==219")
     venv_with_twisted = virtual_environments.prepare_virtualenv(packages)
 
