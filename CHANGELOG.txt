@@ -1,3 +1,5 @@
+Version 1.15 Fri Aug 28 2015
+
   - Twisted's trial support (Alexey Larkov, https://github.com/gmlexx)
   - nose: fix tests reporting in multiprocess environment, thanks to Lewis Coates, https://github.com/lewisc
   - Fix UnicodeEncodeError when sys.stdout.encoding is None, thanks to Marc Abramowitz, https://github.com/msabramo
