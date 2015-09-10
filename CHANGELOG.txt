@@ -1,3 +1,5 @@
+  - blocks messages support (Marc Abramowitz, https://github.com/msabramo)
+
 Version 1.15 Fri Aug 28 2015
 
   - Twisted's trial support (Alexey Larkov, https://github.com/gmlexx)
