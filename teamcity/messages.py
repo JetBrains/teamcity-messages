@@ -12,10 +12,11 @@ else:
 
 class BlockContextManager(object):
     """Context manager for logging blockOpened and blockClosed."""
-    def __init__(self, name, messages):
+    def __init__(self, name, messages, flowId):
         self.name = name
         self.messages = messages
         self.closed = False
+        self.flowId = flowId
 
     def __enter__(self):
         self.message('blockOpened', name=self.name)
@@ -33,6 +34,8 @@ class BlockContextManager(object):
         self.closed = True
 
     def message(self, *args, **kwargs):
+        if self.flowId is not None:
+            kwargs['flowId'] = self.flowId
         return self.messages.message(*args, **kwargs)
 
 
@@ -127,5 +130,5 @@ class TeamcityServiceMessages(object):
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
 
-    def block(self, name):
-        return BlockContextManager(name=name, messages=self)
+    def block(self, name, flowId=None):
+        return BlockContextManager(name=name, messages=self, flowId=flowId)
