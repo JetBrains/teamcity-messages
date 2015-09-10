@@ -10,6 +10,32 @@ else:
     text_type = str
 
 
+class BlockContextManager(object):
+    """Context manager for logging blockOpened and blockClosed."""
+    def __init__(self, name, messages):
+        self.name = name
+        self.messages = messages
+        self.closed = False
+
+    def __enter__(self):
+        self.message('blockOpened', name=self.name)
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
+    def close(self):
+        # Prevent emitting blockClosed message twice
+        if self.closed:
+            return
+
+        self.message('blockClosed', name=self.name)
+        self.closed = True
+
+    def message(self, *args, **kwargs):
+        return self.messages.message(*args, **kwargs)
+
+
 class TeamcityServiceMessages(object):
     quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
 
@@ -100,3 +126,6 @@ class TeamcityServiceMessages(object):
 
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
+
+    def block(self, name):
+        return BlockContextManager(name=name, messages=self)
