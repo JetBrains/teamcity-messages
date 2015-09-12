@@ -136,6 +136,12 @@ class TeamcityServiceMessages(object):
     def buildStatisticLinesUncovered(self, linesUncovered):
         self.message('buildStatisticValue', key='CodeCoverageAbsLUncovered', value=str(linesUncovered))
 
+    def enableServiceMessages(self, flowId=None):
+        self.message('enableServiceMessages', flowId=flowId)
+
+    def disableServiceMessages(self, flowId=None):
+        self.message('disableServiceMessages', flowId=flowId)
+
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
 
