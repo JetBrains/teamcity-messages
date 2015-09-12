@@ -12,7 +12,12 @@ class PyTest(TestCommand):
     def run_tests(self):
         import pytest
         import sys
-        errno = pytest.main(["-l", "--junitxml=test-result.xml", "tests/unit-tests", "tests/integration-tests"])
+
+        args = ["-l", "--junitxml=test-result.xml", "tests/unit-tests", "tests/integration-tests"]
+        if sys.version_info >= (2, 6):
+            args.append("tests/unit-tests-since-2.6")
+
+        errno = pytest.main(args)
         sys.exit(errno)
 
 setup(

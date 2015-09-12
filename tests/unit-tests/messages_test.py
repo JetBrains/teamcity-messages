@@ -51,38 +51,6 @@ def test_three_properties():
     assert stream.observed_output == "\n##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556' fruit='apple' meat='steak' pie='raspberry']\n".encode('utf-8')
 
 
-def test_blocks():
-    stream = StreamStub()
-    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
-    with messages.block("Doing something that's important"):
-        messages.message("Doing stuff")
-    expected_output = textwrap.dedent("""
-        ##teamcity[blockOpened timestamp='2000-11-02T10:23:01.556' name='Doing something that|'s important']
-
-        ##teamcity[Doing stuff timestamp='2000-11-02T10:23:01.556']
-
-        ##teamcity[blockClosed timestamp='2000-11-02T10:23:01.556' name='Doing something that|'s important']
-        """)
-    expected_output = expected_output.encode('utf-8')
-    assert stream.observed_output == expected_output
-
-
-def test_blocks_with_flowid():
-    stream = StreamStub()
-    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
-    with messages.block("Doing something that's important", flowId='a'):
-        messages.message("Doing stuff")
-    expected_output = textwrap.dedent("""
-        ##teamcity[blockOpened timestamp='2000-11-02T10:23:01.556' flowId='a' name='Doing something that|'s important']
-
-        ##teamcity[Doing stuff timestamp='2000-11-02T10:23:01.556']
-
-        ##teamcity[blockClosed timestamp='2000-11-02T10:23:01.556' flowId='a' name='Doing something that|'s important']
-        """)
-    expected_output = expected_output.encode('utf-8')
-    assert stream.observed_output == expected_output
-
-
 def test_unicode():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
