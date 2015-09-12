@@ -19,21 +19,21 @@ class BlockContextManager(object):
         self.flowId = flowId
 
     def __enter__(self):
-        self.message('blockOpened', name=self.name)
+        self._message('blockOpened', name=self.name)
         return self
 
     def __exit__(self, *args):
-        self.close()
+        self._close()
 
-    def close(self):
+    def _close(self):
         # Prevent emitting blockClosed message twice
         if self.closed:
             return
 
-        self.message('blockClosed', name=self.name)
+        self._message('blockClosed', name=self.name)
         self.closed = True
 
-    def message(self, *args, **kwargs):
+    def _message(self, *args, **kwargs):
         if self.flowId is not None:
             kwargs['flowId'] = self.flowId
         return self.messages.message(*args, **kwargs)
