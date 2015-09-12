@@ -124,6 +124,9 @@ class TeamcityServiceMessages(object):
     def buildStatus(self, status, text):
         self.message('buildStatus', status=status, text=text)
 
+    def setParameter(self, name, value):
+        self.message('setParameter', name=name, value=value)
+
     def buildStatisticLinesCovered(self, linesCovered):
         self.message('buildStatisticValue', key='CodeCoverageAbsLCovered', value=str(linesCovered))
 
