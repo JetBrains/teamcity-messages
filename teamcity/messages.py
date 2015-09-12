@@ -142,6 +142,9 @@ class TeamcityServiceMessages(object):
     def disableServiceMessages(self, flowId=None):
         self.message('disableServiceMessages', flowId=flowId)
 
+    def importData(self, typeID, pathToXMLFile):
+        self.message('importData', type=typeID, path=pathToXMLFile)
+
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
 
