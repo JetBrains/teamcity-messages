@@ -118,6 +118,9 @@ class TeamcityServiceMessages(object):
     def publishArtifacts(self, path, flowId=None):
         self._single_value_message('publishArtifacts', path)
 
+    def buildProblem(self, description, identity):
+        self.message('buildProblem', description=description, identity=identity)
+
     def buildStatisticLinesCovered(self, linesCovered):
         self.message('buildStatisticValue', key='CodeCoverageAbsLCovered', value=str(linesCovered))
 
