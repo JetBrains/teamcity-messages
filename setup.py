@@ -22,7 +22,7 @@ class PyTest(TestCommand):
 
 setup(
     name="teamcity-messages",
-    version="1.15",
+    version="1.16",
     author='JetBrains',
     author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +
