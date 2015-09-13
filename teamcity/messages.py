@@ -118,6 +118,18 @@ class TeamcityServiceMessages(object):
     def publishArtifacts(self, path, flowId=None):
         self._single_value_message('publishArtifacts', path)
 
+    def progressMessage(self, message):
+        self._single_value_message('progressMessage', message)
+
+    def buildProblem(self, description, identity):
+        self.message('buildProblem', description=description, identity=identity)
+
+    def buildStatus(self, status, text):
+        self.message('buildStatus', status=status, text=text)
+
+    def setParameter(self, name, value):
+        self.message('setParameter', name=name, value=value)
+
     def buildStatisticLinesCovered(self, linesCovered):
         self.message('buildStatisticValue', key='CodeCoverageAbsLCovered', value=str(linesCovered))
 
@@ -126,6 +138,15 @@ class TeamcityServiceMessages(object):
 
     def buildStatisticLinesUncovered(self, linesUncovered):
         self.message('buildStatisticValue', key='CodeCoverageAbsLUncovered', value=str(linesUncovered))
+
+    def enableServiceMessages(self, flowId=None):
+        self.message('enableServiceMessages', flowId=flowId)
+
+    def disableServiceMessages(self, flowId=None):
+        self.message('disableServiceMessages', flowId=flowId)
+
+    def importData(self, typeID, pathToXMLFile):
+        self.message('importData', type=typeID, path=pathToXMLFile)
 
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
