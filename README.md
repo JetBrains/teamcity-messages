@@ -51,9 +51,11 @@ Test status reporting is enabled automatically under TeamCity build.
 Test status reporting is enabled automatically under TeamCity build.
 
 ### Django
-For Django 1.6+: Use the Teamcity runner instead of the default DiscoverRunner by changing the following setting in your settings.py:
+For Django 1.6+: Use the `TeamcityDjangoRunner` runner instead of the default `DiscoverRunner` by changing the following setting in your settings.py:
 
-    TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
+```python
+TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
+```
 
 If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
 
