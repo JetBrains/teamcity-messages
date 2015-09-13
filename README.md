@@ -64,6 +64,15 @@ Add the `--teamcity` command line option.
 Add `--reporter=teamcity` option to trial command line
 
 
+Python version compatibility
+----------------------------
+
+- Python 2 - >= 2.4
+- Python 3 - all versions
+- PyPy
+- Jython
+
+
 Contact information
 -------------------
 
