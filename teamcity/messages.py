@@ -118,6 +118,9 @@ class TeamcityServiceMessages(object):
     def publishArtifacts(self, path, flowId=None):
         self._single_value_message('publishArtifacts', path)
 
+    def progressMessage(self, message):
+        self._single_value_message('progressMessage', message)
+
     def buildProblem(self, description, identity):
         self.message('buildProblem', description=description, identity=identity)
 
