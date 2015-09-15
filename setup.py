@@ -79,6 +79,10 @@ Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
     cmdclass={'test': PyTest},
 
     entry_points={
+        'console_scripts': [
+            'teamcity-escape = teamcity.messages:escape_value_prog',
+        ],
+
         'nose.plugins.0.10': [
             'teamcity-report = teamcity.nose_report:TeamcityReport'
         ],

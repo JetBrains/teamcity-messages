@@ -17,6 +17,10 @@ def escapeValue(value):
 
 escape_value = escapeValue
 
+def escape_value_prog():
+    for arg in sys.argv[1:]:
+        print(escape_value(arg))
+
 
 class BlockContextManager(object):
     """Context manager for logging blockOpened and blockClosed."""
