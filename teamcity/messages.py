@@ -10,7 +10,7 @@ else:
     text_type = str
 
 
-_quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
+_quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", '[': '|[', ']': '|]'}
 
 def escape_value(value):
     return "".join([_quote.get(x, x) for x in value])

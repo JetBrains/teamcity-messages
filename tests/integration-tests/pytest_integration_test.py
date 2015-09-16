@@ -264,9 +264,9 @@ def test_skip(venv):
 def test_params(venv):
     output = run(venv, 'params_test.py')
 
-    test1_name = 'tests.guinea-pigs.pytest.params_test.test_eval[3+5-8|]'
-    test2_name = "tests.guinea-pigs.pytest.params_test.test_eval[|'1_5|' + |'2|'-1_52|]"
-    test3_name = 'tests.guinea-pigs.pytest.params_test.test_eval[6*9-42|]'
+    test1_name = 'tests.guinea-pigs.pytest.params_test.test_eval|[3+5-8|]'
+    test2_name = "tests.guinea-pigs.pytest.params_test.test_eval|[|'1_5|' + |'2|'-1_52|]"
+    test3_name = 'tests.guinea-pigs.pytest.params_test.test_eval|[6*9-42|]'
 
     assert_service_messages(
         output,
