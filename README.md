@@ -19,7 +19,7 @@ or from source:
 
 Usage
 -----
-This package uses service messages to report  build status to TeamCity. See http://www.jetbrains.net/confluence/display/TCD8/Build+Script+Interaction+with+TeamCity for more details
+This package uses service messages to report  build status to TeamCity. See https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity for more details
 
 ### unittest
 If you wish to use Python default's unittest framework, you should modify the Test runner, e.g.:
