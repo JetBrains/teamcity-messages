@@ -11,6 +11,7 @@ This packages integrates Python with the [TeamCity](http://www.jetbrains.com/tea
 - [Django](https://docs.djangoproject.com/en/1.8/topics/testing/advanced/#other-testing-frameworks)
 - [unittest (Python standard library)](https://docs.python.org/2/library/unittest.html)
 - [Trial (Twisted)](http://twistedmatrix.com/trac/wiki/TwistedTrial)
+- [Flake8](https://flake8.readthedocs.org/)
 
 Installation
 ------------
