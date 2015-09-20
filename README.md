@@ -4,7 +4,13 @@ Python Unit Test Reporting to TeamCity
 [![AppVeyor Build status](https://ci.appveyor.com/api/projects/status/vt08bybn8k60a77s/branch/master?svg=true)](https://ci.appveyor.com/project/shalupov/teamcity-python/branch/master)
 [![Travis Build Status](https://travis-ci.org/JetBrains/teamcity-messages.svg?branch=master)](https://travis-ci.org/JetBrains/teamcity-messages)
 
-This packages provides unittest, nose, py.test, twisted trial addons for sending test result messages to TeamCity continuous integration server http://www.jetbrains.com/teamcity/
+This packages integrates Python with the [TeamCity](http://www.jetbrains.com/teamcity/) Continuous Integration (CI) server. It allow sending ["service messages"](https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity) from Python code. Additionally, it provides integration with the following testing frameworks and tools:
+
+- [py.test](http://pytest.org/)
+- [nose](https://nose.readthedocs.org/)
+- [Django](https://docs.djangoproject.com/en/1.8/topics/testing/advanced/#other-testing-frameworks)
+- [unittest (Python standard library)](https://docs.python.org/2/library/unittest.html)
+- [Trial (Twisted)](http://twistedmatrix.com/trac/wiki/TwistedTrial)
 
 Installation
 ------------
