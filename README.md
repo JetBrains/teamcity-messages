@@ -78,7 +78,7 @@ Python version compatibility
 
 - Python 2 - >= 2.4
 - Python 3 - all versions
-- PyPy
+- PyPy and PyPy 3
 - Jython
 
 
