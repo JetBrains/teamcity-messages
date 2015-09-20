@@ -1,4 +1,4 @@
-from teamcity.messages import TeamcityServiceMessages
+from teamcity.messages import TeamcityServiceMessages, escape_value
 from datetime import datetime
 import os
 import sys
@@ -28,6 +28,14 @@ class StreamStub(object):
         pass
 
 fixed_date = datetime(2000, 11, 2, 10, 23, 1, 556789)
+
+
+def test_escape_value():
+    assert escape_value("[square brackets]") == "|[square brackets|]"
+    assert escape_value("(parentheses)") == "(parentheses)"
+    assert escape_value("'single quotes'") == "|'single quotes|'"
+    assert escape_value("|vertical bars|") == "||vertical bars||"
+    assert escape_value("line1\nline2\nline3") == "line1|nline2|nline3"
 
 
 def test_no_properties():

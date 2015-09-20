@@ -10,6 +10,12 @@ else:
     text_type = str
 
 
+_quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", '[': '|[', ']': '|]'}
+
+def escape_value(value):
+    return "".join(_quote.get(x, x) for x in value)
+
+
 class BlockContextManager(object):
     """Context manager for logging blockOpened and blockClosed."""
     def __init__(self, name, messages, flowId):
@@ -40,8 +46,6 @@ class BlockContextManager(object):
 
 
 class TeamcityServiceMessages(object):
-    quote = {"'": "|'", "|": "||", "\n": "|n", "\r": "|r", ']': '|]'}
-
     def __init__(self, output=sys.stdout, now=datetime.datetime.now, encoding='auto'):
         if sys.version_info < (3, ) or not hasattr(output, 'buffer'):
             self.output = output
@@ -60,7 +64,7 @@ class TeamcityServiceMessages(object):
             self.encoding = None
 
     def escapeValue(self, value):
-        return "".join([self.quote.get(x, x) for x in value])
+        return escape_value(value)
 
     def message(self, messageName, **properties):
         timestamp = self.now().strftime("%Y-%m-%dT%H:%M:%S.") + "%03d" % (self.now().microsecond / 1000)
