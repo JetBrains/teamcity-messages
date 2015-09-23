@@ -1,6 +1,15 @@
 # coding=utf-8
+import os
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
+
+
+here = os.path.abspath(os.path.dirname(__file__))
+try:
+    README = open(os.path.join(here, 'README.rst')).read()
+    CHANGES = open(os.path.join(here, 'CHANGELOG.txt')).read()
+except IOError:
+    README = CHANGES = ''
 
 
 class PyTest(TestCommand):
@@ -34,29 +43,7 @@ setup(
     author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +
                 'to TeamCity continuous integration server from unittest, nose, py.test, twisted trial (Python 2.4+)',
-    long_description="""This packages provides unittest, nose, py.test, twisted trial
-plugins for sending test result messages
-to TeamCity continuous integration server
-http://www.jetbrains.com/teamcity/
-
-**unittest**: see examples/simple.py for example how to
-write your own test file which reports messages
-under TeamCity and prints usual diagnostics without it.
-
-**nose**, **py.test** : test status reporting enabled automatically under TeamCity build (when teamcity-messages package is installed)
-
-**django**: For Django 1.6+: Use the Teamcity runner instead of the default DiscoverRunner by changing the following setting in your settings.py:
-TEST_RUNNER = "teamcity.django.TeamcityDjangoRunner"
-If you are using another test runner, you should override the `run_suite` method or use the `DiscoverRunner.test_runner` property introduced in Django 1.7.
-
-**flake8**: add `--teamcity` option to flake8 command line to report errors and warning as TeamCity failed tests
-
-**twisted trial**: add `--reporter=teamcity` option to trial command line
-
-ChangeLog: https://github.com/JetBrains/teamcity-messages/blob/master/CHANGELOG.txt
-
-Issue Tracker: https://github.com/JetBrains/teamcity-messages/issues
-""",
+    long_description=README + '\n\n' + CHANGES,
     license='Apache 2.0',
     keywords='unittest teamcity test nose py.test pytest jetbrains',
     classifiers=[
