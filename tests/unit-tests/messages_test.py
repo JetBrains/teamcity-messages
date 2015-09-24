@@ -59,11 +59,15 @@ def test_progress_message():
 def test_progress_message_unicode():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
-    unicode_str = b'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir'.decode('utf-8')
-    messages.progressMessage(unicode_str)
-    assert stream.observed_output.strip() == textwrap.dedent(b"""\
-        ##teamcity[progressMessage 'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir']
-        """.decode('utf-8')).encode('utf-8').strip()
+    if sys.version_info < (3, ):
+        bjork = 'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir'.decode('utf-8')
+    else:
+        bjork = b('Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir').decode('utf-8')
+    messages.progressMessage(bjork)
+    expected_output = b(
+        "##teamcity[progressMessage "
+        "'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir']")
+    assert stream.observed_output.strip() == expected_output
 
 
 def test_no_properties():
