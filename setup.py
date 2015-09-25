@@ -38,7 +38,8 @@ class PyTest(TestCommand):
 
 setup(
     name="teamcity-messages",
-    version="1.16",
+    setup_requires=['setuptools_scm'],
+    use_scm_version=True,
     author='JetBrains',
     author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +
