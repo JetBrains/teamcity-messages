@@ -38,6 +38,38 @@ def test_escape_value():
     assert escape_value("line1\nline2\nline3") == "line1|nline2|nline3"
 
 
+def test_publish_artifacts():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    messages.publishArtifacts('/path/to/file')
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[publishArtifacts '/path/to/file']
+        """).strip().encode('utf-8')
+
+
+def test_progress_message():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    messages.progressMessage('doing stuff')
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[progressMessage 'doing stuff']
+        """).strip().encode('utf-8')
+
+
+def test_progress_message_unicode():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    if sys.version_info < (3, ):
+        bjork = 'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir'.decode('utf-8')
+    else:
+        bjork = b('Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir').decode('utf-8')
+    messages.progressMessage(bjork)
+    expected_output = b(
+        "##teamcity[progressMessage "
+        "'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir']")
+    assert stream.observed_output.strip() == expected_output
+
+
 def test_no_properties():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)

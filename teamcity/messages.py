@@ -87,7 +87,14 @@ class TeamcityServiceMessages(object):
         self.output.flush()
 
     def _single_value_message(self, messageName, value):
-        self.output.write("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
+        message = ("\n##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
+
+        if self.encoding and isinstance(message, text_type):
+            message = message.encode(self.encoding)
+
+        # Python may buffer it for a long time, flushing helps to see real-time result
+        self.output.write(message)
+        self.output.flush()
 
     def testSuiteStarted(self, suiteName, flowId=None):
         self.message('testSuiteStarted', name=suiteName, flowId=flowId)
