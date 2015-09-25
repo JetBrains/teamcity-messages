@@ -9,7 +9,7 @@ from service_messages import ServiceMessage, assert_service_messages, parse_serv
 
 @pytest.fixture(scope='module', params=["flake8==2.0.0", "flake8==2.4.0", "flake8"])
 def venv(request):
-    return virtual_environments.prepare_virtualenv([request.param])
+    return virtual_environments.prepare_virtualenv([request.param, 'setuptools_scm'])
 
 
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
