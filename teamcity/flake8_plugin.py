@@ -1,11 +1,13 @@
 import pep8
 import re
 
+from setuptools_scm import get_version
+
 from teamcity.messages import TeamcityServiceMessages
 
 
 name = 'teamcity'
-version = '1.9'
+version = get_version()
 enable_teamcity = False
 
 
