@@ -16,35 +16,6 @@ def escape_value(value):
     return "".join(_quote.get(x, x) for x in value)
 
 
-class BlockContextManager(object):
-    """Context manager for logging blockOpened and blockClosed."""
-    def __init__(self, name, messages, flowId):
-        self.name = name
-        self.messages = messages
-        self.closed = False
-        self.flowId = flowId
-
-    def __enter__(self):
-        self._message('blockOpened', name=self.name)
-        return self
-
-    def __exit__(self, *args):
-        self._close()
-
-    def _close(self):
-        # Prevent emitting blockClosed message twice
-        if self.closed:
-            return
-
-        self._message('blockClosed', name=self.name)
-        self.closed = True
-
-    def _message(self, *args, **kwargs):
-        if self.flowId is not None:
-            kwargs['flowId'] = self.flowId
-        return self.messages.message(*args, **kwargs)
-
-
 class TeamcityServiceMessages(object):
     def __init__(self, output=sys.stdout, now=datetime.datetime.now, encoding='auto'):
         if sys.version_info < (3, ) or not hasattr(output, 'buffer'):
@@ -96,11 +67,35 @@ class TeamcityServiceMessages(object):
         self.output.write(message)
         self.output.flush()
 
+    def blockOpened(self, name, flowId=None):
+        self.message('blockOpened', name=name, flowId=flowId)
+
+    def blockClosed(self, name, flowId=None):
+        self.message('blockClosed', name=name, flowId=flowId)
+
+    def block(self, name, flowId=None):
+        import teamcity.context_managers as cm
+        return cm.block(self, name=name, flowId=flowId)
+
+    def compilationStarted(self, compiler):
+        self.message('compilationStarted', compiler=compiler)
+
+    def compilationFinished(self, compiler):
+        self.message('compilationFinished', compiler=compiler)
+
+    def compilation(self, compiler):
+        import teamcity.context_managers as cm
+        return cm.compilation(self, compiler=compiler)
+
     def testSuiteStarted(self, suiteName, flowId=None):
         self.message('testSuiteStarted', name=suiteName, flowId=flowId)
 
     def testSuiteFinished(self, suiteName, flowId=None):
         self.message('testSuiteFinished', name=suiteName, flowId=flowId)
+
+    def testSuite(self, name):
+        import teamcity.context_managers as cm
+        return cm.testSuite(self, name=name)
 
     def testStarted(self, testName, captureStandardOutput=None, flowId=None):
         self.message('testStarted', name=testName, captureStandardOutput=captureStandardOutput, flowId=flowId)
@@ -113,6 +108,10 @@ class TeamcityServiceMessages(object):
             self.message('testFinished', name=testName, duration=str(duration_ms), flowId=flowId)
         else:
             self.message('testFinished', name=testName, flowId=flowId)
+
+    def test(self, testName, captureStandardOutput=None, testDuration=None, flowId=None):
+        import teamcity.context_managers as cm
+        return cm.test(self, testName=testName, captureStandardOutput=captureStandardOutput, testDuration=testDuration, flowId=flowId)
 
     def testIgnored(self, testName, message='', flowId=None):
         self.message('testIgnored', name=testName, message=message, flowId=flowId)
@@ -131,6 +130,16 @@ class TeamcityServiceMessages(object):
 
     def progressMessage(self, message):
         self._single_value_message('progressMessage', message)
+
+    def progressStart(self, message):
+        self._single_value_message('progressStart', message)
+
+    def progressFinish(self, message):
+        self._single_value_message('progressFinish', message)
+
+    def progress(self, message):
+        import teamcity.context_managers as cm
+        return cm.progress(self, message=message)
 
     def buildProblem(self, description, identity):
         self.message('buildProblem', description=description, identity=identity)
@@ -156,11 +165,17 @@ class TeamcityServiceMessages(object):
     def disableServiceMessages(self, flowId=None):
         self.message('disableServiceMessages', flowId=flowId)
 
+    def serviceMessagesDisabled(self, flowId=None):
+        import teamcity.context_managers as cm
+        return cm.serviceMessagesDisabled(self, flowId=flowId)
+
+    def serviceMessagesEnabled(self, flowId=None):
+        import teamcity.context_managers as cm
+        return cm.serviceMessagesEnabled(self, flowId=flowId)
+
     def importData(self, typeID, pathToXMLFile):
         self.message('importData', type=typeID, path=pathToXMLFile)
 
     def customMessage(self, text, status, errorDetails='', flowId=None):
         self.message('message', text=text, status=status, errorDetails=errorDetails, flowId=flowId)
 
-    def block(self, name, flowId=None):
-        return BlockContextManager(name=name, messages=self, flowId=flowId)

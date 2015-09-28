@@ -46,3 +46,75 @@ def test_blocks_with_flowid():
         """)
     expected_output = expected_output.encode('utf-8')
     assert stream.observed_output == expected_output
+
+
+def test_compilation():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    with messages.compilation('gcc'):
+        pass
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[compilationStarted timestamp='2000-11-02T10:23:01.556' compiler='gcc']
+
+        ##teamcity[compilationFinished timestamp='2000-11-02T10:23:01.556' compiler='gcc']
+        """).strip().encode('utf-8')
+
+
+def test_test_suite():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    with messages.testSuite('suite emotion'):
+        pass
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[testSuiteStarted timestamp='2000-11-02T10:23:01.556' name='suite emotion']
+
+        ##teamcity[testSuiteFinished timestamp='2000-11-02T10:23:01.556' name='suite emotion']
+        """).strip().encode('utf-8')
+
+
+def test_test():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    with messages.test('only a test'):
+        pass
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[testStarted timestamp='2000-11-02T10:23:01.556' name='only a test']
+
+        ##teamcity[testFinished timestamp='2000-11-02T10:23:01.556' name='only a test']
+        """).strip().encode('utf-8')
+
+
+def test_progress():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    with messages.progress('only a test'):
+        pass
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[progressStart 'only a test']
+
+        ##teamcity[progressFinish 'only a test']
+        """).strip().encode('utf-8')
+
+
+def test_service_messages_disabled():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    with messages.serviceMessagesDisabled():
+        pass
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[disableServiceMessages timestamp='2000-11-02T10:23:01.556']
+
+        ##teamcity[enableServiceMessages timestamp='2000-11-02T10:23:01.556']
+        """).strip().encode('utf-8')
+
+
+def test_service_messages_enabled():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    with messages.serviceMessagesEnabled():
+        pass
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[enableServiceMessages timestamp='2000-11-02T10:23:01.556']
+
+        ##teamcity[disableServiceMessages timestamp='2000-11-02T10:23:01.556']
+        """).strip().encode('utf-8')
