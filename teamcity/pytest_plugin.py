@@ -191,11 +191,15 @@ class EchoTeamCityMessages(object):
                 self.messages = messages
 
             def report(self, morfs, outfile=None):
-                self.find_code_units(morfs)
+                if hasattr(self, 'find_code_units'):
+                    self.find_code_units(morfs)
+                else:
+                    self.find_file_reporters(morfs)
 
                 total = Numbers()
 
-                for cu in self.code_units:
+                units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+                for cu in units:
                     try:
                         analysis = self.coverage._analyze(cu)
                         nums = analysis.numbers

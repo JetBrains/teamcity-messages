@@ -74,8 +74,17 @@ def test_custom_test_items(venv):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
-def test_coverage(venv):
-    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-cov==1.8.1",))
+@pytest.mark.parametrize("coverage_version, pytest_cov_version", [
+    ("==3.7.1", "==1.8.1"),
+    ("==4.0.1", "==2.2.0"),
+    # latest
+    ("", ""),
+])
+def test_coverage(venv, coverage_version, pytest_cov_version):
+    venv_with_coverage = virtual_environments.prepare_virtualenv(
+        venv.packages + (
+            "coverage" + coverage_version,
+            "pytest-cov" + pytest_cov_version))
 
     output = run(venv_with_coverage, 'coverage_test', options="--cov coverage_test")
     test_name = "tests.guinea-pigs.pytest.coverage_test.coverage_test.test_covered_func"
@@ -312,7 +321,7 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
-    # print("OUTPUT: " + output.replace("#", "*"))
+    print("OUTPUT: " + output.replace("#", "*"))
     proc.wait()
 
     return output
