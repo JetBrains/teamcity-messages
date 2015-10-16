@@ -198,7 +198,11 @@ class EchoTeamCityMessages(object):
 
                 total = Numbers()
 
-                units = self.code_units if hasattr(self, 'code_units') else self.file_reporters
+                if hasattr(self, 'code_units'):
+                    units = self.code_units
+                else:
+                    units = self.file_reporters
+
                 for cu in units:
                     try:
                         analysis = self.coverage._analyze(cu)
