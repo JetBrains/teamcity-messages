@@ -1,5 +1,6 @@
 # coding=utf-8
 import os
+import re
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
@@ -10,6 +11,14 @@ try:
     CHANGES = open(os.path.join(here, 'CHANGELOG.txt')).read()
 except IOError:
     README = CHANGES = ''
+
+version_re = r"^__version__ = ['\"]([^'\"]+)['\"]$"
+version_file = os.path.join(here, 'teamcity', '__init__.py')
+version_match = re.search(version_re, open(version_file).read(), re.MULTILINE)
+if not version_match:
+    raise RuntimeError("Could not find package version in " + version_file)
+
+VERSION = version_match.group(1)
 
 
 class PyTest(TestCommand):
@@ -38,7 +47,7 @@ class PyTest(TestCommand):
 
 setup(
     name="teamcity-messages",
-    version="1.16",
+    version=VERSION,
     author='JetBrains',
     author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +

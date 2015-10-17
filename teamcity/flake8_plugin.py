@@ -2,10 +2,11 @@ import pep8
 import re
 
 from teamcity.messages import TeamcityServiceMessages
+from teamcity import __version__
 
 
 name = 'teamcity'
-version = '1.9'
+version = __version__
 enable_teamcity = False
 
 
