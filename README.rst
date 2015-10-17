@@ -1,7 +1,8 @@
 Python Unit Test Reporting to TeamCity
 ======================================
 
-|AppVeyor Build status| |Travis Build Status|
+|  |license| |versions| |status| |downloads|
+|  |appveyor_ci| |travis_ci|
 
 This packages integrates Python with the
 `TeamCity <http://www.jetbrains.com/teamcity/>`__ Continuous Integration
@@ -108,7 +109,7 @@ Python version compatibility
 ----------------------------
 
 -  Python 2 - >= 2.4
--  Python 3 - all versions
+-  Python 3 - >= 3.2
 -  PyPy and PyPy 3
 -  Jython
 
@@ -124,7 +125,21 @@ License
 
 Apache, version 2.0 http://www.apache.org/licenses/LICENSE-2.0
 
-.. |AppVeyor Build status| image:: https://ci.appveyor.com/api/projects/status/vt08bybn8k60a77s/branch/master?svg=true
+.. |license| image:: https://img.shields.io/pypi/l/teamcity-messages.svg
+   :target: https://pypi.python.org/pypi/teamcity-messages
+   :alt: License
+.. |downloads| image:: https://img.shields.io/pypi/dd/teamcity-messages.svg
+   :target: https://pypi.python.org/pypi/teamcity-messages
+   :alt: Daily PyPI downloads
+.. |versions| image:: https://img.shields.io/pypi/pyversions/teamcity-messages.svg
+   :target: https://pypi.python.org/pypi/teamcity-messages
+   :alt: Python versions supported
+.. |status| image:: https://img.shields.io/pypi/status/teamcity-messages.svg
+   :target: https://pypi.python.org/pypi/teamcity-messages
+   :alt: Package stability
+.. |appveyor_ci| image:: https://ci.appveyor.com/api/projects/status/vt08bybn8k60a77s/branch/master?svg=true
    :target: https://ci.appveyor.com/project/shalupov/teamcity-python/branch/master
-.. |Travis Build Status| image:: https://travis-ci.org/JetBrains/teamcity-messages.svg?branch=master
+   :alt: AppVeyor Build Status
+.. |travis_ci| image:: https://travis-ci.org/JetBrains/teamcity-messages.svg?branch=master
    :target: https://travis-ci.org/JetBrains/teamcity-messages
+   :alt: Travis Build Status
