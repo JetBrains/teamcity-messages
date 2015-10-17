@@ -30,8 +30,13 @@ class PyTest(TestCommand):
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
+        try:
+            self.test_args = []
+        except AttributeError:
+            # It may fail on some setuptools versions where test_args is a property
+            # On that versions "test_args = []" is not required anyway
+            pass
+        self.test_suite = "fake_suite"
 
     def run_tests(self):
         import pytest
