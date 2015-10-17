@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+Version 1.17 Sat Oct 17 2015
+  - support coverage >= 4.0
+  - automatically detect TeamCity in flake8 plugin (Marc Abramowitz, https://github.com/msabramo)
+  - more messages support (Marc Abramowitz, https://github.com/msabramo)
+    buildProblem, buildStatus, setParameter, importData, enableServiceMessages, disableServiceMessages etc
+
 Version 1.16 Sat Sep 12 2015
 
   - blocks messages support (Marc Abramowitz, https://github.com/msabramo)

@@ -97,7 +97,7 @@ introduced in Django 1.7.
 flake8
 ~~~~~~
 
-Add the ``--teamcity`` command line option.
+Test status reporting is enabled automatically under TeamCity build.
 
 Twisted trial
 ~~~~~~~~~~~~~
