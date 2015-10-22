@@ -314,6 +314,57 @@ def test_teardown_module_error(venv):
     assert ms[3].params['details'].index("assert 1 == 0") > 0
 
 
+# As of twisted 15.2.1 trial is not available on Python 3
+@pytest.mark.skipif("sys.version_info < (2, 6) or sys.version_info >= (3, 0)", reason="requires Python 2.6 or 2.7")
+def test_twisted_trial(venv):
+    packages = list(*venv.packages)
+    packages.append("twisted==15.2.1")
+    if os.name == 'nt':
+        if sys.version_info < (2, 7):
+            pytest.skip("pypiwin32 is available since Python 2.7")
+        packages.append("pypiwin32==219")
+    venv_with_twisted = virtual_environments.prepare_virtualenv(packages)
+
+    env = virtual_environments.get_clean_system_environment()
+    env['PYTHONPATH'] = os.path.join(os.getcwd(), "tests", "guinea-pigs", "unittest")
+
+    # Start the process and wait for its output
+    trial_file = os.path.join(venv_with_twisted.bin, 'trial')
+    trial_exe_file = os.path.join(venv_with_twisted.bin, 'trial.exe')
+    trial_py_file = os.path.join(venv_with_twisted.bin, 'trial.py')
+
+    if os.path.exists(trial_file):
+        command = trial_file
+    elif os.path.exists(trial_py_file):
+        command = os.path.join(venv_with_twisted.bin, 'python') + " " + trial_py_file
+    elif os.path.exists(trial_exe_file):
+        command = trial_exe_file
+    else:
+        raise Exception("twisted trial is not found at " + trial_py_file + " or " + trial_file + " or " + trial_exe_file)
+
+    command += " --reporter=teamcity twisted_trial"
+    print("RUN: " + command)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    output = "".join([x.decode() for x in proc.stdout.readlines()])
+    proc.wait()
+
+    print("OUTPUT:" + output.replace("#", "*"))
+
+    test1 = "twisted_trial.test_case.CalculationTestCase.test_fail (some desc)"
+    test2 = "twisted_trial.test_case.CalculationTestCase.test_ok"
+
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test1}),
+            ServiceMessage('testFailed', {'name': test1}),
+            ServiceMessage('testFinished', {'name': test1}),
+            ServiceMessage('testStarted', {'name': test2}),
+            ServiceMessage('testFinished', {'name': test2}),
+        ])
+    assert ms[1].params['details'].index("5 != 4") > 0
+
+
 def run_directly(venv, file):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"

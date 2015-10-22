@@ -28,7 +28,8 @@ class TeamcityTestResult(TestResult):
         # Force test_id for doctests
         if get_class_fullname(test) != "doctest.DocTestCase":
             desc = test.shortDescription()
-            if desc and desc != test.id():
+            test_method_name = getattr(test, "_testMethodName", "")
+            if desc and desc != test.id() and desc != test_method_name:
                 return "%s (%s)" % (test.id(), desc.replace('.', '_'))
 
         return test.id()
@@ -121,6 +122,8 @@ class TeamcityTestResult(TestResult):
 
         if is_string(err):
             details = err
+        elif get_class_fullname(err) == "twisted.python.failure.Failure":
+            details = err.getTraceback()
         else:
             details = convert_error_to_string(err)
 

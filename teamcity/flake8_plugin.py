@@ -2,11 +2,12 @@ import pep8
 import re
 
 from teamcity.messages import TeamcityServiceMessages
+from teamcity import __version__, is_running_under_teamcity
 
 
 name = 'teamcity'
-version = '1.9'
-enable_teamcity = False
+version = __version__
+enable_teamcity = is_running_under_teamcity()
 
 
 def add_options(parser):

@@ -1,3 +1,22 @@
+Change Log
+----------
+
+Version 1.17 Sat Oct 17 2015
+  - support coverage >= 4.0
+  - automatically detect TeamCity in flake8 plugin (Marc Abramowitz, https://github.com/msabramo)
+  - more messages support (Marc Abramowitz, https://github.com/msabramo)
+    buildProblem, buildStatus, setParameter, importData, enableServiceMessages, disableServiceMessages etc
+
+Version 1.16 Sat Sep 12 2015
+
+  - blocks messages support (Marc Abramowitz, https://github.com/msabramo)
+
+Version 1.15 Fri Aug 28 2015
+
+  - Twisted's trial support (Alexey Larkov, https://github.com/gmlexx)
+  - nose: fix tests reporting in multiprocess environment, thanks to Lewis Coates, https://github.com/lewisc
+  - Fix UnicodeEncodeError when sys.stdout.encoding is None, thanks to Marc Abramowitz, https://github.com/msabramo
+
 Version 1.14 Sat May 23 2015
 
   - support python 2.4, 2.5

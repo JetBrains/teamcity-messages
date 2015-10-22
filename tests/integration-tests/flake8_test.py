@@ -50,7 +50,6 @@ def test_no_reporting_without_explicit_option(venv):
 
 def run(venv, options):
     env = virtual_environments.get_clean_system_environment()
-    env['TEAMCITY_VERSION'] = "0.0.0"
 
     command = os.path.join(
         os.getcwd(), venv.bin,

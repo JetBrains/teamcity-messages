@@ -73,21 +73,33 @@ def test_custom_test_items(venv):
         ])
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
-def test_coverage(venv):
-    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-cov==1.8.1",))
+if sys.version_info >= (2, 6):
+    @pytest.mark.parametrize("coverage_version, pytest_cov_version", [
+        ("==3.7.1", "==1.8.1"),
+        ("==4.0.1", "==2.2.0"),
+        # latest
+        ("", ""),
+    ])
+    def test_coverage(venv, coverage_version, pytest_cov_version):
+        if coverage_version != "==3.7.1" and (3, 1) < sys.version_info < (3, 3):
+            pytest.skip("coverage >= 4.0 dropped support for Python 3.2")
 
-    output = run(venv_with_coverage, 'coverage_test', options="--cov coverage_test")
-    test_name = "tests.guinea-pigs.pytest.coverage_test.coverage_test.test_covered_func"
-    assert_service_messages(
-        output,
-        [
-            ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFinished', {'name': test_name}),
-            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLCovered', 'value': '9'}),
-            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLTotal', 'value': '13'}),
-            ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLUncovered', 'value': '4'}),
-        ])
+        venv_with_coverage = virtual_environments.prepare_virtualenv(
+            venv.packages + (
+                "coverage" + coverage_version,
+                "pytest-cov" + pytest_cov_version))
+
+        output = run(venv_with_coverage, 'coverage_test', options="--cov coverage_test")
+        test_name = "tests.guinea-pigs.pytest.coverage_test.coverage_test.test_covered_func"
+        assert_service_messages(
+            output,
+            [
+                ServiceMessage('testStarted', {'name': test_name}),
+                ServiceMessage('testFinished', {'name': test_name}),
+                ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLCovered', 'value': '9'}),
+                ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLTotal', 'value': '13'}),
+                ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLUncovered', 'value': '4'}),
+            ])
 
 
 def test_runtime_error(venv):
@@ -264,9 +276,9 @@ def test_skip(venv):
 def test_params(venv):
     output = run(venv, 'params_test.py')
 
-    test1_name = 'tests.guinea-pigs.pytest.params_test.test_eval[3+5-8|]'
-    test2_name = "tests.guinea-pigs.pytest.params_test.test_eval[|'1_5|' + |'2|'-1_52|]"
-    test3_name = 'tests.guinea-pigs.pytest.params_test.test_eval[6*9-42|]'
+    test1_name = 'tests.guinea-pigs.pytest.params_test.test_eval|[3+5-8|]'
+    test2_name = "tests.guinea-pigs.pytest.params_test.test_eval|[|'1_5|' + |'2|'-1_52|]"
+    test3_name = 'tests.guinea-pigs.pytest.params_test.test_eval|[6*9-42|]'
 
     assert_service_messages(
         output,
@@ -312,7 +324,7 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
-    # print("OUTPUT: " + output.replace("#", "*"))
+    print("OUTPUT: " + output.replace("#", "*"))
     proc.wait()
 
     return output
