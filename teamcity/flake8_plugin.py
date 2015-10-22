@@ -47,8 +47,8 @@ class TeamcityReport(pep8.StandardReport):
                 'col': offset + 1,
             }
 
-            error_message = '%s: %s' % (code, text)
-            test_name = '%s: %s' % (code, position)
+            error_message = '%s %s' % (code, text)
+            test_name = '%s: %s' % (position, error_message)
 
             messages.testStarted(test_name)
 
