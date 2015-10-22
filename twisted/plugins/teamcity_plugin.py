@@ -1,7 +1,14 @@
 import sys
 from teamcity.unittestpy import TeamcityTestResult
 from twisted.trial.reporter import Reporter
+from twisted.python.failure import Failure
 from twisted.plugins.twisted_trial import _Reporter
+
+
+class FailureWrapper(Failure):
+
+    def __getitem__(self, key):
+        return self.value[key]
 
 
 class TeamcityReporter(TeamcityTestResult, Reporter):
@@ -17,6 +24,9 @@ class TeamcityReporter(TeamcityTestResult, Reporter):
                           tbformat=tbformat,
                           realtime=realtime,
                           publisher=publisher)
+
+    def addError(self, test, failure, *k):
+        super(TeamcityReporter, self).addError(test, FailureWrapper(failure), *k)
 
 Teamcity = _Reporter("Teamcity Reporter",
                      "twisted.plugins.teamcity_plugin",
