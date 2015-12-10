@@ -50,8 +50,9 @@ def parse_service_messages(text):
     messages = list()
     for line in text.splitlines():
         r = line.strip()
-        if r.startswith("##teamcity[") and r.endswith("]"):
-            m = _parse_one_service_message(r)
+        index = r.find("##teamcity[")
+        if index != -1:
+            m = _parse_one_service_message(r[index:])
             messages.append(m)
     return messages
 
@@ -109,7 +110,7 @@ def assert_service_messages(actual_messages_string, expected_messages):
 
     try:
         if len(actual_messages) != len(expected_messages):
-            raise AssertionError("Expected %d services messages, but got %d" % (len(expected_messages), len(actual_messages)))
+            raise AssertionError("Expected %d service messages, but got %d" % (len(expected_messages), len(actual_messages)))
         for index, (actual, expected) in enumerate(zip(actual_messages, expected_messages)):
             assert actual >= expected, "Expected\n%s, but got\n%s\n at index %d" % (pprint.pformat(expected), pprint.pformat(actual), index)
     except:

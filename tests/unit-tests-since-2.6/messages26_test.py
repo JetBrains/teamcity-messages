@@ -21,11 +21,9 @@ def test_blocks():
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     with messages.block("Doing something that's important"):
         messages.message("Doing stuff")
-    expected_output = textwrap.dedent("""
+    expected_output = textwrap.dedent("""\
         ##teamcity[blockOpened timestamp='2000-11-02T10:23:01.556' name='Doing something that|'s important']
-
         ##teamcity[Doing stuff timestamp='2000-11-02T10:23:01.556']
-
         ##teamcity[blockClosed timestamp='2000-11-02T10:23:01.556' name='Doing something that|'s important']
         """)
     expected_output = expected_output.encode('utf-8')
@@ -37,11 +35,9 @@ def test_blocks_with_flowid():
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     with messages.block("Doing something that's important", flowId='a'):
         messages.message("Doing stuff")
-    expected_output = textwrap.dedent("""
+    expected_output = textwrap.dedent("""\
         ##teamcity[blockOpened timestamp='2000-11-02T10:23:01.556' flowId='a' name='Doing something that|'s important']
-
         ##teamcity[Doing stuff timestamp='2000-11-02T10:23:01.556']
-
         ##teamcity[blockClosed timestamp='2000-11-02T10:23:01.556' flowId='a' name='Doing something that|'s important']
         """)
     expected_output = expected_output.encode('utf-8')
@@ -55,7 +51,6 @@ def test_compilation():
         pass
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[compilationStarted timestamp='2000-11-02T10:23:01.556' compiler='gcc']
-
         ##teamcity[compilationFinished timestamp='2000-11-02T10:23:01.556' compiler='gcc']
         """).strip().encode('utf-8')
 
@@ -67,7 +62,6 @@ def test_test_suite():
         pass
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[testSuiteStarted timestamp='2000-11-02T10:23:01.556' name='suite emotion']
-
         ##teamcity[testSuiteFinished timestamp='2000-11-02T10:23:01.556' name='suite emotion']
         """).strip().encode('utf-8')
 
@@ -79,7 +73,6 @@ def test_test():
         pass
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[testStarted timestamp='2000-11-02T10:23:01.556' name='only a test']
-
         ##teamcity[testFinished timestamp='2000-11-02T10:23:01.556' name='only a test']
         """).strip().encode('utf-8')
 
@@ -91,7 +84,6 @@ def test_progress():
         pass
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[progressStart 'only a test']
-
         ##teamcity[progressFinish 'only a test']
         """).strip().encode('utf-8')
 
@@ -103,7 +95,6 @@ def test_service_messages_disabled():
         pass
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[disableServiceMessages timestamp='2000-11-02T10:23:01.556']
-
         ##teamcity[enableServiceMessages timestamp='2000-11-02T10:23:01.556']
         """).strip().encode('utf-8')
 
@@ -115,6 +106,5 @@ def test_service_messages_enabled():
         pass
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[enableServiceMessages timestamp='2000-11-02T10:23:01.556']
-
         ##teamcity[disableServiceMessages timestamp='2000-11-02T10:23:01.556']
         """).strip().encode('utf-8')
