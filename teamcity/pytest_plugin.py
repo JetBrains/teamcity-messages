@@ -136,6 +136,11 @@ class EchoTeamCityMessages(object):
         duration = timedelta(seconds=report.duration)
 
         if report.passed:
+            # Do not report if we have a "failed" original_outcome. This key is
+            # created by box/Flaky pytest plugin when it'll retry running a
+            if getattr(report, 'original_outcome', None) == 'failed':
+                return
+
             # Do not report passed setup/teardown if no output
             if report.when == 'call' or self.report_has_output(report):
                 self.ensure_test_start_reported(test_id)
