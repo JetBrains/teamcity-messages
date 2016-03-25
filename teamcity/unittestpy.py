@@ -52,7 +52,7 @@ class TeamcityTestResult(TestResult):
         test_id = self.get_test_id(test)
 
         if reason:
-            reason_str = ": " + reason
+            reason_str = ": " + reason.__str__()
         else:
             reason_str = ""
         self.messages.testIgnored(test_id, message="Skipped" + reason_str, flowId=test_id)
