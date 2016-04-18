@@ -30,7 +30,7 @@ def pytest_addoption(parser):
     group._addoption('--no-teamcity', action="count",
                      dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
     group._addoption('--teamcity-encoding', action="store",
-                     dest="teamcity_encoding", default='auto', help="manually set ecnoding to JetBrains TeamCity service messages")
+                     dest="teamcity_encoding", default='auto', help="manually set encoding to JetBrains TeamCity service messages")
 
 
 def pytest_configure(config):
