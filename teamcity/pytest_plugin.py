@@ -29,6 +29,8 @@ def pytest_addoption(parser):
                      dest="teamcity", default=0, help="force output of JetBrains TeamCity service messages")
     group._addoption('--no-teamcity', action="count",
                      dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
+    group._addoption('--teamcity-encoding', action="store",
+                     dest="teamcity_encoding", default='auto', help="manually set ecnoding to JetBrains TeamCity service messages")
 
 
 def pytest_configure(config):
@@ -43,7 +45,9 @@ def pytest_configure(config):
         output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
         coverage_controller = _get_coverage_controller(config)
 
-        config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled, coverage_controller)
+        config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled, 
+                                                         coverage_controller,
+                                                         config.option.teamcity_encoding)
         config.pluginmanager.register(config._teamcityReporting)
 
 
@@ -66,11 +70,11 @@ def _get_coverage_controller(config):
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, output_capture_enabled, coverage_controller):
+    def __init__(self, output_capture_enabled, coverage_controller, encoding):
         self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
 
-        self.teamcity = TeamcityServiceMessages()
+        self.teamcity = TeamcityServiceMessages(encoding=encoding)
         self.test_start_reported_mark = set()
 
         self.max_reported_output_size = 1 * 1024 * 1024
