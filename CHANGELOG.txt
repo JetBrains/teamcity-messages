@@ -3,6 +3,7 @@ Change Log
 
   - pytest: do not report setup fixtures as separate tests (https://github.com/JetBrains/teamcity-messages/issues/91)
   - pytest: better test location presentation
+  - pytest: support for pytest-pep8 and pytest-lint plugins
   - nose: make sure to turn reason into string when skipping test #98 (Piyush Gupta, https://github.com/piyushg91)
   - twisted: fix twisted failure test reporting #88 (Alexey Larkov, https://github.com/gmlexx)
   - flake8: better test name #89 (Marc Abramowitz, https://github.com/msabramo)
