@@ -290,21 +290,21 @@ def test_no_properties():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     messages.message('dummyMessage')
-    assert stream.observed_output == "\n##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556']\n".encode('utf-8')
+    assert stream.observed_output == "##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556']\n".encode('utf-8')
 
 
 def test_one_property():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     messages.message('dummyMessage', fruit='apple')
-    assert stream.observed_output == "\n##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556' fruit='apple']\n".encode('utf-8')
+    assert stream.observed_output == "##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556' fruit='apple']\n".encode('utf-8')
 
 
 def test_three_properties():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
     messages.message('dummyMessage', fruit='apple', meat='steak', pie='raspberry')
-    assert stream.observed_output == "\n##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556' fruit='apple' meat='steak' pie='raspberry']\n".encode('utf-8')
+    assert stream.observed_output == "##teamcity[dummyMessage timestamp='2000-11-02T10:23:01.556' fruit='apple' meat='steak' pie='raspberry']\n".encode('utf-8')
 
 
 def test_unicode():
@@ -315,7 +315,7 @@ def test_unicode():
     else:
         bjork = b('Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir').decode('utf-8')
     messages.message(bjork)
-    assert stream.observed_output == ("\n##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % bjork).encode('utf-8')
+    assert stream.observed_output == ("##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % bjork).encode('utf-8')
 
 
 def test_unicode_to_sys_stdout_with_no_encoding():
