@@ -1,6 +1,9 @@
 Change Log
 ----------
 
+  - pytest: do not report setup fixtures as separate tests (https://github.com/JetBrains/teamcity-messages/issues/91)
+  - pytest: better test location presentation
+
 Version 1.17 Sat Oct 17 2015
   - support coverage >= 4.0
   - automatically detect TeamCity in flake8 plugin (Marc Abramowitz, https://github.com/msabramo)
