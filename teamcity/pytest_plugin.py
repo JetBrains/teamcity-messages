@@ -106,9 +106,9 @@ class EchoTeamCityMessages(object):
                 return True
         return False
 
-    def report_test_output(self, report, test_id, when):
+    def report_test_output(self, report, test_id):
         for (secname, data) in report.sections:
-            if when not in secname:
+            if report.when not in secname:
                 continue
             if not data:
                 continue
@@ -124,43 +124,53 @@ class EchoTeamCityMessages(object):
         """
         :type report: _pytest.runner.TestReport
         """
-        orig_test_id = self.format_test_id(report.nodeid)
-
-        if report.when == 'call':
-            suffix = ''
-        else:
-            suffix = '_' + report.when
-
-        test_id = orig_test_id + suffix
+        test_id = self.format_test_id(report.nodeid)
 
         duration = timedelta(seconds=report.duration)
 
         if report.passed:
             # Do not report passed setup/teardown if no output
-            if report.when == 'call' or self.report_has_output(report):
+            if report.when == 'call':
                 self.ensure_test_start_reported(test_id)
-                self.report_test_output(report, test_id, report.when)
+                self.report_test_output(report, test_id)
                 self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+            else:
+                if self.report_has_output(report):
+                    block_name = "test " + report.when
+                    self.teamcity.blockOpened(block_name, flowId=test_id)
+                    self.report_test_output(report, test_id)
+                    self.teamcity.blockClosed(block_name, flowId=test_id)
         elif report.failed:
-            self.ensure_test_start_reported(test_id)
-            self.report_test_output(report, test_id, report.when)
-            self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
-            self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+            if report.when == 'call':
+                self.ensure_test_start_reported(test_id)
+                self.report_test_output(report, test_id)
+                self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
+                self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+            elif report.when == 'setup':
+                if self.report_has_output(report):
+                    self.teamcity.blockOpened("test setup", flowId=test_id)
+                    self.report_test_output(report, test_id)
+                    self.teamcity.blockClosed("test setup", flowId=test_id)
 
-            # If test setup failed, report test failure as well
-            if report.when == 'setup':
-                self.ensure_test_start_reported(orig_test_id)
-                self.teamcity.testFailed(orig_test_id, "test setup failed, see %s test failure" % test_id, flowId=orig_test_id)
-                self.teamcity.testFinished(orig_test_id, flowId=orig_test_id)
+                self.ensure_test_start_reported(test_id)
+                self.teamcity.testFailed(test_id, "test setup failed", str(report.longrepr), flowId=test_id)
+                self.teamcity.testFinished(test_id, flowId=test_id)
+            elif report.when == 'teardown':
+                # Report failed teardown as a separate test as original test is already finished
+                teardown_test_id = test_id + "_teardown"
+                self.ensure_test_start_reported(teardown_test_id)
+                self.report_test_output(report, teardown_test_id)
+                self.teamcity.testFailed(teardown_test_id, str(report.location), str(report.longrepr), flowId=teardown_test_id)
+                self.teamcity.testFinished(teardown_test_id, testDuration=duration, flowId=teardown_test_id)
         elif report.skipped:
             if type(report.longrepr) is tuple and len(report.longrepr) == 3:
                 reason = report.longrepr[2]
             else:
                 reason = str(report.longrepr)
-            self.ensure_test_start_reported(orig_test_id)
-            self.report_test_output(report, orig_test_id, report.when)
-            self.teamcity.testIgnored(orig_test_id, reason, flowId=orig_test_id)
-            self.teamcity.testFinished(orig_test_id, flowId=orig_test_id)
+            self.ensure_test_start_reported(test_id)
+            self.report_test_output(report, test_id)
+            self.teamcity.testIgnored(test_id, reason, flowId=test_id)
+            self.teamcity.testFinished(test_id, flowId=test_id)
 
     def pytest_collectreport(self, report):
         if report.failed:

@@ -140,33 +140,27 @@ def test_fixture_error(venv):
     output = run(venv, 'fixture_error_test.py')
 
     test1_name = 'tests.guinea-pigs.pytest.fixture_error_test.test_error1'
-    test1_setup = test1_name + '_setup'
     test2_name = 'tests.guinea-pigs.pytest.fixture_error_test.test_error2'
-    test2_setup = test2_name + '_setup'
 
     ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test1_name, 'flowId': test1_name}),
-            ServiceMessage('testStarted', {'name': test1_setup}),
-            ServiceMessage('testFailed', {'name': test1_setup, 'flowId': test1_setup}),
-            ServiceMessage('testFinished', {'name': test1_setup}),
             ServiceMessage('testFailed', {'name': test1_name,
-                                          'message': 'test setup failed, see ' + test1_setup + ' test failure',
+                                          'message': 'test setup failed',
                                           'flowId': test1_name}),
-            ServiceMessage('testFinished', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testFinished', {'name': test1_name}),
+
             ServiceMessage('testStarted', {'name': test2_name, 'flowId': test2_name}),
-            ServiceMessage('testStarted', {'name': test2_setup, 'flowId': test2_setup}),
-            ServiceMessage('testFailed', {'name': test2_setup, 'flowId': test2_setup}),
-            ServiceMessage('testFinished', {'name': test2_setup, 'flowId': test2_setup}),
-            ServiceMessage('testFailed', {'name': test2_name, 'flowId': test2_name,
-                                          'message': 'test setup failed, see ' + test2_setup + ' test failure'}),
-            ServiceMessage('testFinished', {'name': test2_name, 'flowId': test2_name}),
+            ServiceMessage('testFailed', {'name': test2_name,
+                                          'message': 'test setup failed',
+                                          'flowId': test2_name}),
+            ServiceMessage('testFinished', {'name': test2_name}),
         ])
-    assert ms[2].params["details"].find("raise Exception") > 0
-    assert ms[2].params["details"].find("oops") > 0
-    assert ms[8].params["details"].find("raise Exception") > 0
-    assert ms[8].params["details"].find("oops") > 0
+    assert ms[1].params["details"].find("raise Exception") > 0
+    assert ms[1].params["details"].find("oops") > 0
+    assert ms[4].params["details"].find("raise Exception") > 0
+    assert ms[4].params["details"].find("oops") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
@@ -174,24 +168,22 @@ def test_output(venv):
     output = run(venv, 'output_test.py')
 
     test_name = 'tests.guinea-pigs.pytest.output_test.test_out'
-    test_setup = test_name + '_setup'
-    test_teardown = test_name + '_teardown'
 
     assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'false'}),
-            ServiceMessage('testStarted', {'name': test_setup, 'flowId': test_setup}),
-            ServiceMessage('testStdOut', {'name': test_setup, 'flowId': test_setup, 'out': 'setup stdout|n'}),
-            ServiceMessage('testStdErr', {'name': test_setup, 'flowId': test_setup, 'out': 'setup stderr|n'}),
-            ServiceMessage('testFinished', {'name': test_setup}),
+            ServiceMessage('blockOpened', {'name': 'test setup', 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'setup stdout|n'}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name, 'out': 'setup stderr|n'}),
+            ServiceMessage('blockClosed', {'name': 'test setup'}),
             ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'test stdout|n'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name, 'out': 'test stderr|n'}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStarted', {'name': test_teardown, 'flowId': test_teardown}),
-            ServiceMessage('testStdOut', {'name': test_teardown, 'flowId': test_teardown, 'out': 'teardown stdout|n'}),
-            ServiceMessage('testStdErr', {'name': test_teardown, 'flowId': test_teardown, 'out': 'teardown stderr|n'}),
-            ServiceMessage('testFinished', {'name': test_teardown, 'flowId': test_teardown}),
+            ServiceMessage('blockOpened', {'name': 'test teardown', 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'teardown stdout|n'}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name, 'out': 'teardown stderr|n'}),
+            ServiceMessage('blockClosed', {'name': 'test teardown'}),
         ])
 
 
