@@ -307,6 +307,29 @@ def test_fail_big_output(venv):
     )
 
 
+def test_issue_98(venv):
+    env = virtual_environments.get_clean_system_environment()
+    env['TEAMCITY_VERSION'] = "0.0.0"
+
+    # Start the process and wait for its output
+    command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'nose', 'issue_98', 'custom_test_loader.py')
+    print("RUN: " + command)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    output = "".join([x.decode() for x in proc.stdout.readlines()])
+    proc.wait()
+
+    print("OUTPUT:" + output.replace("#", "*"))
+
+    test_name = 'simple_tests.SimpleTests.test_two'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped: Skipping', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
 def run(venv, file, clazz=None, test=None, options=""):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
