@@ -3,6 +3,8 @@ Change Log
 
   - pytest: do not report setup fixtures as separate tests (https://github.com/JetBrains/teamcity-messages/issues/91)
   - pytest: better test location presentation
+  - nose: make sure to turn reason into string when skipping test #98 (Piyush Gupta, https://github.com/piyushg91)
+  - twisted: fix twisted failure test reporting #88 (Alexey Larkov, https://github.com/gmlexx)
 
 Version 1.17 Sat Oct 17 2015
   - support coverage >= 4.0
