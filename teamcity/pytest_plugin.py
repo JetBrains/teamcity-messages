@@ -62,9 +62,6 @@ def _get_coverage_controller(config):
     return cov_plugin.cov_controller
 
 
-# The following code relies on py.test nodeid uniqueness
-
-
 class EchoTeamCityMessages(object):
     def __init__(self, output_capture_enabled, coverage_controller):
         self.coverage_controller = coverage_controller
@@ -125,6 +122,25 @@ class EchoTeamCityMessages(object):
                 for chunk in split_output(limit_output(data)):
                     self.teamcity.testStdErr(test_id, out=chunk, flowId=test_id)
 
+    def report_test_finished(self, test_id, duration=None):
+        self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+        self.test_start_reported_mark.remove(test_id)
+
+    def report_test_failure(self, test_id, report, message=None, report_output=True):
+        if hasattr(report, 'duration'):
+            duration = timedelta(seconds=report.duration)
+        else:
+            duration = None
+
+        if message is None:
+            message = self.format_location(report.location)
+
+        self.ensure_test_start_reported(test_id)
+        if report_output:
+            self.report_test_output(report, test_id)
+        self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
+        self.report_test_finished(test_id, duration)
+
     def pytest_runtest_logreport(self, report):
         """
         :type report: _pytest.runner.TestReport
@@ -138,7 +154,7 @@ class EchoTeamCityMessages(object):
             if report.when == 'call':
                 self.ensure_test_start_reported(test_id)
                 self.report_test_output(report, test_id)
-                self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+                self.report_test_finished(test_id, duration)
             else:
                 if self.report_has_output(report):
                     block_name = "test " + report.when
@@ -147,26 +163,17 @@ class EchoTeamCityMessages(object):
                     self.teamcity.blockClosed(block_name, flowId=test_id)
         elif report.failed:
             if report.when == 'call':
-                self.ensure_test_start_reported(test_id)
-                self.report_test_output(report, test_id)
-                self.teamcity.testFailed(test_id, self.format_location(report.location), str(report.longrepr), flowId=test_id)
-                self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+                self.report_test_failure(test_id, report)
             elif report.when == 'setup':
                 if self.report_has_output(report):
                     self.teamcity.blockOpened("test setup", flowId=test_id)
                     self.report_test_output(report, test_id)
                     self.teamcity.blockClosed("test setup", flowId=test_id)
 
-                self.ensure_test_start_reported(test_id)
-                self.teamcity.testFailed(test_id, "test setup failed", str(report.longrepr), flowId=test_id)
-                self.teamcity.testFinished(test_id, flowId=test_id)
+                self.report_test_failure(test_id, report, message="test setup failed", report_output=False)
             elif report.when == 'teardown':
                 # Report failed teardown as a separate test as original test is already finished
-                teardown_test_id = test_id + "_teardown"
-                self.ensure_test_start_reported(teardown_test_id)
-                self.report_test_output(report, teardown_test_id)
-                self.teamcity.testFailed(teardown_test_id, self.format_location(report.location), str(report.longrepr), flowId=teardown_test_id)
-                self.teamcity.testFinished(teardown_test_id, testDuration=duration, flowId=teardown_test_id)
+                self.report_test_failure(test_id + "_teardown", report)
         elif report.skipped:
             if type(report.longrepr) is tuple and len(report.longrepr) == 3:
                 reason = report.longrepr[2]
@@ -175,15 +182,12 @@ class EchoTeamCityMessages(object):
             self.ensure_test_start_reported(test_id)
             self.report_test_output(report, test_id)
             self.teamcity.testIgnored(test_id, reason, flowId=test_id)
-            self.teamcity.testFinished(test_id, flowId=test_id)
+            self.report_test_finished(test_id, duration)
 
     def pytest_collectreport(self, report):
         if report.failed:
             test_id = self.format_test_id(report.nodeid) + "_collect"
-
-            self.teamcity.testStarted(test_id, flowId=test_id)
-            self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
-            self.teamcity.testFinished(test_id, flowId=test_id)
+            self.report_test_failure(test_id, report)
 
     def pytest_terminal_summary(self):
         if self.coverage_controller is not None:
