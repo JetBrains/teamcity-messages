@@ -38,6 +38,46 @@ def fix_slashes(s):
         return s.replace('\\', '/')
 
 
+def test_pytest_pep8(venv):
+    venv_with_pep8 = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pep8",))
+
+    output = run(venv_with_pep8, 'pep8_test.py', options="--pep8")
+    pep8_test_name = "tests.guinea-pigs.pytest.pep8_test.PEP8"
+    test_name = "tests.guinea-pigs.pytest.pep8_test.test_ok"
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': pep8_test_name}),
+            ServiceMessage('testFailed', {'name': pep8_test_name}),
+            ServiceMessage('testFinished', {'name': pep8_test_name}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+
+    assert ms[1].params["details"].find("E302 expected 2 blank lines, found 1") > 0
+
+
+def test_pytest_pylint(venv):
+    venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint",))
+
+    output = run(venv_with_pylint, 'pylint_test.py', options="--pylint")
+    pylint_test_name = "tests.guinea-pigs.pytest.pylint_test.Pylint"
+    test_name = "tests.guinea-pigs.pytest.pylint_test.test_ok"
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': pylint_test_name}),
+            ServiceMessage('testStdErr', {'name': pylint_test_name}),
+            ServiceMessage('testFailed', {'name': pylint_test_name}),
+            ServiceMessage('testFinished', {'name': pylint_test_name}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+
+    assert ms[1].params["out"].find("No config file found") >= 0
+    assert ms[2].params["details"].find("Unused import sys") > 0
+
+
 def test_hierarchy(venv):
     output = run(venv, 'namespace')
     test_name = 'tests.guinea-pigs.pytest.namespace.pig_test.TestSmoke.test_smoke'

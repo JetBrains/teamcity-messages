@@ -73,7 +73,38 @@ class EchoTeamCityMessages(object):
         self.max_reported_output_size = 1 * 1024 * 1024
         self.reported_output_chunk_size = 50000
 
-    def format_test_id(self, nodeid):
+    def get_id_from_location(self, location):
+        if type(location) is not tuple or len(location) != 3 or not hasattr(location[2], "startswith"):
+            return None
+
+        def convert_file_to_id(filename):
+            filename = re.sub(r"\.pyc?$", "", filename)
+            return filename.replace(os.sep, ".").replace("/", ".")
+
+        def add_prefix_to_filename_id(filename_id, prefix):
+            dot_location = filename_id.rfind('.')
+            if dot_location <= 0 or dot_location >= len(filename_id) - 1:
+                return None
+
+            return filename_id[:dot_location + 1] + prefix + filename_id[dot_location + 1:]
+
+        pylint_prefix = '[pylint] '
+        if location[2].startswith(pylint_prefix):
+            id_from_file = convert_file_to_id(location[2][len(pylint_prefix):])
+            return id_from_file + ".Pylint"
+
+        if location[2] == "PEP8-check":
+            id_from_file = convert_file_to_id(location[0])
+            return id_from_file + ".PEP8"
+
+        return None
+
+    def format_test_id(self, nodeid, location):
+        id_from_location = self.get_id_from_location(location)
+
+        if id_from_location is not None:
+            return id_from_location
+
         test_id = nodeid
 
         if test_id.find("::") < 0:
@@ -91,7 +122,7 @@ class EchoTeamCityMessages(object):
         return str(location)
 
     def pytest_runtest_logstart(self, nodeid, location):
-        self.ensure_test_start_reported(self.format_test_id(nodeid))
+        self.ensure_test_start_reported(self.format_test_id(nodeid, location))
 
     def ensure_test_start_reported(self, test_id):
         if test_id not in self.test_start_reported_mark:
@@ -145,7 +176,7 @@ class EchoTeamCityMessages(object):
         """
         :type report: _pytest.runner.TestReport
         """
-        test_id = self.format_test_id(report.nodeid)
+        test_id = self.format_test_id(report.nodeid, report.location)
 
         duration = timedelta(seconds=report.duration)
 
@@ -186,7 +217,7 @@ class EchoTeamCityMessages(object):
 
     def pytest_collectreport(self, report):
         if report.failed:
-            test_id = self.format_test_id(report.nodeid) + "_collect"
+            test_id = self.format_test_id(report.nodeid, report.location) + "_collect"
             self.report_test_failure(test_id, report)
 
     def pytest_terminal_summary(self):
