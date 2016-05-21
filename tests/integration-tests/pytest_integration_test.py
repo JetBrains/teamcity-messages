@@ -1,5 +1,6 @@
 import os
 import sys
+import platform
 import subprocess
 
 import pytest
@@ -28,6 +29,13 @@ def construct_fixture():
     return venv
 
 globals()['venv'] = construct_fixture()
+
+
+def fix_slashes(s):
+    if platform.system() == 'Windows':
+        return s.replace('/', '\\')
+    else:
+        return s.replace('\\', '/')
 
 
 def test_hierarchy(venv):
@@ -233,7 +241,8 @@ def test_teardown_error(venv):
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test.test_error'}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test.test_error'}),
             ServiceMessage('testStarted', {'name': teardown_test_id, 'flowId': teardown_test_id}),
-            ServiceMessage('testFailed', {'flowId': teardown_test_id}),
+            ServiceMessage('testFailed', {'flowId': teardown_test_id,
+                                          'message': fix_slashes('tests/guinea-pigs/pytest/teardown_error_test.py') + ':13 (test_error)'}),
             ServiceMessage('testFinished', {'name': teardown_test_id, 'flowId': teardown_test_id}),
         ])
     assert ms[3].params["details"].find("raise Exception") > 0
@@ -280,7 +289,8 @@ def test_params(venv):
             ServiceMessage('testStarted', {'name': test2_name}),
             ServiceMessage('testFinished', {'name': test2_name}),
             ServiceMessage('testStarted', {'name': test3_name}),
-            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFailed', {'name': test3_name,
+                                          'message': fix_slashes('tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])'}),
             ServiceMessage('testFinished', {'name': test3_name}),
         ])
 

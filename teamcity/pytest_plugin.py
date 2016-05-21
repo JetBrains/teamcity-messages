@@ -88,6 +88,11 @@ class EchoTeamCityMessages(object):
 
         return test_id
 
+    def format_location(self, location):
+        if type(location) is tuple and len(location) == 3:
+            return "%s:%s (%s)" % (str(location[0]), str(location[1]), str(location[2]))
+        return str(location)
+
     def pytest_runtest_logstart(self, nodeid, location):
         self.ensure_test_start_reported(self.format_test_id(nodeid))
 
@@ -144,7 +149,7 @@ class EchoTeamCityMessages(object):
             if report.when == 'call':
                 self.ensure_test_start_reported(test_id)
                 self.report_test_output(report, test_id)
-                self.teamcity.testFailed(test_id, str(report.location), str(report.longrepr), flowId=test_id)
+                self.teamcity.testFailed(test_id, self.format_location(report.location), str(report.longrepr), flowId=test_id)
                 self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
             elif report.when == 'setup':
                 if self.report_has_output(report):
@@ -160,7 +165,7 @@ class EchoTeamCityMessages(object):
                 teardown_test_id = test_id + "_teardown"
                 self.ensure_test_start_reported(teardown_test_id)
                 self.report_test_output(report, teardown_test_id)
-                self.teamcity.testFailed(teardown_test_id, str(report.location), str(report.longrepr), flowId=teardown_test_id)
+                self.teamcity.testFailed(teardown_test_id, self.format_location(report.location), str(report.longrepr), flowId=teardown_test_id)
                 self.teamcity.testFinished(teardown_test_id, testDuration=duration, flowId=teardown_test_id)
         elif report.skipped:
             if type(report.longrepr) is tuple and len(report.longrepr) == 3:
