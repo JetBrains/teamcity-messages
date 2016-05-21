@@ -38,8 +38,6 @@ class TeamcityReport(pep8.StandardReport):
 
         normalized_filename = self.filename.replace("\\", "/")
 
-        suite_name = 'pep8: %s' % normalized_filename
-        messages.testSuiteStarted(suite_name)
         for line_number, offset, code, text, doc in self._deferred_print:
             position = '%(path)s:%(row)d:%(col)d' % {
                 'path': normalized_filename,
@@ -48,7 +46,7 @@ class TeamcityReport(pep8.StandardReport):
             }
 
             error_message = '%s %s' % (code, text)
-            test_name = '%s: %s' % (position, error_message)
+            test_name = 'pep8: %s: %s' % (position, error_message)
 
             messages.testStarted(test_name)
 
@@ -69,5 +67,4 @@ class TeamcityReport(pep8.StandardReport):
 
             messages.testFailed(test_name, error_message, details)
             messages.testFinished(test_name)
-        messages.testSuiteFinished(suite_name)
         return self.file_errors

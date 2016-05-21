@@ -17,14 +17,12 @@ def test_smoke(venv):
     output = run(venv, options="--teamcity")
 
     file_name = "tests/guinea-pigs/flake8/smoke.py"
-    test1_name = file_name + ":3:1: E302 expected 2 blank lines, found 1"
-    test2_name = file_name + ":7:1: W391 blank line at end of file"
+    test1_name = "pep8: " + file_name + ":3:1: E302 expected 2 blank lines, found 1"
+    test2_name = "pep8: " + file_name + ":7:1: W391 blank line at end of file"
 
     assert_service_messages(
         output,
         [
-            ServiceMessage('testSuiteStarted', {'name': "pep8: " + file_name}),
-
             ServiceMessage('testStarted', {'name': test1_name}),
             ServiceMessage('testFailed', {'name': test1_name, 'message': "E302 expected 2 blank lines, found 1"}),
             ServiceMessage('testFinished', {'name': test1_name}),
@@ -32,8 +30,6 @@ def test_smoke(venv):
             ServiceMessage('testStarted', {'name': test2_name}),
             ServiceMessage('testFailed', {'name': test2_name, 'message': "W391 blank line at end of file"}),
             ServiceMessage('testFinished', {'name': test2_name}),
-
-            ServiceMessage('testSuiteFinished', {'name': "pep8: " + file_name}),
         ])
 
 
