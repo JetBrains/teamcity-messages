@@ -307,6 +307,7 @@ def test_fail_big_output(venv):
     )
 
 
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_issue_98(venv):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
