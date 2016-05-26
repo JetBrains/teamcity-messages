@@ -10,8 +10,16 @@ from service_messages import parse_service_messages, ServiceMessage
 
 @pytest.fixture(scope='module', params=["django==1.6", "django==1.7", "django"])
 def venv(request):
-    if request.param != "1.6" and sys.version_info < (2, 7):
+    if sys.version_info < (2, 6):
+        pytest.skip("Django (all versions) requires Python 2.6+")
+
+    if request.param != "django==1.6" and sys.version_info < (2, 7):
         pytest.skip("Django 1.7+ requires Python 2.7+")
+    if request.param == "django":
+        if sys.version_info[0] == 2 and sys.version_info < (2, 7):
+            pytest.skip("Django 1.9+ requires Python 2.7+")
+        if sys.version_info[0] == 3 and sys.version_info < (3, 4):
+            pytest.skip("Django 1.9+ requires Python 3.4+")
     return virtual_environments.prepare_virtualenv([request.param])
 
 
