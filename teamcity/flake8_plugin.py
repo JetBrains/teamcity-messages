@@ -1,4 +1,8 @@
-import pep8
+try:
+    import pycodestyle as pep8
+except ImportError:
+    import pep8
+
 import re
 
 from teamcity.messages import TeamcityServiceMessages
