@@ -7,7 +7,7 @@ import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, parse_service_messages
 
 
-@pytest.fixture(scope='module', params=["flake8==2.0.0", "flake8==2.4.0", "flake8"])
+@pytest.fixture(scope='module', params=["flake8==2.0.0", "flake8==2.4.0", "flake8==2.6.0", "flake8"])
 def venv(request):
     return virtual_environments.prepare_virtualenv([request.param])
 
