@@ -85,6 +85,7 @@ setup(
         'twisted': ['plugins/teamcity_plugin.py'],
     },
 
+    install_requires=['flake8>=3'],
     tests_require=['pytest', 'virtualenv'],
     cmdclass={'test': PyTest},
 
@@ -97,8 +98,8 @@ setup(
             'pytest-teamcity = teamcity.pytest_plugin',
         ],
 
-        'flake8.extension': [
-            'P999 = teamcity.flake8_plugin',
+        'flake8.report': [
+            'teamcity-messages = teamcity.flake8_plugin:TeamcityReport',
         ]
     },
 )
