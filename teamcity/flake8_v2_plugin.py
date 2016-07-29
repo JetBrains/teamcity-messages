@@ -15,12 +15,15 @@ enable_teamcity = is_running_under_teamcity()
 class TeamcityReport(pep8.StandardReport):
     name = 'teamcity'
     version = __version__
+    options_added = False
 
     @classmethod
     def add_options(cls, parser):
-        parser.add_option('--teamcity', default=False,
-                          action='callback', callback=cls.set_option_callback,
-                          help="Enable teamcity messages")
+        if not cls.options_added:
+            parser.add_option('--teamcity', default=False,
+                              action='callback', callback=cls.set_option_callback,
+                              help="Enable teamcity messages")
+            cls.options_added = True
 
     @classmethod
     def set_option_callback(cls, option, opt, value, parser):

@@ -41,7 +41,7 @@ def test_smoke_flake8_v2(venv_flake8_v2):
         ])
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_smoke_flake8_v3(venv_flake8_v3):
     output = run(venv_flake8_v3, options="--teamcity --format=teamcity-messages")
 
