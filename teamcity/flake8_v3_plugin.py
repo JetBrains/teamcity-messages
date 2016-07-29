@@ -11,6 +11,23 @@ class TeamcityReport(base.BaseFormatter):
     version = __version__
     messages = TeamcityServiceMessages()
 
+    options_added = False
+
+    @classmethod
+    def add_options(cls, parser):
+        if not cls.options_added:
+            parser.add_option('--teamcity', default=False,
+                              action='callback', callback=cls.set_option_callback,
+                              help="Enable teamcity messages (does nothing "
+                                   "in flake8 v3; here for backwards "
+                                   "compatibility only with flake8 v2)")
+            cls.options_added = True
+
+    @classmethod
+    def set_option_callback(cls, option, opt, value, parser):
+        global enable_teamcity
+        enable_teamcity = True
+
     def format(self, error):
         position = '%s:%d:%d' % (
             error.filename, error.line_number, error.column_number)
