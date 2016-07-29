@@ -32,7 +32,7 @@ class TeamcityReport(base.BaseFormatter):
         position = '%s:%d:%d' % (
             error.filename, error.line_number, error.column_number)
         error_message = '%s %s' % (error.code, error.text)
-        test_name = 'flake8: %s: %s' % (position, error_message)
+        test_name = 'pep8: %s: %s' % (position, error_message)
 
         line = error.physical_line
         offset = error.column_number
@@ -42,4 +42,6 @@ class TeamcityReport(base.BaseFormatter):
         ]
         details = '\n'.join(details)
 
+        self.messages.testStarted(test_name)
         self.messages.testFailed(test_name, error_message, details)
+        self.messages.testFinished(test_name)
