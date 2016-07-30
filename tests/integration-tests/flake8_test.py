@@ -52,13 +52,13 @@ def test_smoke_flake8_v3(venv_flake8_v3):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': test2_name}),
-            ServiceMessage('testFailed', {'name': test2_name, 'message': "W391 blank line at end of file"}),
-            ServiceMessage('testFinished', {'name': test2_name}),
-
             ServiceMessage('testStarted', {'name': test1_name}),
             ServiceMessage('testFailed', {'name': test1_name, 'message': "E302 expected 2 blank lines, found 1"}),
             ServiceMessage('testFinished', {'name': test1_name}),
+
+            ServiceMessage('testStarted', {'name': test2_name}),
+            ServiceMessage('testFailed', {'name': test2_name, 'message': "W391 blank line at end of file"}),
+            ServiceMessage('testFinished', {'name': test2_name}),
         ])
 
 
