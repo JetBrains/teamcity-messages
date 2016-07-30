@@ -12,7 +12,7 @@ def venv_flake8_v2(request):
     return virtual_environments.prepare_virtualenv([request.param])
 
 
-@pytest.fixture(scope='module', params=["flake8==3.0.2"])
+@pytest.fixture(scope='module', params=["flake8==3.0.3"])
 def venv_flake8_v3(request):
     return virtual_environments.prepare_virtualenv([request.param])
 
