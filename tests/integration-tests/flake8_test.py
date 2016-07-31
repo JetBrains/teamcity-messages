@@ -42,8 +42,9 @@ def test_smoke_flake8_v2(venv_flake8_v2):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
-def test_smoke_flake8_v3(venv_flake8_v3):
-    output = run(venv_flake8_v3, options="--teamcity --format=teamcity-messages")
+def test_smoke_flake8_v3(venv_flake8_v3, monkeypatch):
+    monkeypatch.setenv('TEAMCITY_VERSION', '9.1')
+    output = run(venv_flake8_v3, options="")
 
     file_name = "tests/guinea-pigs/flake8/smoke.py"
     test1_name = "pep8: " + file_name + ":3:1: E302 expected 2 blank lines, found 1"

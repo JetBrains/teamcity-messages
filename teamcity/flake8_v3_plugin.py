@@ -4,7 +4,7 @@ from io import BytesIO
 from flake8.formatting import base
 
 from teamcity.messages import TeamcityServiceMessages
-from teamcity import __version__
+from teamcity import __version__, is_running_under_teamcity
 
 
 class TeamcityReport(base.BaseFormatter):
@@ -16,17 +16,15 @@ class TeamcityReport(base.BaseFormatter):
     @classmethod
     def add_options(cls, parser):
         if not cls.options_added:
-            parser.add_option('--teamcity', default=False,
-                              action='callback', callback=cls.set_option_callback,
-                              help="Enable teamcity messages (does nothing "
-                                   "in flake8 v3; here for backwards "
-                                   "compatibility only with flake8 v2)")
+            parser.add_option('--teamcity',
+                              default=is_running_under_teamcity(),
+                              help="Enable teamcity messages")
             cls.options_added = True
 
     @classmethod
-    def set_option_callback(cls, option, opt, value, parser):
-        global enable_teamcity
-        enable_teamcity = True
+    def parse_options(cls, options):
+        if options.teamcity or is_running_under_teamcity():
+            options.format = 'teamcity-messages'
 
     def format(self, error):
         normalized_filename = error.filename.replace("\\", "/")
