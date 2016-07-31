@@ -29,8 +29,9 @@ class TeamcityReport(base.BaseFormatter):
         enable_teamcity = True
 
     def format(self, error):
+        normalized_filename = error.filename.replace("\\", "/")
         position = '%s:%d:%d' % (
-            error.filename, error.line_number, error.column_number)
+            normalized_filename, error.line_number, error.column_number)
         error_message = '%s %s' % (error.code, error.text)
         test_name = 'pep8: %s: %s' % (position, error_message)
 
