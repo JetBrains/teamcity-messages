@@ -18,13 +18,17 @@ class TeamcityReport(base.BaseFormatter):
         if not cls.options_added:
             parser.add_option('--teamcity',
                               default=is_running_under_teamcity(),
-                              help="Enable teamcity messages")
+                              help="Force output of JetBrains TeamCity service messages")
+            parser.add_option('--no-teamcity',
+                              default=False,
+                              help="Disable output of JetBrains TeamCity service messages (even under TeamCity build)")
             cls.options_added = True
 
     @classmethod
     def parse_options(cls, options):
-        if options.teamcity or is_running_under_teamcity():
-            options.format = 'teamcity-messages'
+        if not options.no_teamcity:
+            if options.teamcity or is_running_under_teamcity():
+                options.format = 'teamcity-messages'
 
     def format(self, error):
         normalized_filename = error.filename.replace("\\", "/")
