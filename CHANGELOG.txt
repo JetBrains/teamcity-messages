@@ -3,7 +3,8 @@ Change Log
 
 Version 1.20 Wed Aug 3 2016
 
-  - flake8 3.x support (Marc Abramowitz, https://github.com/msabramo)
+  - flake8: 3.x support (Marc Abramowitz, https://github.com/msabramo)
+  - flake8: --no-teamcity option for 3.x
 
 Version 1.19 Sun Jun 26 2016
 
