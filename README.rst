@@ -1,7 +1,7 @@
 Python Unit Test Reporting to TeamCity
 ======================================
 
-|  |pypi_version| |license| |versions| |downloads|
+|  |pypi_version| |license| |versions|
 |  |appveyor_ci| |travis_ci|
 
 This packages integrates Python with the
@@ -128,9 +128,6 @@ Apache, version 2.0 http://www.apache.org/licenses/LICENSE-2.0
 .. |license| image:: https://img.shields.io/pypi/l/teamcity-messages.svg
    :target: https://pypi.python.org/pypi/teamcity-messages
    :alt: License
-.. |downloads| image:: https://img.shields.io/pypi/dd/teamcity-messages.svg
-   :target: https://pypi.python.org/pypi/teamcity-messages
-   :alt: Daily PyPI downloads
 .. |versions| image:: https://img.shields.io/pypi/pyversions/teamcity-messages.svg
    :target: https://pypi.python.org/pypi/teamcity-messages
    :alt: Python versions supported
