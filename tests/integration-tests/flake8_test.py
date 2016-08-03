@@ -58,6 +58,7 @@ def test_smoke_flake8_v3(venv_flake8_v3):
             ServiceMessage('testFinished', {'name': test2_name}),
         ])
 
+
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_flake8_v3_no_teamcity(venv_flake8_v3):
     output = run(venv_flake8_v3, options="--no-teamcity")
