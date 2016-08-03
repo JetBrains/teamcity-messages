@@ -15,6 +15,8 @@ def venv(request):
 
     if request.param != "django==1.6" and sys.version_info < (2, 7):
         pytest.skip("Django 1.7+ requires Python 2.7+")
+    if (request.param == "django==1.6" or request.param == "django==1.7") and sys.version_info >= (3, 5):
+        pytest.skip("Django supports Python 3.5+ since 1.8.6")
     if request.param == "django":
         if sys.version_info[0] == 2 and sys.version_info < (2, 7):
             pytest.skip("Django 1.9+ requires Python 2.7+")

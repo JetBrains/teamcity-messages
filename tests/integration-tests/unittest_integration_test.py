@@ -239,7 +239,12 @@ def test_discovery(venv):
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="unittest discovery requires Python 2.7+")
 def test_discovery_errors(venv):
     output = run_directly(venv, 'discovery_errors.py')
-    test_name = 'unittest.loader.ModuleImportFailure.testsimple'
+
+    if sys.version_info >= (3, 5):
+        test_name = "unittest.loader._FailedTest.testsimple"
+    else:
+        test_name = 'unittest.loader.ModuleImportFailure.testsimple'
+
     ms = assert_service_messages(
         output,
         [
