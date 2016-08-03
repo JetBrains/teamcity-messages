@@ -98,7 +98,10 @@ setup(
         ],
 
         'flake8.extension': [
-            'P999 = teamcity.flake8_plugin',
+            'teamcity-messages = teamcity.flake8_plugin:TeamcityReport',
+        ],
+        'flake8.report': [
+            'teamcity-messages = teamcity.flake8_plugin:TeamcityReport',
         ]
     },
 )
