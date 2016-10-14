@@ -70,6 +70,21 @@ def test_progress_message_unicode():
     assert stream.observed_output.strip() == expected_output
 
 
+def test_message_unicode():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    if sys.version_info < (3, ):
+        bjork = 'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir'.decode('utf-8')
+    else:
+        bjork = b('Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir').decode('utf-8')
+    messages.message('foo', u=bjork, b=bjork.encode('utf-8'))
+    expected_output = b(
+        "##teamcity[foo timestamp='2000-11-02T10:23:01.556' "
+        "b='Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir' "
+        "u='Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir']")
+    assert stream.observed_output.strip() == expected_output
+
+
 def test_block_opened():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)

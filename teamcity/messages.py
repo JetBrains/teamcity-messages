@@ -34,8 +34,22 @@ class TeamcityServiceMessages(object):
         else:
             self.encoding = None
 
-    def escapeValue(self, value):
-        return escape_value(value)
+    def encode(self, value):
+        if self.encoding and isinstance(value, text_type):
+            value = value.encode(self.encoding)
+        return value
+
+    def decode(self, value):
+        if self.encoding and not isinstance(value, text_type):
+            value = value.decode(self.encoding)
+        return value
+
+    if sys.version_info < (3, ):
+        def escapeValue(self, value):
+            return escape_value(self.encode(value))
+    else:
+        def escapeValue(self, value):
+            return escape_value(self.decode(value))
 
     def message(self, messageName, **properties):
         timestamp = self.now().strftime("%Y-%m-%dT%H:%M:%S.") + "%03d" % (self.now().microsecond / 1000)
@@ -50,21 +64,15 @@ class TeamcityServiceMessages(object):
 
         message += ("]\n")
 
-        if self.encoding and isinstance(message, text_type):
-            message = message.encode(self.encoding)
-
         # Python may buffer it for a long time, flushing helps to see real-time result
-        self.output.write(message)
+        self.output.write(self.encode(message))
         self.output.flush()
 
     def _single_value_message(self, messageName, value):
         message = ("##teamcity[%s '%s']\n" % (messageName, self.escapeValue(value)))
 
-        if self.encoding and isinstance(message, text_type):
-            message = message.encode(self.encoding)
-
         # Python may buffer it for a long time, flushing helps to see real-time result
-        self.output.write(message)
+        self.output.write(self.encode(message))
         self.output.flush()
 
     def blockOpened(self, name, flowId=None):
