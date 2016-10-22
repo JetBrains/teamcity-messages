@@ -1,7 +1,7 @@
 import pytest
 
 
-@pytest.mark.xfail("True", reason="xfail reason")
+@pytest.mark.xfail("True", reason="xfail reason", strict=True)
 def test_unexpectedly_passing():
     pass
 
