@@ -4,10 +4,10 @@ Python Unit Test Reporting to TeamCity
 |  |pypi_version| |license| |versions|
 |  |appveyor_ci| |travis_ci|
 
-This packages integrates Python with the
+This package integrates Python with the
 `TeamCity <http://www.jetbrains.com/teamcity/>`__ Continuous Integration
-(CI) server. It allow sending `"service
-messages" <https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity>`__
+(CI) server. It allows sending `"service
+messages" <https://confluence.jetbrains.com/display/TCDL/Build+Script+Interaction+with+TeamCity>`__
 from Python code. Additionally, it provides integration with the
 following testing frameworks and tools:
 
@@ -37,15 +37,14 @@ or from source:
 Usage
 -----
 
-This package uses service messages to report build status to TeamCity.
-See
-https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity
+This package uses service messages to report the build status to TeamCity.
+See https://confluence.jetbrains.com/display/TCDL/Build+Script+Interaction+with+TeamCity
 for more details
 
 unittest
 ~~~~~~~~
 
-If you wish to use Python default's unittest framework, you should
+If you wish to use the Python default unittest framework, you should
 modify the Test runner, e.g.:
 
 .. code:: python
