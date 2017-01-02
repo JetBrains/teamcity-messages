@@ -105,13 +105,18 @@ class TeamcityReport(object):
         :type test: nose.case.Test
         """
         plugin = self._get_capture_plugin(test)
-        return getattr(plugin, "buffer", None) if plugin is not None else None
+        if plugin is None:
+            return None
+        return getattr(plugin, "buffer", None)
 
     def _captureStandardOutput_value(self, test):
         """
         :type test: nose.case.Test
         """
-        return 'false' if self._capture_plugin_enabled(test) else 'true'
+        if self._capture_plugin_enabled(test):
+            return 'false'
+        else:
+            return 'true'
 
     def report_fail(self, test, fail_type, err):
         # workaround nose bug on python 3
