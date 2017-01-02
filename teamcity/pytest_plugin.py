@@ -174,6 +174,22 @@ class EchoTeamCityMessages(object):
         self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
         self.report_test_finished(test_id, duration)
 
+    def report_test_skip(self, test_id, report):
+        if type(report.longrepr) is tuple and len(report.longrepr) == 3:
+            reason = report.longrepr[2]
+        else:
+            reason = str(report.longrepr)
+
+        if hasattr(report, 'duration'):
+            duration = timedelta(seconds=report.duration)
+        else:
+            duration = None
+
+        self.ensure_test_start_reported(test_id)
+        self.report_test_output(report, test_id)
+        self.teamcity.testIgnored(test_id, reason, flowId=test_id)
+        self.report_test_finished(test_id, duration)
+
     def pytest_runtest_logreport(self, report):
         """
         :type report: _pytest.runner.TestReport
@@ -208,19 +224,15 @@ class EchoTeamCityMessages(object):
                 # Report failed teardown as a separate test as original test is already finished
                 self.report_test_failure(test_id + "_teardown", report)
         elif report.skipped:
-            if type(report.longrepr) is tuple and len(report.longrepr) == 3:
-                reason = report.longrepr[2]
-            else:
-                reason = str(report.longrepr)
-            self.ensure_test_start_reported(test_id)
-            self.report_test_output(report, test_id)
-            self.teamcity.testIgnored(test_id, reason, flowId=test_id)
-            self.report_test_finished(test_id, duration)
+            self.report_test_skip(test_id, report)
 
     def pytest_collectreport(self, report):
+        test_id = self.format_test_id(report.nodeid, report.location) + "_collect"
+
         if report.failed:
-            test_id = self.format_test_id(report.nodeid, report.location) + "_collect"
             self.report_test_failure(test_id, report)
+        elif report.skipped:
+            self.report_test_skip(test_id, report)
 
     def pytest_terminal_summary(self):
         if self.coverage_controller is not None:

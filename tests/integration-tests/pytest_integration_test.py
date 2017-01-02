@@ -328,6 +328,19 @@ def test_collect_exception(venv):
     assert ms[2].params["details"].find("runtime error") > 0
 
 
+def test_collect_skip(venv):
+    output = run(venv, 'collect_skip_test.py')
+    test_name = 'tests.guinea-pigs.pytest.collect_skip_test.top_level_collect'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': 'Some output|n', 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'message': 'SkipTest: skip reason', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
 def test_params(venv):
     output = run(venv, 'params_test.py')
 
