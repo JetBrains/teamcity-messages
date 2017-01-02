@@ -135,6 +135,7 @@ def test_pass_output(venv):
 
 def test_pass_no_capture(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass', options="--nocapture")
+    assert output.find("Output from test_pass") > 0
     assert_service_messages(
         output,
         [
