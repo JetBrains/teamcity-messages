@@ -1,6 +1,12 @@
 Change Log
 ----------
 
+Version 1.21 Mon Jan 2 2017
+
+  - pytest: internal Error during test collection with pytest and teamcity-messages plugin #112
+  - nose: support capturing test output from successful tests, #113
+  - Fix possible error when joining bytes and unicode (Victor Makarov, https://github.com/vitek)
+
 Version 1.20 Wed Aug 3 2016
 
   - flake8: 3.x support (Marc Abramowitz, https://github.com/msabramo)
