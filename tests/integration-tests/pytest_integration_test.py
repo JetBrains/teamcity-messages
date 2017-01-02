@@ -313,6 +313,19 @@ def test_skip(venv):
             ServiceMessage('testFinished', {'name': test_name}),
         ])
 
+def test_collect_exception(venv):
+    output = run(venv, 'collect_exception_test.py')
+    test_name = 'tests.guinea-pigs.pytest.collect_exception_test.top_level_collect'
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': 'Some output|n', 'flowId': test_name}),
+            ServiceMessage('testFailed', {'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+    assert ms[2].params["details"].find("runtime error") > 0
+
 
 def test_params(venv):
     output = run(venv, 'params_test.py')

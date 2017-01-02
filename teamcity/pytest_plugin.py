@@ -141,7 +141,9 @@ class EchoTeamCityMessages(object):
 
     def report_test_output(self, report, test_id):
         for (secname, data) in report.sections:
-            if report.when not in secname:
+            # https://github.com/JetBrains/teamcity-messages/issues/112
+            # CollectReport doesn't have 'when' property
+            if hasattr(report, "when") and report.when not in secname:
                 continue
             if not data:
                 continue
