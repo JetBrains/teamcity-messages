@@ -121,12 +121,22 @@ def test_generators_class(venv):
         ])
 
 
-def test_pass(venv):
+def test_pass_output(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'nose-guinea-pig.GuineaPig.test_pass'}),
+            ServiceMessage('testStarted', {'name': 'nose-guinea-pig.GuineaPig.test_pass', 'captureStandardOutput': 'false'}),
+            ServiceMessage('testFinished', {'name': 'nose-guinea-pig.GuineaPig.test_pass'}),
+        ])
+
+
+def test_pass_no_capture(venv):
+    output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass', options="--nocapture")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': 'nose-guinea-pig.GuineaPig.test_pass', 'captureStandardOutput': 'true'}),
             ServiceMessage('testFinished', {'name': 'nose-guinea-pig.GuineaPig.test_pass'}),
         ])
 

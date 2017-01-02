@@ -3,7 +3,7 @@ import unittest
 
 class GuineaPig (unittest.TestCase):
     def test_pass(self):
-        pass
+        print("Output from test_pass")
 
     def test_fail(self):
         assert 2 * 2 == 5

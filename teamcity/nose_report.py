@@ -83,6 +83,29 @@ class TeamcityReport(object):
     def options(self, parser, env=os.environ):
         pass
 
+    def _get_capture_plugin(self, test):
+        """
+        :type test: nose.case.Test
+        :rtype: nose.plugins.base.Plugin
+        """
+        for plugin in test.config.plugins.plugins:
+            if plugin.name == "capture":
+                return plugin
+        return None
+
+    def _capture_plugin_enabled(self, test):
+        """
+        :type test: nose.case.Test
+        """
+        plugin = self._get_capture_plugin(test)
+        return plugin is not None and plugin.enabled
+
+    def _captureStandardOutput_value(self, test):
+        """
+        :type test: nose.case.Test
+        """
+        return 'false' if self._capture_plugin_enabled(test) else 'true'
+
     def report_fail(self, test, fail_type, err):
         # workaround nose bug on python 3
         if is_string(err[1]):
@@ -124,7 +147,7 @@ class TeamcityReport(object):
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
             self.report_finish(test)
         elif test_class_name == CONTEXT_SUITE_FQN:
-            self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
+            self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(test), flowId=test_id)
             self.report_fail(test, 'error in ' + test.error_context + ' context', err)
             self.messages.testFinished(test_id, flowId=test_id)
         else:
@@ -139,7 +162,7 @@ class TeamcityReport(object):
         test_id = self.get_test_id(test)
 
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
-        self.messages.testStarted(test_id, captureStandardOutput='true', flowId=test_id)
+        self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(test), flowId=test_id)
 
     def addSuccess(self, test):
         self.report_finish(test)
