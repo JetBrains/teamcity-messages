@@ -17,10 +17,10 @@ def construct_fixture():
         params.append(("pytest",))
 
     if (2, 5) <= sys.version_info < (2, 6):
-        params.append(("pytest==2.5.0", "py==1.4.19"))
+        params.append(("py==1.4.19", "pytest==2.5.0"))
 
     if (2, 4) <= sys.version_info < (2, 5):
-        params.append(("pytest==2.3.3", "py==1.4.12"))
+        params.append(("py==1.4.12", "pytest==2.3.3"))
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
