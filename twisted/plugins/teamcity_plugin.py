@@ -28,6 +28,7 @@ class TeamcityReporter(TeamcityTestResult, Reporter):
     def addError(self, test, failure, *k):
         super(TeamcityReporter, self).addError(test, FailureWrapper(failure), *k)
 
+
 Teamcity = _Reporter("Teamcity Reporter",
                      "twisted.plugins.teamcity_plugin",
                      description="teamcity messages",

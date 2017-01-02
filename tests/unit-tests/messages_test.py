@@ -27,6 +27,7 @@ class StreamStub(object):
     def flush(self):
         pass
 
+
 fixed_date = datetime(2000, 11, 2, 10, 23, 1, 556789)
 
 

@@ -28,6 +28,7 @@ def construct_fixture():
 
     return venv
 
+
 globals()['venv'] = construct_fixture()
 
 
