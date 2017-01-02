@@ -21,7 +21,7 @@ def venv_flake8_v3(request):
 def test_smoke_flake8_v2(venv_flake8_v2):
     output = run(venv_flake8_v2, options="--teamcity", set_tc_version=False)
 
-    file_name = "tests/guinea-pigs/flake8/smoke.py"
+    file_name = "./smoke.py"
     test1_name = "pep8: " + file_name + ":3:1: E302 expected 2 blank lines, found 1"
     test2_name = "pep8: " + file_name + ":7:1: W391 blank line at end of file"
 
@@ -42,7 +42,7 @@ def test_smoke_flake8_v2(venv_flake8_v2):
 def test_smoke_flake8_v3(venv_flake8_v3):
     output = run(venv_flake8_v3, options="")
 
-    file_name = "tests/guinea-pigs/flake8/smoke.py"
+    file_name = "./smoke.py"
     test1_name = "pep8: " + file_name + ":3:1: E302 expected 2 blank lines, found 1"
     test2_name = "pep8: " + file_name + ":7:1: W391 blank line at end of file"
 
@@ -67,7 +67,7 @@ def test_flake8_v3_no_teamcity(venv_flake8_v3):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.6+")
-def test_falek8_v3_no_reporting_without_explicit_option_and_tc_env(venv_flake8_v3):
+def test_flake8_v3_no_reporting_without_explicit_option_and_tc_env(venv_flake8_v3):
     output = run(venv_flake8_v3, options="", set_tc_version=False)
 
     ms = parse_service_messages(output)
@@ -83,13 +83,15 @@ def run(venv, options, set_tc_version=True):
     if set_tc_version:
         env['TEAMCITY_VERSION'] = "0.0.0"
 
+    flake8_dir = os.path.join(os.getcwd(), "tests", "guinea-pigs", "flake8")
+
     command = os.path.join(
         os.getcwd(), venv.bin,
-        'flake8' + virtual_environments.get_exe_suffix()) + " " + options + " " + os.path.join("tests", "guinea-pigs", "flake8")
+        'flake8' + virtual_environments.get_exe_suffix()) + " " + options + " ."
 
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
-                            cwd=os.path.join(os.getcwd()), shell=True)
+                            cwd=flake8_dir, shell=True)
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
 
