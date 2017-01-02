@@ -313,6 +313,7 @@ def test_skip(venv):
             ServiceMessage('testFinished', {'name': test_name}),
         ])
 
+
 def test_collect_exception(venv):
     output = run(venv, 'collect_exception_test.py')
     test_name = 'tests.guinea-pigs.pytest.collect_exception_test.top_level_collect'
