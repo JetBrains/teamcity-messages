@@ -100,6 +100,13 @@ class TeamcityReport(object):
         plugin = self._get_capture_plugin(test)
         return plugin is not None and plugin.enabled
 
+    def _capture_plugin_buffer(self, test):
+        """
+        :type test: nose.case.Test
+        """
+        plugin = self._get_capture_plugin(test)
+        return getattr(plugin, "buffer", None) if plugin is not None else None
+
     def _captureStandardOutput_value(self, test):
         """
         :type test: nose.case.Test
@@ -119,16 +126,21 @@ class TeamcityReport(object):
         end_index = details.find(_captured_output_end_marker)
 
         if 0 <= start_index < end_index:
-            captured_output = details[start_index + len(_captured_output_start_marker):end_index]
+            # do not log test output twice, see report_finish for actual output handling
             details = details[:start_index] + details[end_index + len(_captured_output_end_marker):]
-
-            for chunk in split_output(limit_output(captured_output)):
-                self.messages.testStdOut(test_id, chunk, flowId=test_id)
 
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
     def report_finish(self, test):
         test_id = self.get_test_id(test)
+
+        captured_output = getattr(test, "capturedOutput", None)
+        if captured_output is None and self._capture_plugin_enabled(test):
+            # nose capture does not fill 'capturedOutput' property on successful tests
+            captured_output = self._capture_plugin_buffer(test)
+        if captured_output:
+            for chunk in split_output(limit_output(captured_output)):
+                self.messages.testStdOut(test_id, chunk, flowId=test_id)
 
         if test_id in self.test_started_datetime_map:
             time_diff = datetime.datetime.now() - self.test_started_datetime_map[test_id]

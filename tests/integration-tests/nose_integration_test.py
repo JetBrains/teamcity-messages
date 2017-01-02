@@ -22,7 +22,7 @@ def test_hierarchy(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'true', 'flowId': test_name}),
+            ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'false', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -123,11 +123,13 @@ def test_generators_class(venv):
 
 def test_pass_output(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_pass')
+    test_name = 'nose-guinea-pig.GuineaPig.test_pass'
     assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': 'nose-guinea-pig.GuineaPig.test_pass', 'captureStandardOutput': 'false'}),
-            ServiceMessage('testFinished', {'name': 'nose-guinea-pig.GuineaPig.test_pass'}),
+            ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'false'}),
+            ServiceMessage('testStdOut', {'out': 'Output from test_pass|n', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
         ])
 
 
@@ -294,8 +296,8 @@ def test_fail_output(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n', 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -310,9 +312,9 @@ def test_fail_big_output(venv):
     assert_service_messages(
         output,
         [ServiceMessage('testStarted', {})] +
+        [ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name})] +
         [ServiceMessage('testStdOut', {'out': full_line, 'flowId': test_name})] * 20 +
         [ServiceMessage('testStdOut', {'out': leftovers, 'flowId': test_name})] +
-        [ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name})] +
         [ServiceMessage('testFinished', {})]
     )
 
