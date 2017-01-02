@@ -240,17 +240,12 @@ def test_discovery(venv):
 def test_discovery_errors(venv):
     output = run_directly(venv, 'discovery_errors.py')
 
-    if sys.version_info >= (3, 5):
-        test_name = "unittest.loader._FailedTest.testsimple"
-    else:
-        test_name = 'unittest.loader.ModuleImportFailure.testsimple'
-
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'message': 'Error', 'flowId': test_name}),
-            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStarted', {}),
+            ServiceMessage('testFailed', {'message': 'Error'}),
+            ServiceMessage('testFinished', {}),
         ])
 
     assert ms[1].params['details'].index("ImportError") > 0
