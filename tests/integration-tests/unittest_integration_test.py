@@ -97,6 +97,18 @@ def test_teardown_error(venv):
     assert ms[1].params['details'].index("tearDown") > 0
 
 
+def test_buffer_output(venv):
+    output = run_directly(venv, 'buffer_output.py')
+    test_name = '__main__.SpamTest.test_test'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': "stdout_test|n", 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'out': "stderr_test", 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
 def test_doctests(venv):
     output = run_directly(venv, 'doctests.py')
     test_name = '__main__.factorial'
