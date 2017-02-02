@@ -19,7 +19,7 @@ class TeamcityTestResult(TestResult):
         self.test_started_datetime_map = {}
         self.failed_tests = set()
         self.subtest_failures = {}
-        self.messages = TeamcityServiceMessages(stream)
+        self.messages = TeamcityServiceMessages(_real_stdout)
 
     def get_test_id(self, test):
         if is_string(test):
