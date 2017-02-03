@@ -145,7 +145,7 @@ class TeamcityTestResult(TestResult):
     def stopTest(self, test):
         test_id = self.get_test_id(test)
 
-        if self.buffer:
+        if getattr(self, 'buffer', None):
             # Do not allow super() method to print output by itself
             self._mirrorOutput = False
 
