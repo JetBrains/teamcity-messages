@@ -14,6 +14,7 @@ class SpamTest(TestCase):
     def test_test(self):
         print("stdout_test")
         sys.stderr.write("stderr_test")
+        raise Exception("A")
 
     @classmethod
     def tearDownClass(cls):
