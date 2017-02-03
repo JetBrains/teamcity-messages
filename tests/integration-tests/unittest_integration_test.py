@@ -97,6 +97,7 @@ def test_teardown_error(venv):
     assert ms[1].params['details'].index("tearDown") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="buffer requires Python 2.7+")
 def test_buffer_output(venv):
     output = run_directly(venv, 'buffer_output.py')
     test_name = '__main__.SpamTest.test_test'
