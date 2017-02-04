@@ -68,15 +68,13 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
             output,
             [
                 ServiceMessage('testStarted', {'name': pylint_test_name}),
-                ServiceMessage('testStdErr', {'name': pylint_test_name}),
                 ServiceMessage('testFailed', {'name': pylint_test_name}),
                 ServiceMessage('testFinished', {'name': pylint_test_name}),
                 ServiceMessage('testStarted', {'name': test_name}),
                 ServiceMessage('testFinished', {'name': test_name}),
             ])
 
-        assert ms[1].params["out"].find("No config file found") >= 0
-        assert ms[2].params["details"].find("Unused import sys") > 0
+        assert ms[1].params["details"].find("Unused import sys") > 0
 
 
 def test_hierarchy(venv):
