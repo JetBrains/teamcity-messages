@@ -167,8 +167,10 @@ def test_subtest_ok(venv):
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'out': test_name + ' (i=1): ok|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=1)', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -177,58 +179,67 @@ def test_subtest_ok(venv):
 def test_subtest_error(venv):
     output = run_directly(venv, 'subtest_error.py')
     test_name = '__main__.TestXXX.testSubtestError'
-    subtest_name = test_name + ' (i=|\'abc.xxx|\')'
     ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdErr', {'out': subtest_name + ': error|n', 'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testFailed', {'message': 'Subtest failed', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc.xxx|')",
+                                          'message': 'One or more subtests failed',
+                                          'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[3].params['details'].find(subtest_name) == 0
-    assert ms[3].params['details'].find("RuntimeError") > 0
-    assert ms[3].params['details'].find("RRR") > 0
+    assert ms[4].params['out'].find("SubTest error") >= 0
+    assert ms[4].params['out'].find("RuntimeError") >= 0
+    assert ms[4].params['out'].find("RRR") >= 0
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_failure(venv):
     output = run_directly(venv, 'subtest_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
-    subtest_name = test_name + ' (i=|\'abc.xxx|\')'
     ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdErr', {'out': subtest_name + ': failure|n', 'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testFailed', {'message': 'Subtest failed', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc.xxx|')",
+                                          'message': 'One or more subtests failed',
+                                          'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[3].params['details'].find(subtest_name) == 0
-    assert ms[3].params['details'].find("AssertionError") > 0
-    assert ms[3].params['details'].find("1 == 0") > 0
+    assert ms[4].params['out'].find("SubTest failure") >= 0
+    assert ms[4].params['out'].find("AssertionError") >= 0
+    assert ms[4].params['out'].find("assert 1 == 0") >= 0
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_mixed_failure(venv):
     output = run_directly(venv, 'subtest_mixed_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
-    subtest_name = test_name + ' (i=|\'abc.xxx|\')'
     ms = assert_service_messages(
         output,
         [
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'out': test_name + ' (i=0): ok|n', 'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdErr', {'out': subtest_name + ': failure|n', 'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
             ServiceMessage('testFailed', {'message': 'Failure', 'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[3].params['details'].find(subtest_name) == 0
-    assert ms[3].params['details'].find("AssertionError") > 0
-    assert ms[3].params['details'].find("1 == 0") > 0
-    assert ms[3].params['details'].find("6 == 1") > 0
+    assert ms[6].params['details'].find("Failed subtests list: (i=|'abc.xxx|')|n|n") >= 0
+    assert ms[6].params['details'].find("AssertionError") > 0
+    assert ms[6].params['details'].find("6 == 1") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="unexpected_success requires Python 2.7+")
