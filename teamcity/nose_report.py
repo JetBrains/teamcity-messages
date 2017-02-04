@@ -3,6 +3,7 @@ import os
 import sys
 import datetime
 import inspect
+import types
 
 from teamcity import is_running_under_teamcity
 from teamcity.common import is_string, split_output, limit_output, get_class_fullname, convert_error_to_string
@@ -44,6 +45,7 @@ class TeamcityReport(Plugin):
 
         self.messages = TeamcityServiceMessages(_real_stdout)
         self.test_started_datetime_map = {}
+        self.contexts = []
         self.config = None
         self.enabled = False
 
@@ -171,6 +173,10 @@ class TeamcityReport(Plugin):
         self.report_fail(test, 'Failure', err)
         self.report_finish(test)
 
+    # noinspection PyUnusedLocal
+    def beforeTest(self, test):
+        self.report_context_output()
+
     def startTest(self, test):
         test_id = self.get_test_id(test)
 
@@ -179,3 +185,39 @@ class TeamcityReport(Plugin):
 
     def addSuccess(self, test):
         self.report_finish(test)
+
+    def startContext(self, context):
+        self.report_context_output()
+        if self._capture_plugin_enabled():
+            self._get_capture_plugin().start()
+
+        self.contexts.append(context)
+
+    def stopContext(self, context):
+        self.report_context_output()
+        if self._capture_plugin_enabled():
+            self._get_capture_plugin().end()
+
+        pop = self.contexts.pop()
+        assert pop is context
+
+    def report_context_output(self):
+        current = self.contexts[-1] if len(self.contexts) > 0 else None
+
+        if isinstance(current, types.ModuleType):
+            current_id = current.__name__
+        else:
+            current_id = get_class_fullname(current)
+
+        # support multi-process running
+        flow_id = "context:" + current_id + "@" + str(os.getpid())
+
+        captured_output = None
+        if self._capture_plugin_enabled():
+            # nose capture does not fill 'capturedOutput' property on successful tests
+            captured_output = self._capture_plugin_buffer()
+        if captured_output:
+            for chunk in split_output(limit_output(captured_output)):
+                self.messages.blockOpened(current_id, flowId=flow_id)
+                self.messages.testStdOut(current_id, chunk, flowId=flow_id)
+                self.messages.blockClosed(current_id, flowId=flow_id)
