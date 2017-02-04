@@ -35,7 +35,7 @@ _real_stdout = sys.stdout
 
 
 # noinspection PyPep8Naming,PyMethodMayBeStatic
-class TeamcityReport(object):
+class TeamcityReport(Plugin):
     name = 'teamcity-report'
     score = 10000
 
@@ -44,6 +44,7 @@ class TeamcityReport(object):
 
         self.messages = TeamcityServiceMessages(_real_stdout)
         self.test_started_datetime_map = {}
+        self.config = None
         self.enabled = False
 
     def get_test_id(self, test):
@@ -83,41 +84,32 @@ class TeamcityReport(object):
 
     def configure(self, options, conf):
         self.enabled = is_running_under_teamcity()
+        self.config = conf
 
     def options(self, parser, env=os.environ):
         pass
 
-    def _get_capture_plugin(self, test):
+    def _get_capture_plugin(self):
         """
-        :type test: nose.case.Test
-        :rtype: nose.plugins.base.Plugin
+        :rtype: nose.plugins.capture.Capture
         """
-        for plugin in test.config.plugins.plugins:
+        for plugin in self.config.plugins.plugins:
             if plugin.name == "capture":
                 return plugin
         return None
 
-    def _capture_plugin_enabled(self, test):
-        """
-        :type test: nose.case.Test
-        """
-        plugin = self._get_capture_plugin(test)
+    def _capture_plugin_enabled(self):
+        plugin = self._get_capture_plugin()
         return plugin is not None and plugin.enabled
 
-    def _capture_plugin_buffer(self, test):
-        """
-        :type test: nose.case.Test
-        """
-        plugin = self._get_capture_plugin(test)
+    def _capture_plugin_buffer(self):
+        plugin = self._get_capture_plugin()
         if plugin is None:
             return None
         return getattr(plugin, "buffer", None)
 
-    def _captureStandardOutput_value(self, test):
-        """
-        :type test: nose.case.Test
-        """
-        if self._capture_plugin_enabled(test):
+    def _captureStandardOutput_value(self):
+        if self._capture_plugin_enabled():
             return 'false'
         else:
             return 'true'
@@ -144,9 +136,9 @@ class TeamcityReport(object):
         test_id = self.get_test_id(test)
 
         captured_output = getattr(test, "capturedOutput", None)
-        if captured_output is None and self._capture_plugin_enabled(test):
+        if captured_output is None and self._capture_plugin_enabled():
             # nose capture does not fill 'capturedOutput' property on successful tests
-            captured_output = self._capture_plugin_buffer(test)
+            captured_output = self._capture_plugin_buffer()
         if captured_output:
             for chunk in split_output(limit_output(captured_output)):
                 self.messages.testStdOut(test_id, chunk, flowId=test_id)
@@ -168,7 +160,7 @@ class TeamcityReport(object):
             self.messages.testIgnored(test_id, message="Deprecated", flowId=test_id)
             self.report_finish(test)
         elif test_class_name == CONTEXT_SUITE_FQN:
-            self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(test), flowId=test_id)
+            self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(), flowId=test_id)
             self.report_fail(test, 'error in ' + test.error_context + ' context', err)
             self.messages.testFinished(test_id, flowId=test_id)
         else:
@@ -183,7 +175,7 @@ class TeamcityReport(object):
         test_id = self.get_test_id(test)
 
         self.test_started_datetime_map[test_id] = datetime.datetime.now()
-        self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(test), flowId=test_id)
+        self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(), flowId=test_id)
 
     def addSuccess(self, test):
         self.report_finish(test)
