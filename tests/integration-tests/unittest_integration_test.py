@@ -222,6 +222,25 @@ def test_subtest_failure(venv):
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
+def test_subtest_nested(venv):
+    output = run_directly(venv, 'subtest_nested.py')
+    test_name = '__main__.TestXXX.testNested'
+
+    # Nested blocks support requires strict notifications about starting and stopping subtests
+    # which is not yet supported, see https://mail.python.org/pipermail/python-dev/2016-June/145402.html
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=2)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=2)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
+@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_mixed_failure(venv):
     output = run_directly(venv, 'subtest_mixed_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
