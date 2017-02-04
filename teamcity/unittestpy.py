@@ -76,6 +76,7 @@ class TeamcityTestResult(TestResult):
             test_name = re.sub(r'^(.*) \((.*)\)$', r'\2.\1', test_name)
 
             self.messages.testStarted(test_name, flowId=test_name)
+            # noinspection PyTypeChecker
             self.report_fail(test_name, 'Failure', err)
             self.messages.testFinished(test_name, flowId=test_name)
         elif get_class_fullname(err[0]) == "unittest2.case.SkipTest":
