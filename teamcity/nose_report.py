@@ -8,7 +8,10 @@ from teamcity import is_running_under_teamcity
 from teamcity.common import is_string, split_output, limit_output, get_class_fullname, convert_error_to_string
 from teamcity.messages import TeamcityServiceMessages
 
+# noinspection PyPackageRequirements
 from nose.exc import SkipTest, DeprecatedTest
+# noinspection PyPackageRequirements
+from nose.plugins import Plugin
 
 
 CONTEXT_SUITE_FQN = "nose.suite.ContextSuite"
@@ -21,7 +24,7 @@ def _ln(label):
     out = '%s %s %s' % ('-' * chunk, label, '-' * chunk)
     pad = 70 - len(out)
     if pad > 0:
-        out = out + ('-' * pad)
+        out += '-' * pad
     return out
 
 
@@ -31,6 +34,7 @@ _captured_output_end_marker = "\n" + _ln('>> end captured stdout <<')
 _real_stdout = sys.stdout
 
 
+# noinspection PyPep8Naming,PyMethodMayBeStatic
 class TeamcityReport(object):
     name = 'teamcity-report'
     score = 10000
