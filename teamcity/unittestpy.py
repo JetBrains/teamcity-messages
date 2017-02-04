@@ -100,7 +100,10 @@ class TeamcityTestResult(TestResult):
         test_id = self.get_test_id(test)
         subtest_id = self.get_test_id(subtest)
 
-        block_id = subtest_id[len(test_id):].strip() if subtest_id.startswith(test_id) else subtest_id
+        if subtest_id.startswith(test_id):
+            block_id = subtest_id[len(test_id):].strip()
+        else:
+            block_id = subtest_id
         if len(block_id) == 0:
             block_id = subtest_id
 
