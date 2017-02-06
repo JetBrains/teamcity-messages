@@ -49,6 +49,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         ms = assert_service_messages(
             output,
             [
+                ServiceMessage('testCount', {'count': "2"}),
                 ServiceMessage('testStarted', {'name': pep8_test_name}),
                 ServiceMessage('testFailed', {'name': pep8_test_name}),
                 ServiceMessage('testFinished', {'name': pep8_test_name}),
@@ -56,7 +57,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
                 ServiceMessage('testFinished', {'name': test_name}),
             ])
 
-        assert ms[1].params["details"].find("E302 expected 2 blank lines, found 1") > 0
+        assert ms[2].params["details"].find("E302 expected 2 blank lines, found 1") > 0
 
     def test_pytest_pylint(venv):
         venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint",))
@@ -67,6 +68,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         ms = assert_service_messages(
             output,
             [
+                ServiceMessage('testCount', {'count': "2"}),
                 ServiceMessage('testStarted', {'name': pylint_test_name}),
                 ServiceMessage('testFailed', {'name': pylint_test_name}),
                 ServiceMessage('testFinished', {'name': pylint_test_name}),
@@ -74,7 +76,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
                 ServiceMessage('testFinished', {'name': test_name}),
             ])
 
-        assert ms[1].params["details"].find("Unused import sys") > 0
+        assert ms[2].params["details"].find("Unused import sys") > 0
 
 
 def test_hierarchy(venv):
@@ -83,6 +85,7 @@ def test_hierarchy(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -113,6 +116,7 @@ def test_custom_test_items(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line1'}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line1'}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line2'}),
@@ -141,6 +145,7 @@ if sys.version_info >= (2, 6):
         assert_service_messages(
             output,
             [
+                ServiceMessage('testCount', {'count': "1"}),
                 ServiceMessage('testStarted', {'name': test_name}),
                 ServiceMessage('testFinished', {'name': test_name}),
                 ServiceMessage('buildStatisticValue', {'key': 'CodeCoverageAbsLCovered', 'value': '9'}),
@@ -154,6 +159,7 @@ def test_runtime_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.runtime_error_test.test_exception'}),
             ServiceMessage('testFailed', {'flowId': 'tests.guinea-pigs.pytest.runtime_error_test.test_exception'}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test.test_exception'}),
@@ -161,9 +167,9 @@ def test_runtime_error(venv):
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.runtime_error_test.test_error'}),
         ])
-    assert ms[1].params["details"].find("raise Exception") > 0
-    assert ms[1].params["details"].find("oops") > 0
-    assert ms[4].params["details"].find("assert 0 != 0") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[5].params["details"].find("assert 0 != 0") > 0
 
 
 def test_unittest_error(venv):
@@ -171,6 +177,7 @@ def test_unittest_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_error'}),
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_error'}),
@@ -178,9 +185,9 @@ def test_unittest_error(venv):
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_fail'}),
         ])
-    assert ms[1].params["details"].find("raise Exception") > 0
-    assert ms[1].params["details"].find("oops") > 0
-    assert ms[4].params["details"].find("AssertionError") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[5].params["details"].find("AssertionError") > 0
 
 
 def test_fixture_error(venv):
@@ -192,6 +199,8 @@ def test_fixture_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
+
             ServiceMessage('testStarted', {'name': test1_name, 'flowId': test1_name}),
             ServiceMessage('testFailed', {'name': test1_name,
                                           'message': 'test setup failed',
@@ -204,10 +213,10 @@ def test_fixture_error(venv):
                                           'flowId': test2_name}),
             ServiceMessage('testFinished', {'name': test2_name}),
         ])
-    assert ms[1].params["details"].find("raise Exception") > 0
-    assert ms[1].params["details"].find("oops") > 0
-    assert ms[4].params["details"].find("raise Exception") > 0
-    assert ms[4].params["details"].find("oops") > 0
+    assert ms[2].params["details"].find("raise Exception") > 0
+    assert ms[2].params["details"].find("oops") > 0
+    assert ms[5].params["details"].find("raise Exception") > 0
+    assert ms[5].params["details"].find("oops") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
@@ -219,6 +228,8 @@ def test_output(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
+
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'false'}),
             ServiceMessage('blockOpened', {'name': 'test setup', 'flowId': test_name}),
             ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'setup stdout|n'}),
@@ -243,6 +254,7 @@ def test_chunked_output(venv):
 
     assert_service_messages(
         output,
+        [ServiceMessage('testCount', {'count': "1"})] +
         [ServiceMessage('testStarted', {})] +
         [ServiceMessage('testStdOut', {'out': full_line})] * 20 +
         [ServiceMessage('testStdOut', {'out': leftovers})] +
@@ -260,6 +272,7 @@ def test_output_no_capture(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'true'}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -277,6 +290,7 @@ def test_teardown_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.teardown_error_test.test_error'}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.teardown_error_test.test_error'}),
             ServiceMessage('testStarted', {'name': teardown_test_id, 'flowId': teardown_test_id}),
@@ -284,8 +298,8 @@ def test_teardown_error(venv):
                                           'message': fix_slashes('tests/guinea-pigs/pytest/teardown_error_test.py') + ':13 (test_error)'}),
             ServiceMessage('testFinished', {'name': teardown_test_id, 'flowId': teardown_test_id}),
         ])
-    assert ms[3].params["details"].find("raise Exception") > 0
-    assert ms[3].params["details"].find("teardown oops") > 0
+    assert ms[4].params["details"].find("raise Exception") > 0
+    assert ms[4].params["details"].find("teardown oops") > 0
 
 
 def test_module_error(venv):
@@ -296,6 +310,7 @@ def test_module_error(venv):
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.module_error_test.top_level_collect'}),
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.module_error_test.top_level_collect'}),
+            ServiceMessage('testCount', {'count': "0"}),
         ])
     assert ms[1].params["details"].find("raise Exception") > 0
     assert ms[1].params["details"].find("module oops") > 0
@@ -307,6 +322,7 @@ def test_skip(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testIgnored', {'message': 'Skipped: skip reason', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
@@ -323,6 +339,7 @@ def test_collect_exception(venv):
             ServiceMessage('testStdOut', {'out': 'Some output|n', 'flowId': test_name}),
             ServiceMessage('testFailed', {'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testCount', {'count': "0"}),
         ])
     assert ms[2].params["details"].find("runtime error") > 0
 
@@ -338,6 +355,7 @@ def test_collect_skip(venv):
             ServiceMessage('testStdOut', {'out': 'Some output|n', 'flowId': test_name}),
             ServiceMessage('testIgnored', {'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testCount', {'count': "0"}),
         ])
     assert ms[2].params["message"].find("skip reason") > 0
 
@@ -352,6 +370,7 @@ def test_params(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "3"}),
             ServiceMessage('testStarted', {'name': test1_name}),
             ServiceMessage('testFinished', {'name': test1_name}),
             ServiceMessage('testStarted', {'name': test2_name}),
@@ -373,6 +392,7 @@ def test_params_2(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
             ServiceMessage('testStarted', {'name': test1_name}),
             ServiceMessage('testFinished', {'name': test1_name}),
             ServiceMessage('testStarted', {'name': test2_name}),
@@ -392,6 +412,7 @@ def test_nose_parameterized(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
             ServiceMessage('testStarted', {'name': test1_name}),
             ServiceMessage('testFinished', {'name': test1_name}),
             ServiceMessage('testStarted', {'name': test2_name}),
@@ -404,6 +425,7 @@ def test_xfail(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.xfail_test.test_unexpectedly_passing'}),
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test.test_unexpectedly_passing'}),
@@ -411,7 +433,7 @@ def test_xfail(venv):
             ServiceMessage('testIgnored', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test.test_expected_to_fail'}),
         ])
-    assert ms[4].params["message"].find("xfail reason") > 0
+    assert ms[5].params["message"].find("xfail reason") > 0
 
 
 def run(venv, file_name, test=None, options='', set_tc_version=True):
