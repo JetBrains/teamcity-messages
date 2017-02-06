@@ -17,7 +17,7 @@
     <option name="TEST_TYPE" value="TEST_SCRIPT" />
     <option name="PATTERN" value="" />
     <option name="USE_PATTERN" value="false" />
-    <option name="testToRun" value="$PROJECT_DIR$/../teamcity-python\tests\integration-tests" />
+    <option name="testToRun" value="$PROJECT_DIR$/tests/integration-tests" />
     <option name="keywords" value="" />
     <option name="params" value="-s" />
     <option name="USE_PARAM" value="true" />
