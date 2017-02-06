@@ -344,6 +344,23 @@ def test_issue_98(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
+def test_nose_parameterized(venv):
+    venv_with_params = virtual_environments.prepare_virtualenv(venv.packages + ["nose-parameterized"])
+
+    output = run(venv_with_params, 'nose_parameterized')
+    test1_name = "test.test(|'1_1|', |'https://facebook_com/share_php?http://foo_com/|')"
+    test2_name = 'test.test(None, 3)'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testFinished', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testStarted', {'name': test2_name, 'flowId': test2_name}),
+            ServiceMessage('testFinished', {'name': test2_name, 'flowId': test2_name}),
+        ])
+
+
 def run(venv, file, clazz=None, test=None, options=""):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
