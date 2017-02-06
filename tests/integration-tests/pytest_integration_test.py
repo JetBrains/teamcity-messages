@@ -363,6 +363,22 @@ def test_params(venv):
         ])
 
 
+def test_params_2(venv):
+    output = run(venv, 'params_test_2.py')
+
+    test1_name = 'tests.guinea-pigs.pytest.params_test_2.test|[None-https://facebook_com/|]'
+    test2_name = "tests.guinea-pigs.pytest.params_test_2.test|[None-https://facebook_com/share_php?http://foo_com/|]"
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test1_name}),
+            ServiceMessage('testFinished', {'name': test1_name}),
+            ServiceMessage('testStarted', {'name': test2_name}),
+            ServiceMessage('testFinished', {'name': test2_name}),
+        ])
+
+
 def test_xfail(venv):
     output = run(venv, 'xfail_test.py')
     ms = assert_service_messages(

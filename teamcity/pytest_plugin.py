@@ -107,12 +107,26 @@ class EchoTeamCityMessages(object):
 
         test_id = nodeid
 
-        if test_id.find("::") < 0:
-            test_id += "::top_level"
+        if test_id:
+            if test_id.find("::") < 0:
+                test_id += "::top_level"
+        else:
+            test_id = "top_level"
+
+        first_bracket = test_id.find("[")
+        if first_bracket > 0:
+            params = test_id[first_bracket:]
+            test_id = test_id[:first_bracket]
+        else:
+            params = ""
 
         test_id = test_id.replace("::()::", "::")
         test_id = re.sub(r"\.pyc?::", r"::", test_id)
         test_id = test_id.replace(".", "_").replace(os.sep, ".").replace("/", ".").replace('::', '.')
+
+        if params:
+            params = params.replace(".", "_")
+            test_id += params
 
         return test_id
 
