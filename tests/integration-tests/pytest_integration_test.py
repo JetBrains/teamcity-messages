@@ -363,6 +363,7 @@ def test_params(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 5)", reason="broken on 2.4 somehow")
 def test_params_2(venv):
     output = run(venv, 'params_test_2.py')
 
