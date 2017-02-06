@@ -115,8 +115,13 @@ class EchoTeamCityMessages(object):
 
         first_bracket = test_id.find("[")
         if first_bracket > 0:
-            params = test_id[first_bracket:]
+            # [] -> (), make it look like nose parameterized tests
+            params = "(" + test_id[first_bracket + 1:]
+            if params.endswith("]"):
+                params = params[:-1] + ")"
             test_id = test_id[:first_bracket]
+            if test_id.endswith("::"):
+                test_id = test_id[:-2]
         else:
             params = ""
 

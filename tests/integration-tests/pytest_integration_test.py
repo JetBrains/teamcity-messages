@@ -345,9 +345,9 @@ def test_collect_skip(venv):
 def test_params(venv):
     output = run(venv, 'params_test.py')
 
-    test1_name = 'tests.guinea-pigs.pytest.params_test.test_eval|[3+5-8|]'
-    test2_name = "tests.guinea-pigs.pytest.params_test.test_eval|[|'1_5|' + |'2|'-1_52|]"
-    test3_name = 'tests.guinea-pigs.pytest.params_test.test_eval|[6*9-42|]'
+    test1_name = 'tests.guinea-pigs.pytest.params_test.test_eval(3+5-8)'
+    test2_name = "tests.guinea-pigs.pytest.params_test.test_eval(|'1_5|' + |'2|'-1_52)"
+    test3_name = 'tests.guinea-pigs.pytest.params_test.test_eval(6*9-42)'
 
     assert_service_messages(
         output,
@@ -366,8 +366,8 @@ def test_params(venv):
 def test_params_2(venv):
     output = run(venv, 'params_test_2.py')
 
-    test1_name = 'tests.guinea-pigs.pytest.params_test_2.test|[None-https://facebook_com/|]'
-    test2_name = "tests.guinea-pigs.pytest.params_test_2.test|[None-https://facebook_com/share_php?http://foo_com/|]"
+    test1_name = 'tests.guinea-pigs.pytest.params_test_2.test(None-https://facebook_com/)'
+    test2_name = "tests.guinea-pigs.pytest.params_test_2.test(None-https://facebook_com/share_php?http://foo_com/)"
 
     assert_service_messages(
         output,
@@ -385,8 +385,8 @@ def test_nose_parameterized(venv):
 
     output = run(venv_with_params, 'nose_parameterized_test.py')
 
-    test1_name = 'tests.guinea-pigs.pytest.nose_parameterized_test.test.|[0|]'
-    test2_name = "tests.guinea-pigs.pytest.nose_parameterized_test.test.|[1|]"
+    test1_name = 'tests.guinea-pigs.pytest.nose_parameterized_test.test(0)'
+    test2_name = "tests.guinea-pigs.pytest.nose_parameterized_test.test(1)"
 
     assert_service_messages(
         output,
