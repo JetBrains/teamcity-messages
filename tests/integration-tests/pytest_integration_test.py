@@ -379,6 +379,25 @@ def test_params_2(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
+def test_nose_parameterized(venv):
+    venv_with_params = virtual_environments.prepare_virtualenv(venv.packages + ("nose-parameterized",))
+
+    output = run(venv_with_params, 'nose_parameterized_test.py')
+
+    test1_name = 'tests.guinea-pigs.pytest.nose_parameterized_test.test.|[0|]'
+    test2_name = "tests.guinea-pigs.pytest.nose_parameterized_test.test.|[1|]"
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testStarted', {'name': test1_name}),
+            ServiceMessage('testFinished', {'name': test1_name}),
+            ServiceMessage('testStarted', {'name': test2_name}),
+            ServiceMessage('testFinished', {'name': test2_name}),
+        ])
+
+
 def test_xfail(venv):
     output = run(venv, 'xfail_test.py')
     ms = assert_service_messages(
