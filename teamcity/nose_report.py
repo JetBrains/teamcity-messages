@@ -151,7 +151,6 @@ class TeamcityReport(Plugin):
         else:
             self.messages.testFinished(test_id, flowId=test_id)
 
-
     def prepareTestLoader(self, loader):
         """Insert ourselves into loader calls to count tests.
         The top-level loader call often returns lazy results, like a LazySuite.
