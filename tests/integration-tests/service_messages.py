@@ -105,7 +105,18 @@ def has_service_messages(messages_string):
     return len(messages) > 0
 
 
+def match(messages, message):
+    candidates = [x for x in messages if x >= message]
+    if len(candidates) == 0:
+        raise AssertionError("No messages match " + str(message) + " across " + pprint.pformat(messages))
+    if len(candidates) > 1:
+        raise AssertionError("More than one message match " + str(message) + " across " + pprint.pformat(messages) +
+                             ": " + pprint.pformat(candidates))
+    return candidates[0]
+
+
 def assert_service_messages(actual_messages_string, expected_messages):
+    expected_messages = [x for x in expected_messages if x is not None]
     actual_messages = parse_service_messages(actual_messages_string)
 
     try:

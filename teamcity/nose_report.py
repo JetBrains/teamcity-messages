@@ -8,6 +8,7 @@ from teamcity import is_running_under_teamcity
 from teamcity.common import is_string, split_output, limit_output, get_class_fullname, convert_error_to_string
 from teamcity.messages import TeamcityServiceMessages
 
+import nose
 # noinspection PyPackageRequirements
 from nose.exc import SkipTest, DeprecatedTest
 # noinspection PyPackageRequirements
@@ -45,6 +46,7 @@ class TeamcityReport(Plugin):
         self.messages = TeamcityServiceMessages(_real_stdout)
         self.test_started_datetime_map = {}
         self.config = None
+        self.total_tests = 0
         self.enabled = False
 
     def get_test_id(self, test):
@@ -148,6 +150,45 @@ class TeamcityReport(Plugin):
             self.messages.testFinished(test_id, testDuration=time_diff, flowId=test_id)
         else:
             self.messages.testFinished(test_id, flowId=test_id)
+
+
+    def prepareTestLoader(self, loader):
+        """Insert ourselves into loader calls to count tests.
+        The top-level loader call often returns lazy results, like a LazySuite.
+        This is a problem, as we would destroy the suite by iterating over it
+        to count the tests. Consequently, we monkey-patch the top-level loader
+        call to do the load twice: once for the actual test running and again
+        to yield something we can iterate over to do the count.
+
+        from https://github.com/erikrose/nose-progressive/
+        :type loader: nose.loader.TestLoader
+        """
+
+        # TODO: If there's ever a practical need, also patch loader.suiteClass
+        # or even TestProgram.createTests. createTests seems to be main top-
+        # level caller of loader methods, and nose.core.collector() (which
+        # isn't even called in nose) is an alternate one.
+        #
+        # nose 1.3.4 contains required fix:
+        # Another fix for Python 3.4: Call super in LazySuite to access _removed_tests variable
+        if hasattr(loader, 'loadTestsFromNames') and nose.__versioninfo__ >= (1, 3, 4):
+            old_loadTestsFromNames = loader.loadTestsFromNames
+
+            def _loadTestsFromNames(*args, **kwargs):
+                suite = old_loadTestsFromNames(*args, **kwargs)
+                self.total_tests += suite.countTestCases()
+
+                # Clear out the loader's cache. Otherwise, it never finds any tests
+                # for the actual test run:
+                loader._visitedPaths = set()
+
+                return old_loadTestsFromNames(*args, **kwargs)
+            loader.loadTestsFromNames = _loadTestsFromNames
+
+    # noinspection PyUnusedLocal
+    def prepareTestRunner(self, runner):
+        if self.total_tests:
+            self.messages.testCount(self.total_tests)
 
     def addError(self, test, err):
         test_class_name = get_class_fullname(test)

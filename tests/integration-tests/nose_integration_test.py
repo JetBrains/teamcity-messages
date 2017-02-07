@@ -4,10 +4,10 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import ServiceMessage, assert_service_messages
+from service_messages import ServiceMessage, assert_service_messages, match
 
 
-@pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1"])
+@pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
 def venv(request):
     """
     Prepares a virtual environment for nose.
@@ -16,12 +16,23 @@ def venv(request):
     return virtual_environments.prepare_virtualenv([request.param])
 
 
+def _test_count(venv, count):
+    nose_version = None
+    for package in venv.packages:
+        if package.startswith("nose=="):
+            nose_version = tuple([int(x) for x in package[6:].split(".")])
+    if nose_version is None or nose_version >= (1, 3, 4):
+        return ServiceMessage('testCount', {'count': str(count)})
+    return None
+
+
 def test_hierarchy(venv):
     output = run(venv, 'hierarchy')
     test_name = 'namespace1.namespace2.testmyzz.test'
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'false', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -33,6 +44,7 @@ def test_doctests(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -44,6 +56,7 @@ def test_docstrings(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -55,6 +68,7 @@ def test_skip(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testIgnored', {'name': test_name, 'message': 'SKIPPED: my skip', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
@@ -70,6 +84,7 @@ def test_coverage(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': 'testa.test_mycode'}),
             ServiceMessage('testFinished', {'name': 'testa.test_mycode'}),
         ])
@@ -87,6 +102,7 @@ def test_deprecated(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testIgnored', {'name': test_name, 'message': 'Deprecated', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
@@ -98,6 +114,7 @@ def test_generators(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 3),
             ServiceMessage('testStarted', {'name': 'testa.test_evens(0, 0, |\'_|\')'}),
             ServiceMessage('testFinished', {'name': 'testa.test_evens(0, 0, |\'_|\')'}),
             ServiceMessage('testStarted', {'name': "testa.test_evens(1, 3, |'_|')"}),
@@ -112,6 +129,7 @@ def test_generators_class(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 3),
             ServiceMessage('testStarted', {'name': 'testa.TestA.test_evens(0, 0, |\'_|\')'}),
             ServiceMessage('testFinished', {'name': 'testa.TestA.test_evens(0, 0, |\'_|\')'}),
             ServiceMessage('testStarted', {'name': "testa.TestA.test_evens(1, 3, |'_|')"}),
@@ -127,6 +145,7 @@ def test_pass_output(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'false'}),
             ServiceMessage('testStdOut', {'out': 'Output from test_pass|n', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
@@ -139,6 +158,7 @@ def test_pass_no_capture(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': 'nose-guinea-pig.GuineaPig.test_pass', 'captureStandardOutput': 'true'}),
             ServiceMessage('testFinished', {'name': 'nose-guinea-pig.GuineaPig.test_pass'}),
         ])
@@ -150,13 +170,14 @@ def test_fail(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-
-    assert ms[1].params['details'].find("Traceback") == 0
-    assert ms[1].params['details'].find("2 * 2 == 5") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("2 * 2 == 5") > 0
 
 
 def test_setup_module_error(venv):
@@ -165,12 +186,14 @@ def test_setup_module_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[1].params['details'].find("Traceback") == 0
-    assert ms[1].params['details'].find("AssertionError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
 
 
 def test_setup_class_error(venv):
@@ -179,12 +202,14 @@ def test_setup_class_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in setup context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[1].params['details'].find("Traceback") == 0
-    assert ms[1].params['details'].find("RRR") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("RRR") > 0
 
 
 def test_setup_package_error(venv):
@@ -193,12 +218,14 @@ def test_setup_package_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in setup context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[1].params['details'].find("Traceback") == 0
-    assert ms[1].params['details'].find("AssertionError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
 
 
 def test_setup_function_error(venv):
@@ -207,12 +234,14 @@ def test_setup_function_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[1].params['details'].find("Traceback") == 0
-    assert ms[1].params['details'].find("AssertionError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
 
 
 def test_teardown_module_error(venv):
@@ -221,14 +250,16 @@ def test_teardown_module_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testFinished', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in teardown context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[3].params['details'].find("Traceback") == 0
-    assert ms[3].params['details'].find("AssertionError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
 
 
 def test_teardown_class_error(venv):
@@ -237,14 +268,16 @@ def test_teardown_class_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': 'testa.TestXXX.runTest'}),
             ServiceMessage('testFinished', {'name': 'testa.TestXXX.runTest'}),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in teardown context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[3].params['details'].find("Traceback") == 0
-    assert ms[3].params['details'].find("RRR") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("RRR") > 0
 
 
 def test_teardown_package_error(venv):
@@ -253,14 +286,16 @@ def test_teardown_package_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testFinished', {'name': 'namespace2.testa.test_mycode'}),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name, 'message': 'error in teardown context'}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[3].params['details'].find("Traceback") == 0
-    assert ms[3].params['details'].find("AssertionError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
 
 
 def test_teardown_function_error(venv):
@@ -269,12 +304,14 @@ def test_teardown_function_error(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[1].params['details'].find("Traceback") == 0
-    assert ms[1].params['details'].find("AssertionError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Traceback") == 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
 
 
 def test_fail_with_msg(venv):
@@ -283,11 +320,13 @@ def test_fail_with_msg(venv):
     ms = assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
-    assert ms[1].params['details'].find("Bitte keine Werbung") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Bitte keine Werbung") > 0
 
 
 def test_fail_output(venv):
@@ -296,6 +335,7 @@ def test_fail_output(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n', 'flowId': test_name}),
@@ -312,6 +352,7 @@ def test_fail_big_output(venv):
 
     assert_service_messages(
         output,
+        [_test_count(venv, 1)] +
         [ServiceMessage('testStarted', {})] +
         [ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name})] +
         [ServiceMessage('testStdOut', {'out': full_line, 'flowId': test_name})] * 20 +
@@ -354,6 +395,7 @@ def test_nose_parameterized(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 2),
             ServiceMessage('testStarted', {'name': test1_name, 'flowId': test1_name}),
             ServiceMessage('testFinished', {'name': test1_name, 'flowId': test1_name}),
             ServiceMessage('testStarted', {'name': test2_name, 'flowId': test2_name}),
