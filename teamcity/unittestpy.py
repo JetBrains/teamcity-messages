@@ -13,6 +13,7 @@ _real_stdout = sys.stdout
 class TeamcityTestResult(TestResult):
     separator2 = "\n"
 
+    # noinspection PyUnusedLocal
     def __init__(self, stream=_real_stdout, descriptions=None, verbosity=None):
         super(TeamcityTestResult, self).__init__()
 
@@ -194,6 +195,17 @@ class TeamcityTestRunner(TextTestRunner):
     if sys.version_info < (2, 7):
         def _makeResult(self):
             return TeamcityTestResult(self.stream, self.descriptions, self.verbosity)
+
+
+    def run(self, test):
+        # noinspection PyBroadException
+        try:
+            total_tests = test.countTestCases()
+            TeamcityServiceMessages(_real_stdout).testCount(total_tests)
+        except:
+            pass
+
+        return super(TeamcityTestRunner, self).run(test)
 
 
 if __name__ == '__main__':

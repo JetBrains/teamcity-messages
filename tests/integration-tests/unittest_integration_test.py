@@ -5,7 +5,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import ServiceMessage, assert_service_messages
+from service_messages import ServiceMessage, assert_service_messages, match
 
 
 @pytest.fixture(scope='module')
@@ -23,6 +23,7 @@ def test_nested_suits(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'captureStandardOutput': 'true', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
@@ -34,6 +35,7 @@ def test_docstring(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -45,12 +47,14 @@ def test_assert(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
-    assert ms[1].params['details'].index("assert 1 == 0") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].index("assert 1 == 0") > 0
 
 
 def test_fail(venv):
@@ -59,12 +63,14 @@ def test_fail(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
-    assert ms[1].params['details'].index('fail("Grr")') > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].index('fail("Grr")') > 0
 
 
 def test_setup_error(venv):
@@ -73,13 +79,15 @@ def test_setup_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'message': 'Error', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
-    assert ms[1].params['details'].index("RRR") > 0
-    assert ms[1].params['details'].index("setUp") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].index("RRR") > 0
+    assert failed_ms.params['details'].index("setUp") > 0
 
 
 def test_teardown_error(venv):
@@ -88,13 +96,15 @@ def test_teardown_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'message': 'Error', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
-    assert ms[1].params['details'].index("RRR") > 0
-    assert ms[1].params['details'].index("tearDown") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].index("RRR") > 0
+    assert failed_ms.params['details'].index("tearDown") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="buffer requires Python 2.7+")
@@ -104,6 +114,7 @@ def test_buffer_output(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testStdOut', {'out': "stdout_test|n", 'flowId': test_name}),
@@ -124,6 +135,7 @@ def test_doctests(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -138,6 +150,9 @@ def test_skip(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "2"}),
+            ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_ok'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_ok'}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped: testing skipping', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
@@ -151,12 +166,14 @@ def test_expected_failure(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testIgnored', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[1].params['message'].find("Expected failure") == 0
-    assert ms[1].params['message'].find("this should happen unfortunately") > 0
+    failed_ms = match(ms, ServiceMessage('testIgnored', {'name': test_name}))
+    assert failed_ms.params['message'].find("Expected failure") == 0
+    assert failed_ms.params['message'].find("this should happen unfortunately") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
@@ -166,6 +183,7 @@ def test_subtest_ok(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
@@ -182,6 +200,7 @@ def test_subtest_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
@@ -193,9 +212,10 @@ def test_subtest_error(venv):
                                           'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[4].params['out'].find("SubTest error") >= 0
-    assert ms[4].params['out'].find("RuntimeError") >= 0
-    assert ms[4].params['out'].find("RRR") >= 0
+    failed_ms = match(ms, ServiceMessage('testStdErr', {'name': test_name}))
+    assert failed_ms.params['out'].find("SubTest error") >= 0
+    assert failed_ms.params['out'].find("RuntimeError") >= 0
+    assert failed_ms.params['out'].find("RRR") >= 0
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
@@ -205,6 +225,7 @@ def test_subtest_failure(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
@@ -216,9 +237,10 @@ def test_subtest_failure(venv):
                                           'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[4].params['out'].find("SubTest failure") >= 0
-    assert ms[4].params['out'].find("AssertionError") >= 0
-    assert ms[4].params['out'].find("assert 1 == 0") >= 0
+    failed_ms = match(ms, ServiceMessage('testStdErr', {'name': test_name}))
+    assert failed_ms.params['out'].find("SubTest failure") >= 0
+    assert failed_ms.params['out'].find("AssertionError") >= 0
+    assert failed_ms.params['out'].find("assert 1 == 0") >= 0
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
@@ -231,6 +253,7 @@ def test_subtest_nested(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=2)', 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': '(i=2)', 'flowId': test_name}),
@@ -247,6 +270,7 @@ def test_subtest_mixed_failure(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
@@ -256,9 +280,10 @@ def test_subtest_mixed_failure(venv):
             ServiceMessage('testFailed', {'message': 'Failure', 'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
-    assert ms[6].params['details'].find("Failed subtests list: (i=|'abc.xxx|')|n|n") >= 0
-    assert ms[6].params['details'].find("AssertionError") > 0
-    assert ms[6].params['details'].find("6 == 1") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("Failed subtests list: (i=|'abc.xxx|')|n|n") >= 0
+    assert failed_ms.params['details'].find("AssertionError") > 0
+    assert failed_ms.params['details'].find("6 == 1") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="unexpected_success requires Python 2.7+")
@@ -268,6 +293,7 @@ def test_unexpected_success(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name,
                                           'details': "Test should not succeed since it|'s marked with @unittest.expectedFailure",
@@ -282,6 +308,7 @@ def test_discovery(venv):
     assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': 'testsimple.TestTeamcityMessages.runTest'}),
             ServiceMessage('testFinished', {'name': 'testsimple.TestTeamcityMessages.runTest'}),
         ])
@@ -294,12 +321,14 @@ def test_discovery_errors(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {}),
             ServiceMessage('testFailed', {'message': 'Error'}),
             ServiceMessage('testFinished', {}),
         ])
 
-    assert ms[1].params['details'].index("ImportError") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {}))
+    assert failed_ms.params['details'].index("ImportError") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
@@ -309,12 +338,14 @@ def test_setup_module_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
-    assert ms[1].params['details'].index("assert 1 == 0") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].index("assert 1 == 0") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
@@ -324,12 +355,14 @@ def test_setup_class_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'message': 'Failure', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
-    assert ms[1].params['details'].index("RRR") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].index("RRR") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
@@ -338,6 +371,7 @@ def test_teardown_class_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.test_ok'}),
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.test_ok'}),
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.tearDownClass'}),
@@ -345,7 +379,8 @@ def test_teardown_class_error(venv):
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.tearDownClass'}),
         ])
 
-    assert ms[3].params['details'].index("RRR") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': '__main__.TestXXX.tearDownClass'}))
+    assert failed_ms.params['details'].index("RRR") > 0
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
@@ -355,6 +390,7 @@ def test_teardown_module_error(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': '__main__.TestXXX.test_ok'}),
             ServiceMessage('testFinished', {'name': '__main__.TestXXX.test_ok'}),
             ServiceMessage('testStarted', {'name': teardown_test_name, 'flowId': teardown_test_name}),
@@ -362,7 +398,8 @@ def test_teardown_module_error(venv):
             ServiceMessage('testFinished', {'name': teardown_test_name, 'flowId': teardown_test_name}),
         ])
 
-    assert ms[3].params['details'].index("assert 1 == 0") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': teardown_test_name}))
+    assert failed_ms.params['details'].index("assert 1 == 0") > 0
 
 
 # As of twisted 15.2.1 trial is not available on Python 3
@@ -407,13 +444,15 @@ def test_twisted_trial(venv):
     ms = assert_service_messages(
         output,
         [
+            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test1}),
             ServiceMessage('testFailed', {'name': test1}),
             ServiceMessage('testFinished', {'name': test1}),
             ServiceMessage('testStarted', {'name': test2}),
             ServiceMessage('testFinished', {'name': test2}),
         ])
-    assert ms[1].params['details'].index("5 != 4") > 0
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test1}))
+    assert failed_ms.params['details'].index("5 != 4") > 0
 
 
 def run_directly(venv, file):

@@ -14,5 +14,8 @@ class TestSkip(unittest.TestCase):
     def test_skip_me(self):
         self.fail("shouldn't happen")
 
+    def test_ok(self):
+        pass
+
 
 main(testRunner=TeamcityTestRunner())
