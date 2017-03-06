@@ -196,7 +196,6 @@ class TeamcityTestRunner(TextTestRunner):
         def _makeResult(self):
             return TeamcityTestResult(self.stream, self.descriptions, self.verbosity)
 
-
     def run(self, test):
         # noinspection PyBroadException
         try:
