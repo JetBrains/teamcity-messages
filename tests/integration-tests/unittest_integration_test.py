@@ -444,7 +444,6 @@ def test_twisted_trial(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test1}),
             ServiceMessage('testFailed', {'name': test1}),
             ServiceMessage('testFinished', {'name': test1}),

@@ -115,9 +115,9 @@ def match(messages, message):
     return candidates[0]
 
 
-def assert_service_messages(actual_messages_string, expected_messages):
+def assert_service_messages(actual_messages_string, expected_messages, actual_messages_predicate=lambda x: True):
     expected_messages = [x for x in expected_messages if x is not None]
-    actual_messages = parse_service_messages(actual_messages_string)
+    actual_messages = [x for x in parse_service_messages(actual_messages_string) if actual_messages_predicate(x)]
 
     try:
         if len(actual_messages) != len(expected_messages):
