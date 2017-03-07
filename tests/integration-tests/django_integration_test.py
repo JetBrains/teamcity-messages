@@ -5,7 +5,7 @@ import subprocess
 import pytest
 
 import virtual_environments
-from service_messages import parse_service_messages, ServiceMessage
+from service_messages import ServiceMessage, assert_service_messages
 
 
 @pytest.fixture(scope='module', params=["django==1.6", "django==1.7", "django"])
@@ -28,10 +28,14 @@ def venv(request):
 def test_smoke(venv):
     output = run(venv)
 
-    ms = parse_service_messages(output)
-
-    assert ms[0] >= ServiceMessage('testStarted', {'name': 'test_smoke.SmokeTestCase.test_xxx (XXX identity)'})
-    assert ms[1] >= ServiceMessage('testFinished', {'name': 'test_smoke.SmokeTestCase.test_xxx (XXX identity)'})
+    test_name = "test_smoke.SmokeTestCase.test_xxx (XXX identity)"
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
 
 
 def run(venv):

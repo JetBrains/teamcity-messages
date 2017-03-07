@@ -379,6 +379,7 @@ def test_issue_98(venv):
     assert_service_messages(
         output,
         [
+            _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped: Skipping', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
