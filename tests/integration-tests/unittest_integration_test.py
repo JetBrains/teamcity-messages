@@ -185,9 +185,9 @@ def test_subtest_ok(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=1)', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -202,9 +202,9 @@ def test_subtest_error(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name, 'subTestResult': 'Error'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
             ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc.xxx|')",
@@ -227,9 +227,9 @@ def test_subtest_failure(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name, 'subTestResult': 'Failure'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
             ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc.xxx|')",
@@ -255,9 +255,9 @@ def test_subtest_nested(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=2)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=2)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=2)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=1)', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
@@ -272,9 +272,9 @@ def test_subtest_mixed_failure(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name, 'subTestResult': 'Failure'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
             ServiceMessage('testFailed', {'message': 'Failure', 'name': test_name, 'flowId': test_name}),

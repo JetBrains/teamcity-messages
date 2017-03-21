@@ -112,15 +112,15 @@ class TeamcityTestResult(TestResult):
             self.add_subtest_failure(test_id, block_id)
 
             if issubclass(err[0], test.failureException):
-                self.messages.blockOpened(block_id, flowId=test_id)
+                self.messages.subTestBlockOpened(block_id, subTestResult="Failure", flowId=test_id)
                 self.messages.testStdErr(test_id, out="SubTest failure: %s\n" % convert_error_to_string(err), flowId=test_id)
                 self.messages.blockClosed(block_id, flowId=test_id)
             else:
-                self.messages.blockOpened(block_id, flowId=test_id)
+                self.messages.subTestBlockOpened(block_id, subTestResult="Error", flowId=test_id)
                 self.messages.testStdErr(test_id, out="SubTest error: %s\n" % convert_error_to_string(err), flowId=test_id)
                 self.messages.blockClosed(block_id, flowId=test_id)
         else:
-            self.messages.blockOpened(block_id, flowId=test_id)
+            self.messages.subTestBlockOpened(block_id, subTestResult="Success", flowId=test_id)
             self.messages.blockClosed(block_id, flowId=test_id)
 
     def add_subtest_failure(self, test_id, subtest_block_id):
