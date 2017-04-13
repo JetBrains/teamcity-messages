@@ -110,6 +110,13 @@ def test_reporting_disabled(venv):
     output = run(venv, 'namespace', set_tc_version=True, options="--no-teamcity")
     assert not has_service_messages(output)
 
+def test_custom_teamcity_encoding(venv):
+    output = run(venv, 'encoding_test.py', set_tc_version=True, options="--teamcity-encoding cp1252")
+    assert "UnicodeEncodeError: 'charmap' codec can't encode character" in output
+
+def test_default_teamcity_encoding(venv):
+    output = run(venv, 'encoding_test.py', set_tc_version=True, options="")
+    assert "UnicodeEncodeError: 'charmap' codec can't encode character" not in output
 
 def test_custom_test_items(venv):
     output = run(venv, 'custom')
@@ -464,7 +471,7 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
         os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
-    output = "".join([x.decode() for x in proc.stdout.readlines()])
+    output = "".join([x.decode(errors="ignore") for x in proc.stdout.readlines()])
     print("OUTPUT: " + output.replace("#", "*"))
     proc.wait()
 
