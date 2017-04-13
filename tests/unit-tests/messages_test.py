@@ -2,6 +2,7 @@ from teamcity.messages import TeamcityServiceMessages, escape_value
 from datetime import datetime
 import os
 import sys
+import time
 import tempfile
 import textwrap
 import subprocess
@@ -28,7 +29,7 @@ class StreamStub(object):
         pass
 
 
-fixed_date = datetime(2000, 11, 2, 10, 23, 1, 556789)
+fixed_date = time.mktime(datetime(2000, 11, 2, 10, 23, 1).timetuple()) + 0.5569
 
 
 def test_escape_value():

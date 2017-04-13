@@ -329,6 +329,19 @@ def test_skip(venv):
         ])
 
 
+def test_monkey_patch_strftime(venv):
+    output = run(venv, 'monkey_patch_strftime_test.py')
+    test_name = 'tests.guinea-pigs.pytest.monkey_patch_strftime_test.test_monkeypatch'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+    assert output.find("spam") == -1
+
+
 def test_collect_exception(venv):
     output = run(venv, 'collect_exception_test.py')
     test_name = 'tests.guinea-pigs.pytest.collect_exception_test.top_level_collect'

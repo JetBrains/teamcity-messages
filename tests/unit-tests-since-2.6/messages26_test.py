@@ -1,6 +1,7 @@
 from teamcity.messages import TeamcityServiceMessages
 from datetime import datetime
 import textwrap
+import time
 
 
 class StreamStub(object):
@@ -14,7 +15,7 @@ class StreamStub(object):
         pass
 
 
-fixed_date = datetime(2000, 11, 2, 10, 23, 1, 556789)
+fixed_date = time.mktime(datetime(2000, 11, 2, 10, 23, 1).timetuple()) + 0.5569
 
 
 def test_blocks():
