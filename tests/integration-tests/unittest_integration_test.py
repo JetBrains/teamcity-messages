@@ -335,6 +335,21 @@ def test_discovery(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (3, 2)", reason="unittest failfast requires Python 3.2+")
+def test_fail_fast(venv):
+    output = run_directly(venv, 'fail_fast.py')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "3"}),
+            ServiceMessage('testStarted', {'name': '__main__.FooTest.test_1_test'}),
+            ServiceMessage('testFinished', {'name': '__main__.FooTest.test_1_test'}),
+            ServiceMessage('testStarted', {'name': '__main__.FooTest.test_2_test'}),
+            ServiceMessage('testFailed', {'name': '__main__.FooTest.test_2_test'}),
+            ServiceMessage('testFinished', {'name': '__main__.FooTest.test_2_test'}),
+        ])
+
+
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="unittest discovery requires Python 2.7+")
 def test_discovery_errors(venv):
     output = run_directly(venv, 'discovery_errors.py')
