@@ -160,6 +160,7 @@ def test_skip(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_expected_failure(venv):
     if sys.version_info < (2, 7):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -179,6 +180,7 @@ def test_expected_failure(venv):
     assert failed_ms.params['message'].find("this should happen unfortunately") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_ok(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -198,6 +200,7 @@ def test_subtest_ok(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_error(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -225,6 +228,7 @@ def test_subtest_error(venv):
     assert failed_ms.params['out'].find("RRR") >= 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_failure(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -252,6 +256,7 @@ def test_subtest_failure(venv):
     assert failed_ms.params['out'].find("assert 1 == 0") >= 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_nested(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -274,6 +279,7 @@ def test_subtest_nested(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_skip(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -296,6 +302,7 @@ def test_subtest_skip(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_mixed_failure(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
@@ -321,6 +328,7 @@ def test_subtest_mixed_failure(venv):
     assert failed_ms.params['details'].find("6 == 1") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_unexpected_success(venv):
     if sys.version_info < (2, 7):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
