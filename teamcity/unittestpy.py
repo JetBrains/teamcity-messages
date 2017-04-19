@@ -126,7 +126,9 @@ class TeamcityTestResult(TestResult):
         subtest_id = self.get_test_id(subtest)
 
         if subtest_id.startswith(test_id):
-            block_id = subtest_id[len(test_id):].strip()
+            # Replace "." -> "_" since '.' is a test hierarchy separator
+            # See i.e. https://github.com/JetBrains/teamcity-messages/issues/134 (https://youtrack.jetbrains.com/issue/PY-23846)
+            block_id = subtest_id[len(test_id):].strip().replace(".", "_")
         else:
             block_id = subtest_id
         if len(block_id) == 0:
