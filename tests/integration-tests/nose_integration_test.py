@@ -5,6 +5,7 @@ import pytest
 
 import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, match
+from test_util import get_teamcity_messages_root
 
 
 @pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
@@ -423,7 +424,8 @@ def run(venv, file, clazz=None, test=None, options=""):
         " -v " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'nose', file) + clazz_arg + test_arg
     print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            env=env, shell=True, cwd=get_teamcity_messages_root())
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
 

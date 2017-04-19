@@ -7,6 +7,7 @@ import pytest
 
 import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, has_service_messages
+from test_util import get_teamcity_messages_root
 
 
 def construct_fixture():
@@ -463,7 +464,8 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
     command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
     print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            env=env, shell=True, cwd=get_teamcity_messages_root())
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     print("OUTPUT: " + output.replace("#", "*"))
     proc.wait()

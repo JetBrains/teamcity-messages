@@ -5,6 +5,8 @@ import sys
 import tempfile
 import virtualenv
 
+from test_util import get_teamcity_messages_root
+
 
 _windows = os.name == 'nt'
 
@@ -53,13 +55,11 @@ def prepare_virtualenv(packages=()):
         virtualenv.create_environment(vdir)
 
         for package_spec in packages:
-            rc = subprocess.call(vpip_install + [package_spec], env=env)
-            if rc != 0:
-                raise Exception("Unable to install " + package_spec + " to " + vroot)
+            subprocess.check_call(vpip_install + [package_spec], env=env)
 
         open(done_flag_file, 'a').close()
 
-    subprocess.call([vpython, "setup.py", "install"], env=env)
+    subprocess.check_call([vpython, "setup.py", "install"], env=env, cwd=get_teamcity_messages_root())
 
     return venv_description
 

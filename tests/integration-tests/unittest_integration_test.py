@@ -6,6 +6,7 @@ import pytest
 
 import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, match
+from test_util import get_teamcity_messages_root
 
 
 @pytest.fixture(scope='module')
@@ -204,10 +205,10 @@ def test_subtest_error(venv):
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name, 'subTestResult': 'Error'}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc_xxx|')", 'flowId': test_name, 'subTestResult': 'Error'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
-            ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc.xxx|')",
+            ServiceMessage('blockClosed', {'name': "(i=|'abc_xxx|')", 'flowId': test_name}),
+            ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc_xxx|')",
                                           'message': 'One or more subtests failed',
                                           'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
@@ -229,10 +230,10 @@ def test_subtest_failure(venv):
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name, 'subTestResult': 'Failure'}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc_xxx|')", 'flowId': test_name, 'subTestResult': 'Failure'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
-            ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc.xxx|')",
+            ServiceMessage('blockClosed', {'name': "(i=|'abc_xxx|')", 'flowId': test_name}),
+            ServiceMessage('testFailed', {'details': "Failed subtests list: (i=|'abc_xxx|')",
                                           'message': 'One or more subtests failed',
                                           'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
@@ -294,14 +295,14 @@ def test_subtest_mixed_failure(venv):
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': "(i=|'abc.xxx|')", 'flowId': test_name, 'subTestResult': 'Failure'}),
+            ServiceMessage('blockOpened', {'name': "(i=|'abc_xxx|')", 'flowId': test_name, 'subTestResult': 'Failure'}),
             ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockClosed', {'name': "(i=|'abc.xxx|')", 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': "(i=|'abc_xxx|')", 'flowId': test_name}),
             ServiceMessage('testFailed', {'message': 'Failure', 'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
     failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
-    assert failed_ms.params['details'].find("Failed subtests list: (i=|'abc.xxx|')|n|n") >= 0
+    assert failed_ms.params['details'].find("Failed subtests list: (i=|'abc_xxx|')|n|n") >= 0
     assert failed_ms.params['details'].find("AssertionError") > 0
     assert failed_ms.params['details'].find("6 == 1") > 0
 
@@ -481,7 +482,8 @@ def run_directly(venv, file):
     # Start the process and wait for its output
     command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'unittest', file)
     print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                            env=env, shell=True, cwd=get_teamcity_messages_root())
     output = "".join([x.decode() for x in proc.stdout.readlines()])
     proc.wait()
 
