@@ -18,4 +18,4 @@ class TestSkip(unittest.TestCase):
         pass
 
 
-main(testRunner=TeamcityTestRunner())
+main(testRunner=TeamcityTestRunner)

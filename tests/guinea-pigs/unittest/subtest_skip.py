@@ -1,9 +1,10 @@
-import unittest
-
+import sys
 from teamcity.unittestpy import TeamcityTestRunner
 
-
-from unittest import TestCase
+if sys.version_info < (3, 4):
+    from unittest2 import main, TestCase
+else:
+    from unittest import main, TestCase
 
 
 class TestXXX(TestCase):
@@ -13,4 +14,4 @@ class TestXXX(TestCase):
                 if i == 2:
                     self.skipTest("skip reason")
 
-unittest.main(testRunner=TeamcityTestRunner)
+main(testRunner=TeamcityTestRunner)

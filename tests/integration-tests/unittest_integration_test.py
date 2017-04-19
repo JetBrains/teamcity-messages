@@ -160,8 +160,10 @@ def test_skip(venv):
         ])
 
 
-@pytest.mark.skipif("sys.version_info < (2, 7)", reason="expectedFailure requires Python 2.7+")
 def test_expected_failure(venv):
+    if sys.version_info < (2, 7):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'expected_failure.py')
     test_name = '__main__.TestSkip.test_expected_failure'
     ms = assert_service_messages(
@@ -177,8 +179,10 @@ def test_expected_failure(venv):
     assert failed_ms.params['message'].find("this should happen unfortunately") > 0
 
 
-@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_ok(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'subtest_ok.py')
     test_name = '__main__.TestXXX.testSubtestSuccess'
     assert_service_messages(
@@ -194,8 +198,10 @@ def test_subtest_ok(venv):
         ])
 
 
-@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_error(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'subtest_error.py')
     test_name = '__main__.TestXXX.testSubtestError'
     ms = assert_service_messages(
@@ -219,8 +225,10 @@ def test_subtest_error(venv):
     assert failed_ms.params['out'].find("RRR") >= 0
 
 
-@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_failure(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'subtest_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
     ms = assert_service_messages(
@@ -244,8 +252,10 @@ def test_subtest_failure(venv):
     assert failed_ms.params['out'].find("assert 1 == 0") >= 0
 
 
-@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_nested(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'subtest_nested.py')
     test_name = '__main__.TestXXX.testNested'
 
@@ -264,8 +274,10 @@ def test_subtest_nested(venv):
         ])
 
 
-@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_skip(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'subtest_skip.py')
     test_name = '__main__.TestXXX.testSubtestSkip'
     assert_service_messages(
@@ -284,8 +296,10 @@ def test_subtest_skip(venv):
         ])
 
 
-@pytest.mark.skipif("sys.version_info < (3, 4)", reason="subtests require Python 3.4+")
 def test_subtest_mixed_failure(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'subtest_mixed_failure.py')
     test_name = '__main__.TestXXX.testSubtestFailure'
     ms = assert_service_messages(
@@ -307,8 +321,10 @@ def test_subtest_mixed_failure(venv):
     assert failed_ms.params['details'].find("6 == 1") > 0
 
 
-@pytest.mark.skipif("sys.version_info < (2, 7)", reason="unexpected_success requires Python 2.7+")
 def test_unexpected_success(venv):
+    if sys.version_info < (2, 7):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
     output = run_directly(venv, 'unexpected_success.py')
     test_name = '__main__.TestSkip.test_unexpected_success'
     assert_service_messages(

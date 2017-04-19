@@ -1,12 +1,16 @@
-import unittest
-
+import sys
 from teamcity.unittestpy import TeamcityTestRunner
 
+if sys.version_info < (3, 4):
+    from unittest2 import main, TestCase
+else:
+    from unittest import main, TestCase
 
-class TestXXX(unittest.TestCase):
+
+class TestXXX(TestCase):
     def testNested(self):
         with self.subTest(i=1):
             with self.subTest(i=2):
                 pass
 
-unittest.main(testRunner=TeamcityTestRunner)
+main(testRunner=TeamcityTestRunner)

@@ -1,12 +1,16 @@
 # coding=utf-8
+import sys
 from teamcity.unittestpy import TeamcityTestRunner
 
-import unittest
+if sys.version_info < (2, 7):
+    from unittest2 import main, TestCase, expectedFailure
+else:
+    from unittest import main, TestCase, expectedFailure
 
 
-class TestSkip(unittest.TestCase):
-    @unittest.expectedFailure
+class TestSkip(TestCase):
     def test_expected_failure(self):
         self.fail("this should happen unfortunately")
+    test_expected_failure = expectedFailure(test_expected_failure)
 
-unittest.main(testRunner=TeamcityTestRunner())
+main(testRunner=TeamcityTestRunner)
