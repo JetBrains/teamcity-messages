@@ -55,11 +55,15 @@ def prepare_virtualenv(packages=()):
         virtualenv.create_environment(vdir)
 
         for package_spec in packages:
-            subprocess.check_call(vpip_install + [package_spec], env=env)
+            rc = subprocess.call(vpip_install + [package_spec], env=env)
+            if rc != 0:
+                raise Exception("Unable to install " + package_spec + " to " + vroot)
 
         open(done_flag_file, 'a').close()
 
-    subprocess.check_call([vpython, "setup.py", "install"], env=env, cwd=get_teamcity_messages_root())
+    rc = subprocess.call([vpython, "setup.py", "install"], env=env, cwd=get_teamcity_messages_root())
+    if rc != 0:
+        raise Exception("Unable to setup.py install to " + vroot)
 
     return venv_description
 

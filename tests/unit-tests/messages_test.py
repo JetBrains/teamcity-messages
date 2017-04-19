@@ -362,7 +362,8 @@ def test_unicode_to_sys_stdout_with_no_encoding():
             """) % sys.path).encode('utf-8'))
         f.close()
 
-        subprocess.check_call([sys.executable, file_name])
+        ret = subprocess.call([sys.executable, file_name])
+        assert ret == 0
     finally:
         os.unlink(file_name)
         os.rmdir(tempdir)
