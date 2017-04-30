@@ -22,8 +22,8 @@ def test_smoke_flake8_v2(venv_flake8_v2):
     output = run(venv_flake8_v2, options="--teamcity", set_tc_version=False)
 
     file_name = "./smoke.py"
-    test1_name = "pep8: " + file_name + ":3:1: E302 expected 2 blank lines, found 1"
-    test2_name = "pep8: " + file_name + ":7:1: W391 blank line at end of file"
+    test1_name = "pep8: " + file_name + ": E302 expected 2 blank lines, found 1"
+    test2_name = "pep8: " + file_name + ": W391 blank line at end of file"
 
     assert_service_messages(
         output,
@@ -43,8 +43,8 @@ def test_smoke_flake8_v3(venv_flake8_v3):
     output = run(venv_flake8_v3, options="")
 
     file_name = "./smoke.py"
-    test1_name = "pep8: " + file_name + ":3:1: E302 expected 2 blank lines, found 1"
-    test2_name = "pep8: " + file_name + ":7:1: W391 blank line at end of file"
+    test1_name = "pep8: " + file_name + ": E302 expected 2 blank lines, found 1"
+    test2_name = "pep8: " + file_name + ": W391 blank line at end of file"
 
     assert_service_messages(
         output,
