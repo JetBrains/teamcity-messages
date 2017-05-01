@@ -189,7 +189,7 @@ class TeamcityReport(Plugin):
         if self.total_tests:
             self.messages.testCount(self.total_tests)
 
-    def addError(self, test, err):
+    def addError(self, test, err, *k):  # nose gives 4 arguments
         test_class_name = get_class_fullname(test)
         test_id = self.get_test_id(test)
 
@@ -207,7 +207,7 @@ class TeamcityReport(Plugin):
             self.report_fail(test, 'Error', err)
             self.report_finish(test)
 
-    def addFailure(self, test, err):
+    def addFailure(self, test, err, *k):  # nose gives 5 arguments
         self.report_fail(test, 'Failure', err)
         self.report_finish(test)
 
