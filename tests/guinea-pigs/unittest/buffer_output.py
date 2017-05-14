@@ -12,8 +12,13 @@ class SpamTest(TestCase):
         print("1")
 
     def test_test(self):
-        print("stdout_test")
-        sys.stderr.write("stderr_test")
+        print("stdout_test1")
+        print("stdout_test2")
+        sys.stderr.write("stderr_")
+        sys.stderr.write("test1")
+        sys.stderr.flush()
+
+        sys.stderr.write("stderr_test2")
         raise Exception("A")
 
     @classmethod

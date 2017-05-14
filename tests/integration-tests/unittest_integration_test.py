@@ -119,15 +119,17 @@ def test_buffer_output(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': "stdout_test1|n", 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': "stdout_test2|n", 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'out': "stderr_test1", 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'out': "stdout_test|n", 'flowId': test_name}),
-            ServiceMessage('testStdErr', {'out': "stderr_test", 'flowId': test_name}),
+            ServiceMessage('testStdErr', {'out': "stderr_test2", 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
     # Check no stdout_test or stderr_test in the output (not in service messages)
     # it checks self._mirrorOutput = False
-    output = output.replace("out='stdout_test|n'", "").replace("out='stderr_test'", "")
+    output = output.replace("out='stdout_test", "").replace("out='stderr_test", "")
     assert output.find("stdout_test") < 0
     assert output.find("stderr_test") < 0
 
