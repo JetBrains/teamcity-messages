@@ -107,8 +107,8 @@ Add ``--reporter=teamcity`` option to trial command line
 Python version compatibility
 ----------------------------
 
--  Python 2 - >= 2.4
--  Python 3 - >= 3.2
+-  Python 2 - >= 2.6
+-  Python 3 - >= 3.3
 -  PyPy and PyPy 3
 -  Jython
 
