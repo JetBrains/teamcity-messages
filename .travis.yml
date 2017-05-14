@@ -38,5 +38,5 @@ install:
   - popd
 script:
   - python -V
-  - if [ -n "${FLAKE8}" -a $TRAVIS_PYTHON_VERSION != '2.6' ]; then echo "running flake"; flake8 --ignore=E501 --builtins=basestring --exclude=tests/guinea-pigs; fi
+  - if [ -n "${FLAKE8}" -a $TRAVIS_PYTHON_VERSION != '2.6' ]; then echo "running flake"; flake8 --ignore=E501 --exclude=tests/guinea-pigs; fi
   - python setup.py test

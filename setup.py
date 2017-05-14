@@ -41,12 +41,14 @@ class PyTest(TestCommand):
     def run_tests(self):
         import pytest
         import sys
+        import os
 
         if not self.pytest_args:
             self.pytest_args = ["-l", "--junitxml=test-result.xml", "tests/unit-tests", "tests/integration-tests"]
             if sys.version_info >= (2, 6):
                 self.pytest_args.append("tests/unit-tests-since-2.6")
 
+        sys.path.append(os.path.join(os.getcwd(), "teamcity"))
         errno = pytest.main(self.pytest_args)
         sys.exit(errno)
 

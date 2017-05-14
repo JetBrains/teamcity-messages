@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import subprocess
 
@@ -6,6 +7,7 @@ import pytest
 import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, match
 from test_util import get_teamcity_messages_root
+from common import get_output_encoding
 
 
 @pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
@@ -71,7 +73,7 @@ def test_skip(venv):
         [
             _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testIgnored', {'name': test_name, 'message': 'SKIPPED: my skip', 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': 'SKIPPED: my skip причина', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -426,7 +428,7 @@ def run(venv, file, clazz=None, test=None, options=""):
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             env=env, shell=True, cwd=get_teamcity_messages_root())
-    output = "".join([x.decode() for x in proc.stdout.readlines()])
+    output = "".join([x.decode(get_output_encoding()) for x in proc.stdout.readlines()])
     proc.wait()
 
     print("OUTPUT:" + output.replace("#", "*"))

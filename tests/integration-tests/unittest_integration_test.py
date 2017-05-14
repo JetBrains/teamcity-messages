@@ -1,3 +1,4 @@
+# coding=utf-8
 import os
 import sys
 import subprocess
@@ -7,6 +8,7 @@ import pytest
 import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages, match
 from test_util import get_teamcity_messages_root
+from common import get_output_encoding
 
 
 @pytest.fixture(scope='module')
@@ -155,7 +157,7 @@ def test_skip(venv):
             ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_ok'}),
             ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_ok'}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testIgnored', {'name': test_name, 'message': 'Skipped: testing skipping', 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': u'Skipped: testing skipping причина', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -523,7 +525,7 @@ def run_directly(venv, file):
     print("RUN: " + command)
     proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             env=env, shell=True, cwd=get_teamcity_messages_root())
-    output = "".join([x.decode() for x in proc.stdout.readlines()])
+    output = "".join([x.decode(get_output_encoding()) for x in proc.stdout.readlines()])
     proc.wait()
 
     print("OUTPUT:" + output.replace("#", "*"))

@@ -5,7 +5,8 @@ import datetime
 import re
 
 from teamcity.messages import TeamcityServiceMessages
-from teamcity.common import is_string, get_class_fullname, convert_error_to_string, limit_output, split_output
+from teamcity.common import is_string, get_class_fullname, convert_error_to_string, limit_output, \
+    split_output, get_exception_message, to_unicode
 
 _real_stdout = sys.stdout
 
@@ -69,7 +70,10 @@ class TeamcityTestResult(TestResult):
             super(TeamcityTestResult, self).addSkip(test, reason)
 
         if reason:
-            reason_str = ": " + str(reason)
+            if isinstance(reason, Exception):
+                reason_str = ": " + get_exception_message(reason)
+            else:
+                reason_str = ": " + to_unicode(reason)
         else:
             reason_str = ""
 

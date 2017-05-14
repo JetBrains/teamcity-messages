@@ -15,3 +15,4 @@ Please check the following things:
 * Test generators and parametrized tests 
 * assert failures vs generic exceptions (failure/error)
 * Coverage support
+* Check unicode handling across Python 2, Python 3 and various places (test id, skip reason, failure reason etc)
