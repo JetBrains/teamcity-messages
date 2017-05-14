@@ -1,5 +1,6 @@
-import pprint
 import sys
+
+from common import to_unicode, get_output_encoding
 
 
 class ServiceMessage:
@@ -24,21 +25,24 @@ class ServiceMessage:
             if p in self.params:
                 v1 = self.params[p]
                 v2 = other.params[p]
-                if v1 != v2:
+                if to_unicode(v1) != to_unicode(v2):
                     return False
             else:
                 return False
         return True
 
-    def __str__(self):
+    def as_unicode(self):
         buf = "[" + self.name
         for k, v in self.params.items():
             buf += ' ' + k + "='" + v + "'"
         buf += "]"
-        return buf
+        return to_unicode(buf)
 
-    def __repr__(self):
-        return self.__str__()
+    def __str__(self):
+        return self.as_unicode().encode(get_output_encoding())
+
+    def __unicode__(self):
+        return self.as_unicode()
 
 
 def parse_service_messages(text):
@@ -55,6 +59,13 @@ def parse_service_messages(text):
             m = _parse_one_service_message(r[index:])
             messages.append(m)
     return messages
+
+
+def service_messages_to_string(messages):
+    """
+    :type messages: list[ServiceMessage]
+    """
+    return u" ".join([x.as_unicode() for x in messages])
 
 
 def _parse_one_service_message(s):
@@ -106,16 +117,23 @@ def has_service_messages(messages_string):
 
 
 def match(messages, message):
+    """
+    :type messages: list[ServiceMessage]
+    :type message: ServiceMessage
+    """
     candidates = [x for x in messages if x >= message]
     if len(candidates) == 0:
-        raise AssertionError("No messages match " + str(message) + " across " + pprint.pformat(messages))
+        raise AssertionError("No messages match " + message.as_unicode() + " across " + service_messages_to_string(messages))
     if len(candidates) > 1:
-        raise AssertionError("More than one message match " + str(message) + " across " + pprint.pformat(messages) +
-                             ": " + pprint.pformat(candidates))
+        raise AssertionError("More than one message match " + message.as_unicode() + " across " + service_messages_to_string(messages) +
+                             ": " + service_messages_to_string(candidates))
     return candidates[0]
 
 
 def assert_service_messages(actual_messages_string, expected_messages, actual_messages_predicate=lambda x: True):
+    """
+    :type expected_messages: list[ServiceMessage]
+    """
     expected_messages = [x for x in expected_messages if x is not None]
     actual_messages = [x for x in parse_service_messages(actual_messages_string) if actual_messages_predicate(x)]
 
@@ -123,10 +141,11 @@ def assert_service_messages(actual_messages_string, expected_messages, actual_me
         if len(actual_messages) != len(expected_messages):
             raise AssertionError("Expected %d service messages, but got %d" % (len(expected_messages), len(actual_messages)))
         for index, (actual, expected) in enumerate(zip(actual_messages, expected_messages)):
-            assert actual >= expected, "Expected\n%s, but got\n%s\n at index %d" % (pprint.pformat(expected), pprint.pformat(actual), index)
-    except:
-        print("Actual:\n" + pprint.pformat(actual_messages) + "\n")
-        print("Expected:\n" + pprint.pformat(expected_messages) + "\n")
+            message = u"Expected\n" + expected.as_unicode() + u", but got\n" + actual.as_unicode() + u"\n at index " + str(index)
+            assert actual >= expected, message
+    except AssertionError:
+        print("Actual:\n" + service_messages_to_string(actual_messages) + "\n")
+        print("Expected:\n" + service_messages_to_string(expected_messages) + "\n")
 
         raise sys.exc_info()[1]
 
