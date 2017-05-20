@@ -306,6 +306,26 @@ def test_subtest_skip(venv):
         ])
 
 
+def test_setup_class_skip(venv):
+    if sys.version_info < (2, 7):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
+    output = run_directly(venv, 'setup_class_skip.py')
+    test1_name = '__main__.TestSimple.setUpClass'
+    test2_name = '__main__.TestSubSimple.setUpClass'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "7"}),
+            ServiceMessage('testStarted', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testIgnored', {'name': test1_name, 'flowId': test1_name, 'message': "Skipped: Skip whole Case"}),
+            ServiceMessage('testFinished', {'name': test1_name, 'flowId': test1_name}),
+            ServiceMessage('testStarted', {'name': test2_name, 'flowId': test2_name}),
+            ServiceMessage('testIgnored', {'name': test2_name, 'flowId': test2_name, 'message': "Skipped: Skip whole Case"}),
+            ServiceMessage('testFinished', {'name': test2_name, 'flowId': test2_name}),
+        ])
+
+
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_mixed_failure(venv):
     if sys.version_info < (3, 4):
