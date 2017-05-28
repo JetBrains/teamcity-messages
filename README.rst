@@ -99,6 +99,18 @@ flake8
 
 Test status reporting is enabled automatically under TeamCity build.
 
+tox
+~~~
+
+Pass TEAMCITY_VERSION environment variable inside your test virtenv.
+TEAMCITY_VERSION environment variable exists during build on Teamcity.
+teamcity-messages uses it in order to enable reporting to TeamCity.
+
+::
+
+    [testenv]
+    passenv = TEAMCITY_VERSION
+
 Twisted trial
 ~~~~~~~~~~~~~
 
