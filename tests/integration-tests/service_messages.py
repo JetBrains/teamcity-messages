@@ -65,7 +65,7 @@ def service_messages_to_string(messages):
     """
     :type messages: list[ServiceMessage]
     """
-    return u" ".join([x.as_unicode() for x in messages])
+    return u"\n".join([x.as_unicode() for x in messages])
 
 
 def _parse_one_service_message(s):

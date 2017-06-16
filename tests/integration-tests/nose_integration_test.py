@@ -317,6 +317,28 @@ def test_teardown_function_error(venv):
     assert failed_ms.params['details'].find("AssertionError") > 0
 
 
+def test_buffer_output(venv):
+    output = run(venv, 'buffer_output')
+    test_name = 'test_buffer_output.SpamTest.test_test'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': "stdout_line1|n", 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': "stdout_line2|n", 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'out': "stdout_line3_nonewline", 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+    # Check no stdout_test or stderr_test in the output (not in service messages)
+    # it checks self._mirrorOutput = False
+    output = output.replace("out='stdout_test", "").replace("out='stderr_test", "")
+    assert output.find("stdout_test") < 0
+    assert output.find("stderr_test") < 0
+
+
 def test_fail_with_msg(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_with_msg')
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_with_msg'
@@ -340,8 +362,10 @@ def test_fail_output(venv):
         [
             _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|n', 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 2|n', 'flowId': test_name}),
+            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 3|n', 'flowId': test_name}),
             ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testStdOut', {'name': test_name, 'out': 'Output line 1|nOutput line 2|nOutput line 3|n', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
