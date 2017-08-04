@@ -1,6 +1,10 @@
 # coding=utf-8
 import sys
 import time
+from .diff_tools import patch_unittest_diff, EqualsAssertionError
+
+patch_unittest_diff()
+
 
 if sys.version_info < (3, ):
     # Python 2
@@ -8,7 +12,6 @@ if sys.version_info < (3, ):
 else:
     # Python 3
     text_type = str
-
 
 # Capture some time functions to allow monkeypatching them in tests
 _time = time.time
@@ -141,8 +144,18 @@ class TeamcityServiceMessages(object):
     def testIgnored(self, testName, message='', flowId=None):
         self.message('testIgnored', name=testName, message=message, flowId=flowId)
 
-    def testFailed(self, testName, message='', details='', flowId=None):
-        self.message('testFailed', name=testName, message=message, details=details, flowId=flowId)
+    def testFailed(self, testName, message='', details='', flowId=None, diff_failed=None):
+        if not diff_failed:
+            self.message('testFailed', name=testName, message=message, details=details, flowId=flowId)
+        else:
+            self.message('testFailed',
+                         name=testName,
+                         message=message,
+                         details=details,
+                         flowId=flowId,
+                         type="comparisonFailure",
+                         actual=diff_failed.actual,
+                         expected=diff_failed.expected)
 
     def testStdOut(self, testName, out, flowId=None):
         self.message('testStdOut', name=testName, out=out, flowId=flowId)

@@ -6,7 +6,7 @@ import inspect
 
 from teamcity import is_running_under_teamcity
 from teamcity.common import is_string, get_class_fullname, convert_error_to_string, dump_test_stdout, FlushingStringIO
-from teamcity.messages import TeamcityServiceMessages
+from teamcity.messages import TeamcityServiceMessages, EqualsAssertionError
 
 import nose
 # noinspection PyPackageRequirements
@@ -144,6 +144,14 @@ class TeamcityReport(Plugin):
             # do not log test output twice, see report_finish for actual output handling
             details = details[:start_index] + details[end_index + len(_captured_output_end_marker):]
 
+        try:
+            error = err[1]
+            if isinstance(error, EqualsAssertionError):
+                details = convert_error_to_string(err, 2)
+                self.messages.testFailed(test_id, message=error.msg, details=details, flowId=test_id, diff_failed=error)
+                return
+        except:
+            pass
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
     def report_finish(self, test):
