@@ -20,7 +20,7 @@ from datetime import timedelta
 from teamcity.messages import TeamcityServiceMessages
 from teamcity.common import convert_error_to_string, dump_test_stderr, dump_test_stdout
 from teamcity import is_running_under_teamcity
-
+from teamcity import diff_tools
 
 def pytest_addoption(parser):
     group = parser.getgroup("terminal reporting", "reporting", after="general")
@@ -191,7 +191,30 @@ class EchoTeamCityMessages(object):
         self.ensure_test_start_reported(test_id)
         if report_output:
             self.report_test_output(report, test_id)
-        self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
+
+        diff_error = None
+        try:
+            err_message = str(report.longrepr.reprcrash.message)
+            diff_name = diff_tools.DiffError.__name__
+            # There is a string like "foo.bar.DiffError: [serialized_data]"
+            if diff_name in err_message:
+                serialized_data = err_message[err_message.index(diff_name) + len(diff_name) + 1:]
+                diff_error = diff_tools.deserialize_error(serialized_data)
+        except:
+            pass
+
+        if diff_error:
+            # Cut everything after postfix: it is internal view of DiffError
+            strace = str(report.longrepr)
+            data_postfix = "_ _ _ _ _"
+            if data_postfix in strace:
+                strace = strace[0:strace.index(data_postfix)]
+            self.teamcity.testFailed(test_id, diff_error.msg, strace,
+                                     flowId=test_id,
+                                     diff_failed=diff_error
+                                     )
+        else:
+            self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
         self.report_test_finished(test_id, duration)
 
     def report_test_skip(self, test_id, report):
