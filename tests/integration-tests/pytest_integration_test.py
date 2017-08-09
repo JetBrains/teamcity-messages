@@ -7,6 +7,7 @@ import subprocess
 import pytest
 
 import virtual_environments
+from diff_test_tools import expected_messages, SCRIPT
 from service_messages import ServiceMessage, assert_service_messages, has_service_messages
 from common import get_output_encoding
 from test_util import get_teamcity_messages_root
@@ -435,6 +436,28 @@ def test_nose_parameterized(venv):
             ServiceMessage('testFinished', {'name': test2_name}),
         ])
 
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_diff(venv):
+    output = run(venv, SCRIPT)
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+        ] + expected_messages("tests.guinea-pigs.diff_assert.FooTest.test_test"))
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_diff_assert_error(venv):
+    output = run(venv, "../diff_assert_error.py")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test"}),
+            ServiceMessage('testFailed', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test", "expected": "spam", "actual": "eggs"}),
+            ServiceMessage('testFinished', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test"}),
+        ])
 
 def test_xfail(venv):
     output = run(venv, 'xfail_test.py')
