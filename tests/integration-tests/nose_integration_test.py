@@ -322,8 +322,8 @@ def test_buffer_output(venv):
     test_name = 'test_buffer_output.SpamTest.test_test'
     assert_service_messages(
         output,
+        [_test_count(venv, 1)] +
         [
-            ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testStdOut', {'out': "stdout_line1|n", 'flowId': test_name}),
             ServiceMessage('testStdOut', {'out': "stdout_line2|n", 'flowId': test_name}),
