@@ -8,10 +8,10 @@ _PRIMITIVES = [int, str, bool]
 if _PY2K:
     # Not available in py3
     # noinspection PyUnresolvedReferences
-    _PRIMITIVES.append(unicode)
+    _PRIMITIVES.append(unicode)  # noqa
     # Not available in py3
     # noinspection PyUnresolvedReferences
-    _STR_F = unicode
+    _STR_F = unicode  # noqa
 else:
     _STR_F = str
 
