@@ -191,7 +191,7 @@ class EchoTeamCityMessages(object):
         self.ensure_test_start_reported(test_id)
         if report_output:
             self.report_test_output(report, test_id)
-        self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
+        self.teamcity.testFailed(test_id, message, unicode(report.longrepr), flowId=test_id)
         self.report_test_finished(test_id, duration)
 
     def report_test_skip(self, test_id, report):
