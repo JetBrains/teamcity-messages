@@ -1,14 +1,15 @@
 # coding=utf-8
 import os
-import sys
 import subprocess
+import sys
 
 import pytest
 
 import virtual_environments
+from common import get_output_encoding
+from diff_test_tools import expected_messages, SCRIPT
 from service_messages import ServiceMessage, assert_service_messages, match
 from test_util import get_teamcity_messages_root
-from common import get_output_encoding
 
 
 @pytest.fixture(scope='module')
@@ -536,6 +537,16 @@ def test_twisted_trial(venv):
         ])
     failed_ms = match(ms, ServiceMessage('testFailed', {'name': test1}))
     assert failed_ms.params['details'].index("5 != 4") > 0
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_diff(venv):
+    output = run_directly(venv, SCRIPT)
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+        ] + expected_messages("__main__.FooTest.test_test"))
 
 
 def run_directly(venv, file):

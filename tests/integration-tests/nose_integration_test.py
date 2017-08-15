@@ -5,9 +5,10 @@ import subprocess
 import pytest
 
 import virtual_environments
+from common import get_output_encoding
+from diff_test_tools import SCRIPT, expected_messages
 from service_messages import ServiceMessage, assert_service_messages, match
 from test_util import get_teamcity_messages_root
-from common import get_output_encoding
 
 
 @pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
@@ -109,6 +110,30 @@ def test_deprecated(venv):
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testIgnored', {'name': test_name, 'message': 'Deprecated', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_diff(venv):
+    output = run(venv, SCRIPT)
+    assert_service_messages(
+        output,
+        [
+            _test_count(venv, 1),
+        ] + expected_messages('diff_assert.FooTest.test_test'))
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_long_diff(venv):
+    output = run(venv, "../diff_assert_long.py")
+    test_name = 'diff_assert_long.FooTest.test_test'
+    assert_service_messages(
+        output,
+        [
+            _test_count(venv, 1),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name}),
+            ServiceMessage('testFinished', {'name': test_name}),
         ])
 
 
