@@ -139,9 +139,9 @@ Apache, version 2.0 http://www.apache.org/licenses/LICENSE-2.0
 .. |jb_project| image:: http://jb.gg/badges/official.svg
    :target: https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub
    :alt: Official JetBrains project
-.. |license| image:: https://img.shields.io/pypi/l/teamcity-messages.svg
-   :target: https://pypi.python.org/pypi/teamcity-messages
-   :alt: License
+.. |license| image:: https://img.shields.io/badge/License-Apache%202.0-blue.svg
+   :target: https://opensource.org/licenses/Apache-2.0
+   :alt: Apache 2.0 license
 .. |versions| image:: https://img.shields.io/pypi/pyversions/teamcity-messages.svg
    :target: https://pypi.python.org/pypi/teamcity-messages
    :alt: Python versions supported
