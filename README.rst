@@ -1,8 +1,8 @@
 Python Unit Test Reporting to TeamCity
 ======================================
 
-|  |pypi_version| |license| |versions|
-|  |appveyor_ci| |travis_ci|
+|  |jb_project| |license| |pypi_version|
+|  |versions| |appveyor_ci| |travis_ci|
 
 This package integrates Python with the
 `TeamCity <http://www.jetbrains.com/teamcity/>`__ Continuous Integration
@@ -136,6 +136,9 @@ License
 
 Apache, version 2.0 http://www.apache.org/licenses/LICENSE-2.0
 
+.. |jb_project| image:: http://jb.gg/badges/official.svg
+   :target: https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub
+   :alt: Official JetBrains project
 .. |license| image:: https://img.shields.io/pypi/l/teamcity-messages.svg
    :target: https://pypi.python.org/pypi/teamcity-messages
    :alt: License
