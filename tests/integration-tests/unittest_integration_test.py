@@ -549,6 +549,12 @@ def test_diff(venv):
         ] + expected_messages("__main__.FooTest.test_test"))
 
 
+@pytest.mark.skipif("sys.version_info < (3, 4) ", reason="requires Python 3.4")
+def test_diff_subtest(venv):
+    output = run_directly(venv, "../diff_assert_subtest.py")
+    assert "AssertionError: True != False" in output, "AssertionError broken in output {0}".format(output)
+
+
 def run_directly(venv, file):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
