@@ -352,8 +352,8 @@ def test_buffer_output(venv):
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testStdOut', {'out': "stdout_line1|n", 'flowId': test_name}),
             ServiceMessage('testStdOut', {'out': "stdout_line2|n", 'flowId': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testStdOut', {'out': "stdout_line3_nonewline", 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -396,7 +396,7 @@ def test_fail_output(venv):
 
 
 def test_fail_big_output(venv):
-    output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_big_output')
+    output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_big_output', printOutput=False)
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_big_output'
 
     full_line = 'x' * 50000
@@ -406,9 +406,9 @@ def test_fail_big_output(venv):
         output,
         [_test_count(venv, 1)] +
         [ServiceMessage('testStarted', {})] +
-        [ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name})] +
         [ServiceMessage('testStdOut', {'out': full_line, 'flowId': test_name})] * 20 +
         [ServiceMessage('testStdOut', {'out': leftovers, 'flowId': test_name})] +
+        [ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name})] +
         [ServiceMessage('testFinished', {})]
     )
 
@@ -457,7 +457,7 @@ def test_nose_parameterized(venv):
         ])
 
 
-def run(venv, file, clazz=None, test=None, options=""):
+def run(venv, file, clazz=None, test=None, printOutput=True, options=""):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
 
@@ -480,6 +480,7 @@ def run(venv, file, clazz=None, test=None, options=""):
     output = "".join([x.decode(get_output_encoding()) for x in proc.stdout.readlines()])
     proc.wait()
 
-    print("OUTPUT:" + output.replace("#", "*"))
+    if printOutput:
+        print("OUTPUT:" + output.replace("#", "*"))
 
     return output
