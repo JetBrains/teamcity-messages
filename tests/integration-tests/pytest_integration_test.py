@@ -43,7 +43,9 @@ def fix_slashes(s):
         return s.replace('\\', '/')
 
 
-if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_info[0] == 3 and sys.version_info >= (3, 4)):
+# disable pytest-pep8 on 3.4 due to "No such file or directory: 'doc'" issue
+# see https://bugs.funtoo.org/browse/FL-3596
+if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_info[0] == 3 and sys.version_info >= (3, 5)):
     def test_pytest_pep8(venv):
         venv_with_pep8 = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pep8",))
 
