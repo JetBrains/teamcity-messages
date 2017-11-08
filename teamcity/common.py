@@ -122,6 +122,6 @@ def convert_error_to_string(err, frames_to_skip_from_tail=0):
         if frames_to_skip_from_tail:
             trace = trace[:-frames_to_skip_from_tail]
         return ''.join(trace)
-    except:
+    except Exception:
         tb = traceback.format_exc()
         return "*FAILED TO GET TRACEBACK*: " + tb
