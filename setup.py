@@ -126,6 +126,6 @@ try:
     log.startLoggingWithObserver(my_log_observer, setStdout=False)
 
     list(getPlugins(IPlugin))
-except:
+except Exception:
     # Do not break module install because of twisted internals
     pass

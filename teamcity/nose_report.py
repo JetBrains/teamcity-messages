@@ -167,7 +167,7 @@ class TeamcityReport(Plugin):
                 details = convert_error_to_string(err, 2)
                 self.messages.testFailed(test_id, message=error.msg, details=details, flowId=test_id, comparison_failure=error)
                 return
-        except:
+        except Exception:
             pass
         self.messages.testFailed(test_id, message=fail_type, details=details, flowId=test_id)
 
