@@ -18,11 +18,15 @@ class SpamTest(TestCase):
         sys.stderr.write("test1")
         sys.stderr.flush()
 
+        assert sys.stdout.encoding, "No encoding in " + str(type(sys.stdout))
+        assert sys.stderr.encoding, "No encoding in " + str(type(sys.stderr))
+
         sys.stderr.write("stderr_test2")
         raise Exception("A")
 
     @classmethod
     def tearDownClass(cls):
         print("3")
+
 
 main(testRunner=TeamcityTestRunner(buffer=True))
