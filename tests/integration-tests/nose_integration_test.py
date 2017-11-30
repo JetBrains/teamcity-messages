@@ -5,10 +5,9 @@ import subprocess
 import pytest
 
 import virtual_environments
-from common import get_output_encoding
 from diff_test_tools import SCRIPT, expected_messages
 from service_messages import ServiceMessage, assert_service_messages, match
-from test_util import get_teamcity_messages_root
+from test_util import run_command
 
 
 @pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
@@ -74,7 +73,7 @@ def test_skip(venv):
         [
             _test_count(venv, 1),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testIgnored', {'name': test_name, 'message': 'SKIPPED: my skip причина', 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': u'SKIPPED: my skip причина', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -459,7 +458,6 @@ def test_nose_parameterized(venv):
 
 def run(venv, file, clazz=None, test=None, printOutput=True, options=""):
     env = virtual_environments.get_clean_system_environment()
-    env['TEAMCITY_VERSION'] = "0.0.0"
 
     if clazz:
         clazz_arg = ":" + clazz
@@ -474,13 +472,4 @@ def run(venv, file, clazz=None, test=None, printOutput=True, options=""):
     command = os.path.join(venv.bin, 'nosetests') + \
         " -v " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'nose', file) + clazz_arg + test_arg
-    print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            env=env, shell=True, cwd=get_teamcity_messages_root())
-    output = "".join([x.decode(get_output_encoding()) for x in proc.stdout.readlines()])
-    proc.wait()
-
-    if printOutput:
-        print("OUTPUT:" + output.replace("#", "*"))
-
-    return output
+    return run_command(command, env, printOutput)

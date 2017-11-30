@@ -10,7 +10,7 @@ else:
 
 
 class TestSkip(unittest.TestCase):
-    @skip(u"testing skipping причина")
+    @skip(u"testing skipping øпричина")
     def test_skip_me(self):
         self.fail("shouldn't happen")
 

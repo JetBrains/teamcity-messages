@@ -6,10 +6,9 @@ import sys
 import pytest
 
 import virtual_environments
-from common import get_output_encoding
 from diff_test_tools import expected_messages, SCRIPT
 from service_messages import ServiceMessage, assert_service_messages, match
-from test_util import get_teamcity_messages_root
+from test_util import run_command
 
 
 @pytest.fixture(scope='module')
@@ -160,7 +159,7 @@ def test_skip(venv):
             ServiceMessage('testStarted', {'name': '__main__.TestSkip.test_ok'}),
             ServiceMessage('testFinished', {'name': '__main__.TestSkip.test_ok'}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('testIgnored', {'name': test_name, 'message': u'Skipped: testing skipping причина', 'flowId': test_name}),
+            ServiceMessage('testIgnored', {'name': test_name, 'message': u'Skipped: testing skipping øпричина', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
@@ -562,16 +561,8 @@ def test_equals_processed_correctly(venv):
 
 def run_directly(venv, file):
     env = virtual_environments.get_clean_system_environment()
-    env['TEAMCITY_VERSION'] = "0.0.0"
 
     # Start the process and wait for its output
     command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'unittest', file)
-    print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            env=env, shell=True, cwd=get_teamcity_messages_root())
-    output = "".join([x.decode(get_output_encoding()) for x in proc.stdout.readlines()])
-    proc.wait()
 
-    print("OUTPUT:" + output.replace("#", "*"))
-
-    return output
+    return run_command(command, env)
