@@ -1,16 +1,14 @@
 # coding=utf-8
 import os
-import sys
 import platform
-import subprocess
+import sys
 
 import pytest
 
 import virtual_environments
 from diff_test_tools import expected_messages, SCRIPT
 from service_messages import ServiceMessage, assert_service_messages, has_service_messages
-from common import get_output_encoding
-from test_util import get_teamcity_messages_root
+from test_util import run_command
 
 
 def construct_fixture():
@@ -522,10 +520,6 @@ def test_xfail(venv):
 
 def run(venv, file_name, test=None, options='', set_tc_version=True):
     env = virtual_environments.get_clean_system_environment()
-
-    if set_tc_version:
-        env['TEAMCITY_VERSION'] = "0.0.0"
-
     if test is not None:
         test_suffix = "::" + test
     else:
@@ -533,11 +527,4 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
 
     command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
-    print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            env=env, shell=True, cwd=get_teamcity_messages_root())
-    output = "".join([x.decode(get_output_encoding()) for x in proc.stdout.readlines()])
-    print("OUTPUT: " + output.replace("#", "*"))
-    proc.wait()
-
-    return output
+    return run_command(command, env, True, set_tc_version)
