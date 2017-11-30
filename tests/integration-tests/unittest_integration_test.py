@@ -555,6 +555,11 @@ def test_diff_subtest(venv):
     assert "AssertionError: True != False" in output, "AssertionError broken in output {0}".format(output)
 
 
+def test_equals_processed_correctly(venv):
+    output = run_directly(venv, "../diff_equals_using_eq.py")
+    assert output and "testFailed" not in output
+
+
 def run_directly(venv, file):
     env = virtual_environments.get_clean_system_environment()
     env['TEAMCITY_VERSION'] = "0.0.0"
