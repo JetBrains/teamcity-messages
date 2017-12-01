@@ -12,17 +12,13 @@ from test_util import run_command
 
 
 def construct_fixture():
-    params = []
-
-    if sys.version_info >= (2, 6):
+    # pytest 3.2.5 is the last version to support 2.6 or 3.3
+    # https://docs.pytest.org/en/latest/changelog.html
+    if ((2, 6) <= sys.version_info < (2, 7)) or ((3, 3) <= sys.version_info < (3, 4)):
+        params = [("py==1.4.34", "pytest==3.2.5")]
+    else:
         # latest version
-        params.append(("pytest",))
-
-    if (2, 5) <= sys.version_info < (2, 6):
-        params.append(("py==1.4.19", "pytest==2.5.0"))
-
-    if (2, 4) <= sys.version_info < (2, 5):
-        params.append(("py==1.4.12", "pytest==2.3.3"))
+        params = [("pytest",)]
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
