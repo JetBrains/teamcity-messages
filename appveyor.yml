@@ -1,7 +1,6 @@
 version: '{build}'
 environment:
   matrix:
-  - PYTHON_HOME: C:\Python26
   - PYTHON_HOME: C:\Python27
   - PYTHON_HOME: C:\Python33
   - PYTHON_HOME: C:\Python34
