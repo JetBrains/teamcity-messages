@@ -390,7 +390,7 @@ def test_params(venv):
             ServiceMessage('testFinished', {'name': test2_name}),
             ServiceMessage('testStarted', {'name': test3_name}),
             ServiceMessage('testFailed', {'name': test3_name,
-                                          'message': fix_slashes('tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])'}),
+                                          'message': fix_slashes('tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])|n42 != 54|n'}),
             ServiceMessage('testFinished', {'name': test3_name}),
         ])
 
