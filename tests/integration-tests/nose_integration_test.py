@@ -448,8 +448,8 @@ def test_fail_big_output(venv):
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_issue_98(venv):
     # Start the process and wait for its output
-    command = os.path.join(venv.bin, 'python') + " " + \
-              os.path.join(get_teamcity_messages_root(), 'tests', 'guinea-pigs', 'nose', 'issue_98', 'custom_test_loader.py')
+    custom_test_loader = os.path.join(get_teamcity_messages_root(), 'tests', 'guinea-pigs', 'nose', 'issue_98', 'custom_test_loader.py')
+    command = os.path.join(venv.bin, 'python') + " " + custom_test_loader
     output = run_command(command)
 
     test_name = 'simple_tests.SimpleTests.test_two'
