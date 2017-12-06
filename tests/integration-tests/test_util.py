@@ -2,6 +2,8 @@ import os
 
 import subprocess
 
+import virtual_environments
+
 
 def get_teamcity_messages_root():
     path = os.getcwd()
@@ -13,14 +15,20 @@ def get_teamcity_messages_root():
     raise Exception("Could not find teamcity-messages project root from working directory " + os.getcwd())
 
 
-def run_command(command, env, print_output=True, set_tc_version=True):
+def run_command(command, env=None, print_output=True, set_tc_version=True, cwd=None):
     encoding = "UTF-8"  # Force UTF for remote process and parse its output in same encoding
-    env.update({'PYTHONIOENCODING': encoding})
+
+    if env is not None:
+        env_copy = dict(env)
+    else:
+        env_copy = virtual_environments.get_clean_system_environment()
+    env_copy.update({'PYTHONIOENCODING': encoding})
     if set_tc_version:
-        env['TEAMCITY_VERSION'] = "0.0.0"
+        env_copy['TEAMCITY_VERSION'] = "0.0.0"
+
     print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                            env=env, shell=True, cwd=get_teamcity_messages_root())
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True,
+                            env=env_copy, cwd=cwd or get_teamcity_messages_root())
     output = "".join([x.decode(encoding) for x in proc.stdout.readlines()])
     proc.wait()
     if print_output:

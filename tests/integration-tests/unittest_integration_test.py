@@ -560,9 +560,5 @@ def test_equals_processed_correctly(venv):
 
 
 def run_directly(venv, file):
-    env = virtual_environments.get_clean_system_environment()
-
-    # Start the process and wait for its output
     command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'unittest', file)
-
-    return run_command(command, env)
+    return run_command(command)

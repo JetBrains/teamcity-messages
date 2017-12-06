@@ -515,7 +515,6 @@ def test_xfail(venv):
 
 
 def run(venv, file_name, test=None, options='', set_tc_version=True):
-    env = virtual_environments.get_clean_system_environment()
     if test is not None:
         test_suffix = "::" + test
     else:
@@ -523,4 +522,4 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
 
     command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
-    return run_command(command, env, True, set_tc_version)
+    return run_command(command, set_tc_version=set_tc_version)

@@ -399,7 +399,7 @@ def test_fail_output(venv):
 
 
 def test_fail_big_output(venv):
-    output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_big_output', printOutput=False)
+    output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_big_output', print_output=False)
     test_name = 'nose-guinea-pig.GuineaPig.test_fail_big_output'
 
     full_line = 'x' * 50000
@@ -460,9 +460,7 @@ def test_nose_parameterized(venv):
         ])
 
 
-def run(venv, file, clazz=None, test=None, printOutput=True, options=""):
-    env = virtual_environments.get_clean_system_environment()
-
+def run(venv, file, clazz=None, test=None, print_output=True, options=""):
     if clazz:
         clazz_arg = ":" + clazz
     else:
@@ -476,4 +474,4 @@ def run(venv, file, clazz=None, test=None, printOutput=True, options=""):
     command = os.path.join(venv.bin, 'nosetests') + \
         " -v " + options + " " + \
         os.path.join('tests', 'guinea-pigs', 'nose', file) + clazz_arg + test_arg
-    return run_command(command, env, printOutput)
+    return run_command(command, print_output=print_output)
