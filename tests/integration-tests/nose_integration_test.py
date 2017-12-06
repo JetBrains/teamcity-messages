@@ -7,7 +7,7 @@ import pytest
 import virtual_environments
 from diff_test_tools import SCRIPT, expected_messages
 from service_messages import ServiceMessage, assert_service_messages, match
-from test_util import run_command
+from test_util import run_command, get_teamcity_messages_root
 
 
 @pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
@@ -418,17 +418,10 @@ def test_fail_big_output(venv):
 
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_issue_98(venv):
-    env = virtual_environments.get_clean_system_environment()
-    env['TEAMCITY_VERSION'] = "0.0.0"
-
     # Start the process and wait for its output
-    command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'nose', 'issue_98', 'custom_test_loader.py')
-    print("RUN: " + command)
-    proc = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env, shell=True)
-    output = "".join([x.decode() for x in proc.stdout.readlines()])
-    proc.wait()
-
-    print("OUTPUT:" + output.replace("#", "*"))
+    command = os.path.join(venv.bin, 'python') + " " + \
+              os.path.join(get_teamcity_messages_root(), 'tests', 'guinea-pigs', 'nose', 'issue_98', 'custom_test_loader.py')
+    output = run_command(command)
 
     test_name = 'simple_tests.SimpleTests.test_two'
     assert_service_messages(
