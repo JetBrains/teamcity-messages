@@ -16,7 +16,7 @@ def venv(request):
 
 
 def test_smoke(venv):
-    output = run(venv, os.path.join(get_teamcity_messages_root(), "tests", "guinea-pigs", "djangotest"))
+    output = run(venv, os.path.join(get_teamcity_messages_root(), "tests", "guinea-pigs", "djangotest1"))
 
     test_name = "test_smoke.SmokeTestCase.test_xxx (XXX identity)"
     assert_service_messages(
