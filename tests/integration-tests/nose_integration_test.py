@@ -362,6 +362,10 @@ def test_buffer_output(venv):
     assert output.find("stdout_test") < 0
     assert output.find("stderr_test") < 0
 
+    # assert logcapture plugin works
+    assert output.find("begin captured logging") > 0
+    assert output.find("log info message") >= 0
+
 
 def test_fail_with_msg(venv):
     output = run(venv, 'nose-guinea-pig.py', 'GuineaPig', 'test_fail_with_msg')

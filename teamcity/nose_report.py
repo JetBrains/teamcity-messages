@@ -98,20 +98,21 @@ class TeamcityReport(Plugin):
             old_format_error = capture_plugin.formatError
 
             def newCaptureBeforeTest(test):
-                old_before_test(test)
+                rv = old_before_test(test)
                 test_id = self.get_test_id(test)
                 capture_plugin._buf = FlushingStringIO(lambda data: dump_test_stdout(self.messages, test_id, test_id, data))
                 sys.stdout = capture_plugin._buf
+                return rv
 
             def newCaptureAfterTest(test):
                 if isinstance(capture_plugin._buf, FlushingStringIO):
                     capture_plugin._buf.flush()
-                old_after_test(test)
+                return old_after_test(test)
 
             def newCaptureFormatError(test, err):
                 if isinstance(capture_plugin._buf, FlushingStringIO):
                     capture_plugin._buf.flush()
-                old_format_error(test, err)
+                return old_format_error(test, err)
 
             capture_plugin.beforeTest = newCaptureBeforeTest
             capture_plugin.afterTest = newCaptureAfterTest
