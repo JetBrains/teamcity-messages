@@ -11,7 +11,9 @@ from test_util import run_command, get_teamcity_messages_root
 @pytest.fixture(scope='module', params=["django==1.11.8"])
 def venv(request):
     if sys.version_info < (2, 7):
-        pytest.skip("Django 1.11.8 requires Python 2.7+")
+        pytest.skip("Django 1.11.8 requires Python 2.7 or 3.4+")
+    if (3, 0) <= sys.version_info < (3, 4):
+        pytest.skip("Django 1.11.8 requires Python 2.7 or 3.4+")
     return virtual_environments.prepare_virtualenv([request.param])
 
 
