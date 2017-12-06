@@ -1,7 +1,5 @@
 # coding=utf-8
 import os
-import subprocess
-
 import pytest
 
 import virtual_environments
@@ -97,6 +95,37 @@ def test_coverage(venv):
     f.close()
 
     assert content.find('<line hits="1" number="2"/>') > 0
+
+
+def test_flask_test_incomplete(venv):
+    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["flask_testing==0.6.2"])
+
+    output = run(venv_with_flask, 'flask_testing_incomplete')
+    test_name = 'test_foo.TestIncompleteFoo.test_add'
+    ms = assert_service_messages(
+        output,
+        [
+            _test_count(venv, 1),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+    failed_ms = match(ms, ServiceMessage('testFailed', {'name': test_name}))
+    assert failed_ms.params['details'].find("nNotImplementedError") > 0
+
+
+def test_flask_test_ok(venv):
+    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["flask_testing==0.6.2"])
+
+    output = run(venv_with_flask, 'flask_testing_ok')
+    test_name = 'test_foo.TestFoo.test_add'
+    assert_service_messages(
+        output,
+        [
+            _test_count(venv, 1),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
 
 
 def test_deprecated(venv):

@@ -146,6 +146,12 @@ class TeamcityReport(Plugin):
         else:
             return 'true'
 
+    def report_started(self, test):
+        test_id = self.get_test_id(test)
+
+        self.test_started_datetime_map[test_id] = datetime.datetime.now()
+        self.messages.testStarted(test_id, captureStandardOutput=self._captureStandardOutput_value(), flowId=test_id)
+
     def report_fail(self, test, fail_type, err):
         # workaround nose bug on python 3
         if is_string(err[1]):
@@ -234,6 +240,10 @@ class TeamcityReport(Plugin):
             self.report_fail(test, 'error in ' + test.error_context + ' context', err)
             self.messages.testFinished(test_id, flowId=test_id)
         else:
+            # some test cases may report errors in pre setup when startTest was not called yet
+            # example: https://github.com/JetBrains/teamcity-messages/issues/153
+            if test_id not in self.test_started_datetime_map:
+                self.report_started(test)
             self.report_fail(test, 'Error', err)
             self.report_finish(test)
 
