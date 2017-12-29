@@ -54,6 +54,9 @@ def pytest_addoption(parser):
     group._addoption('--no-teamcity', action="count",
                      dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
 
+    parser.addini("skippassedoutput", help="skip output of passed tests",
+                  type="bool")
+
 
 def pytest_configure(config):
     if config.option.no_teamcity >= 1:
@@ -66,8 +69,13 @@ def pytest_configure(config):
     if enabled:
         output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
         coverage_controller = _get_coverage_controller(config)
+        skip_passed_output = config.getini('skippassedoutput')
 
-        config._teamcityReporting = EchoTeamCityMessages(output_capture_enabled, coverage_controller)
+        config._teamcityReporting = EchoTeamCityMessages(
+            output_capture_enabled,
+            coverage_controller,
+            skip_passed_output
+        )
         config.pluginmanager.register(config._teamcityReporting)
 
 
@@ -87,9 +95,10 @@ def _get_coverage_controller(config):
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, output_capture_enabled, coverage_controller):
+    def __init__(self, output_capture_enabled, coverage_controller, skip_passed_output):
         self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
+        self.skip_passed_output = skip_passed_output
 
         self.teamcity = TeamcityServiceMessages()
         self.test_start_reported_mark = set()
@@ -277,10 +286,11 @@ class EchoTeamCityMessages(object):
             # Do not report passed setup/teardown if no output
             if report.when == 'call':
                 self.ensure_test_start_reported(test_id)
-                self.report_test_output(report, test_id)
+                if not self.skip_passed_output:
+                    self.report_test_output(report, test_id)
                 self.report_test_finished(test_id, duration)
             else:
-                if self.report_has_output(report):
+                if self.report_has_output(report) and not self.skip_passed_output:
                     block_name = "test " + report.when
                     self.teamcity.blockOpened(block_name, flowId=test_id)
                     self.report_test_output(report, test_id)
