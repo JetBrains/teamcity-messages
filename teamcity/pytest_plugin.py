@@ -54,7 +54,7 @@ def pytest_addoption(parser):
     group._addoption('--no-teamcity', action="count",
                      dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
 
-    parser.addini("skippassedoutput", help="skip output of passed tests",
+    parser.addini("skippassedoutput", help="skip output of passed tests for JetBrains TeamCity service messages",
                   type="bool")
 
 

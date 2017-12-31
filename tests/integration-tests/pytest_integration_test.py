@@ -1,6 +1,7 @@
 # coding=utf-8
 import os
 import platform
+import contextlib
 import sys
 
 import pytest
@@ -8,7 +9,7 @@ import pytest
 import virtual_environments
 from diff_test_tools import expected_messages, SCRIPT
 from service_messages import ServiceMessage, assert_service_messages, has_service_messages
-from test_util import run_command
+from test_util import run_command, get_teamcity_messages_root
 
 
 def construct_fixture():
@@ -35,6 +36,15 @@ def fix_slashes(s):
         return s.replace('/', '\\')
     else:
         return s.replace('\\', '/')
+
+
+@contextlib.contextmanager
+def make_ini(content):
+    path = os.path.join(get_teamcity_messages_root(), 'pytest.ini')
+    with open(path, 'w+') as f:
+        f.write(content)
+    yield
+    os.remove(path)
 
 
 # disable pytest-pep8 on 3.4 due to "No such file or directory: 'doc'" issue
@@ -512,6 +522,22 @@ def test_xfail(venv):
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.xfail_test.test_expected_to_fail'}),
         ])
     assert ms[5].params["message"].find("xfail reason") > 0
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_skip_passed_output(venv):
+    with make_ini('[pytest]\nskippassedoutput=true'):
+        output = run(venv, 'output_test.py')
+
+    test_name = 'tests.guinea-pigs.pytest.output_test.test_out'
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'false'}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name})
+        ])
 
 
 def run(venv, file_name, test=None, options='', set_tc_version=True):
