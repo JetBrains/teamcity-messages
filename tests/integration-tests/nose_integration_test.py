@@ -147,8 +147,8 @@ def test_diff(venv):
     assert_service_messages(
         output,
         [
-            _test_count(venv, 1),
-        ] + expected_messages('diff_assert.FooTest.test_test'))
+            _test_count(venv, 3),
+        ] + expected_messages('diff_assert.FooTest'))
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")

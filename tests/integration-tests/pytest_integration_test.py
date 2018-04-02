@@ -468,8 +468,8 @@ def test_diff(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testCount', {'count': "1"}),
-        ] + expected_messages("tests.guinea-pigs.diff_assert.FooTest.test_test"))
+            ServiceMessage('testCount', {'count': "3"}),
+        ] + expected_messages("tests.guinea-pigs.diff_assert.FooTest"))
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
