@@ -544,8 +544,8 @@ def test_diff(venv):
     assert_service_messages(
         output,
         [
-            ServiceMessage('testCount', {'count': "1"}),
-        ] + expected_messages("__main__.FooTest.test_test"))
+            ServiceMessage('testCount', {'count': "3"}),
+        ] + expected_messages("__main__.FooTest"))
 
 
 @pytest.mark.skipif("sys.version_info < (3, 4) ", reason="requires Python 3.4")
