@@ -54,7 +54,7 @@ class EqualsAssertionError(AssertionError):
         super(AssertionError, self).__init__()
         self.expected = expected
         self.actual = actual
-        self.msg =text_type(msg)
+        self.msg = text_type(msg)
 
         if not preformated:
             self.expected = _format_and_convert(self.expected)
