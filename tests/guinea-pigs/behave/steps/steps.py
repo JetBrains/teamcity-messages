@@ -44,3 +44,35 @@ def step_impl(context):
     :type context: behave.runner.Context
     """
     print("Background")
+
+
+@then("THEN_A")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    pass
+
+
+@when("WHEN_A")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    pass
+
+
+@when("WHEN_B")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    pass
+
+
+@then("THEN_B")
+def step_impl(context):
+    """
+    :type context: behave.runner.Context
+    """
+    pass
