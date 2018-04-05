@@ -84,6 +84,26 @@ def test_all_features(venv):
             ServiceMessage('testSuiteFinished', {'name': 'Complex'}),
 
 
+            ServiceMessage('testSuiteStarted', {'name': 'TEST_FEATURE'}),
+
+
+            ServiceMessage('testSuiteStarted', {'name': 'SCENARIO_A'}),
+            ServiceMessage('testStarted', {'name': 'When WHEN_A'}),
+            ServiceMessage('testFinished', {'name': 'When WHEN_A'}),
+            ServiceMessage('testStarted', {'name': 'Then THEN_A'}),
+            ServiceMessage('testFinished', {'name': 'Then THEN_A'}),
+            ServiceMessage('testSuiteFinished', {'name': 'SCENARIO_A'}),
+
+            ServiceMessage('testSuiteStarted', {'name': 'SCENARIO_B'}),
+            ServiceMessage('testStarted', {'name': 'When WHEN_B'}),
+            ServiceMessage('testFinished', {'name': 'When WHEN_B'}),
+            ServiceMessage('testStarted', {'name': 'Then THEN_B'}),
+            ServiceMessage('testFinished', {'name': 'Then THEN_B'}),
+            ServiceMessage('testSuiteFinished', {'name': 'SCENARIO_B'}),
+
+            ServiceMessage('testSuiteFinished', {'name': 'TEST_FEATURE'}),
+
+
 
             # Simple
             ServiceMessage('testSuiteStarted', {'name': 'Simple'}),
@@ -282,6 +302,24 @@ def test_simple_suite(venv):
 
             ServiceMessage('testSuiteFinished', {'name': 'First step ok, second ignored'}),
             ServiceMessage('testSuiteFinished', {'name': 'Simple'}),
+        ])
+
+
+def test_tags(venv):
+    output = run(venv, arguments="FeatureWithTags.feature", options="--wip")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': 'TEST_FEATURE'}),
+
+            ServiceMessage('testSuiteStarted', {'name': 'SCENARIO_B'}),
+            ServiceMessage('testStarted', {'name': 'When WHEN_B'}),
+            ServiceMessage('testFinished', {'name': 'When WHEN_B'}),
+            ServiceMessage('testStarted', {'name': 'Then THEN_B'}),
+            ServiceMessage('testFinished', {'name': 'Then THEN_B'}),
+            ServiceMessage('testSuiteFinished', {'name': 'SCENARIO_B'}),
+
+            ServiceMessage('testSuiteFinished', {'name': 'TEST_FEATURE'}),
         ])
 
 
