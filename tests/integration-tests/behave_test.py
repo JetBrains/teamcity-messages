@@ -1,3 +1,4 @@
+# coding: utf8
 import os
 
 import pytest
@@ -76,9 +77,9 @@ def test_all_features(venv):
             ServiceMessage('testFinished', {'name': 'Given I will fail'}),
 
 
-            ServiceMessage('testStarted', {'name': 'Given Skip me'}),
-            ServiceMessage('testIgnored', {'name': 'Given Skip me'}),
-            ServiceMessage('testFinished', {'name': 'Given Skip me'}),
+            ServiceMessage('testStarted', {'name': 'And Skip me'}),
+            ServiceMessage('testIgnored', {'name': 'And Skip me'}),
+            ServiceMessage('testFinished', {'name': 'And Skip me'}),
 
             ServiceMessage('testSuiteFinished', {'name': 'Broken'}),
             ServiceMessage('testSuiteFinished', {'name': 'Complex'}),
@@ -109,19 +110,34 @@ def test_all_features(venv):
             ServiceMessage('testSuiteStarted', {'name': 'Simple'}),
 
             ServiceMessage('testSuiteStarted', {'name': 'Must be OK'}),
-            ServiceMessage('testStarted', {'name': 'Given I like BDD'}),
-            ServiceMessage('testFinished', {'name': 'Given I like BDD'}),
+            ServiceMessage('testStarted', {'name': u'Given I like BDD'}),
+            ServiceMessage('testFinished', {'name': u'Given I like BDD'}),
             ServiceMessage('testSuiteFinished', {'name': 'Must be OK'}),
 
             ServiceMessage('testSuiteStarted', {'name': 'First step ok, second ignored'}),
-            ServiceMessage('testStarted', {'name': 'Given I like BDD'}),
-            ServiceMessage('testFinished', {'name': 'Given I like BDD'}),
+            ServiceMessage('testStarted', {'name': u'Given I like BDD'}),
+            ServiceMessage('testFinished', {'name': u'Given I like BDD'}),
             ServiceMessage('testStarted', {'name': 'Then No step def'}),
             ServiceMessage('testFailed', {'name': 'Then No step def', 'message': 'Undefined'}),
             ServiceMessage('testFinished', {'name': 'Then No step def'}),
 
             ServiceMessage('testSuiteFinished', {'name': 'First step ok, second ignored'}),
             ServiceMessage('testSuiteFinished', {'name': 'Simple'}),
+        ])
+
+
+def test_rus(venv):
+    output = run(venv, arguments="RusFeature.feature", options="--lang ru", lang_dir="rus")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testSuiteStarted', {'name': u'Моя фича'}),
+            ServiceMessage('testSuiteStarted', {'name': u'Мой сценарий'}),
+
+            ServiceMessage('testStarted', {'name': u'Дано Я говорю по-русски'}),
+            ServiceMessage('testFinished', {'name': u'Дано Я говорю по-русски'}),
+            ServiceMessage('testSuiteFinished', {'name': u'Мой сценарий'}),
+            ServiceMessage('testSuiteFinished', {'name': u'Моя фича'}),
         ])
 
 
@@ -184,9 +200,9 @@ def test_complex_suite(venv):
             ServiceMessage('testFinished', {'name': 'Given I will fail'}),
 
 
-            ServiceMessage('testStarted', {'name': 'Given Skip me'}),
-            ServiceMessage('testIgnored', {'name': 'Given Skip me'}),
-            ServiceMessage('testFinished', {'name': 'Given Skip me'}),
+            ServiceMessage('testStarted', {'name': 'And Skip me'}),
+            ServiceMessage('testIgnored', {'name': 'And Skip me'}),
+            ServiceMessage('testFinished', {'name': 'And Skip me'}),
 
             ServiceMessage('testSuiteFinished', {'name': 'Broken'}),
             ServiceMessage('testSuiteFinished', {'name': 'Complex'}),
@@ -254,8 +270,8 @@ def test_simple_suite_only_ok(venv):
             ServiceMessage('testSuiteStarted', {'name': 'Simple'}),
 
             ServiceMessage('testSuiteStarted', {'name': 'Must be OK'}),
-            ServiceMessage('testStarted', {'name': 'Given I like BDD'}),
-            ServiceMessage('testFinished', {'name': 'Given I like BDD'}),
+            ServiceMessage('testStarted', {'name': u'Given I like BDD'}),
+            ServiceMessage('testFinished', {'name': u'Given I like BDD'}),
             ServiceMessage('testSuiteFinished', {'name': 'Must be OK'}),
             ServiceMessage('testSuiteFinished', {'name': 'Simple'}),
         ])
@@ -270,8 +286,8 @@ def test_simple_suite_only_fail(venv):
 
 
             ServiceMessage('testSuiteStarted', {'name': 'First step ok, second ignored'}),
-            ServiceMessage('testStarted', {'name': 'Given I like BDD'}),
-            ServiceMessage('testFinished', {'name': 'Given I like BDD'}),
+            ServiceMessage('testStarted', {'name': u'Given I like BDD'}),
+            ServiceMessage('testFinished', {'name': u'Given I like BDD'}),
             ServiceMessage('testStarted', {'name': 'Then No step def'}),
             ServiceMessage('testFailed', {'name': 'Then No step def', 'message': 'Undefined'}),
             ServiceMessage('testFinished', {'name': 'Then No step def'}),
@@ -289,13 +305,13 @@ def test_simple_suite(venv):
             ServiceMessage('testSuiteStarted', {'name': 'Simple'}),
 
             ServiceMessage('testSuiteStarted', {'name': 'Must be OK'}),
-            ServiceMessage('testStarted', {'name': 'Given I like BDD'}),
-            ServiceMessage('testFinished', {'name': 'Given I like BDD'}),
+            ServiceMessage('testStarted', {'name': u'Given I like BDD'}),
+            ServiceMessage('testFinished', {'name': u'Given I like BDD'}),
             ServiceMessage('testSuiteFinished', {'name': 'Must be OK'}),
 
             ServiceMessage('testSuiteStarted', {'name': 'First step ok, second ignored'}),
-            ServiceMessage('testStarted', {'name': 'Given I like BDD'}),
-            ServiceMessage('testFinished', {'name': 'Given I like BDD'}),
+            ServiceMessage('testStarted', {'name': u'Given I like BDD'}),
+            ServiceMessage('testFinished', {'name': u'Given I like BDD'}),
             ServiceMessage('testStarted', {'name': 'Then No step def'}),
             ServiceMessage('testFailed', {'name': 'Then No step def', 'message': 'Undefined'}),
             ServiceMessage('testFinished', {'name': 'Then No step def'}),
@@ -323,7 +339,7 @@ def test_tags(venv):
         ])
 
 
-def run(venv, options="", arguments=""):
-    cwd = os.path.join(get_teamcity_messages_root(), "tests", "guinea-pigs", "behave")
-    behave = " ".join([os.path.join(venv.bin, "python"), "_behave_runner.py", options, arguments])
+def run(venv, options="", arguments="", lang_dir="eng"):
+    cwd = os.path.join(get_teamcity_messages_root(), "tests", "guinea-pigs", "behave", lang_dir)
+    behave = " ".join([os.path.join(venv.bin, "python"), os.path.join(os.path.dirname(cwd), "_behave_runner.py"), options, arguments])
     return run_command(behave, cwd=cwd)
