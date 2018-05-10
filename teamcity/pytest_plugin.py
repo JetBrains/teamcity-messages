@@ -16,6 +16,7 @@ import sys
 import re
 import traceback
 from datetime import timedelta
+import pytest
 
 from teamcity.messages import TeamcityServiceMessages
 from teamcity.common import convert_error_to_string, dump_test_stderr, dump_test_stdout
@@ -326,6 +327,33 @@ class EchoTeamCityMessages(object):
             except Exception:
                 tb = traceback.format_exc()
                 self.teamcity.customMessage("Coverage statistics reporting failed", "ERROR", errorDetails=tb)
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_setup(self,item):
+        if not self.output_capture_enabled:
+            self.teamcity.blockOpened('setup')
+            yield
+            self.teamcity.blockClosed('setup')
+        else:
+            yield
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_call(self,item):
+        if not self.output_capture_enabled:
+            self.teamcity.blockOpened('call')
+            yield
+            self.teamcity.blockClosed('call')
+        else:
+            yield
+
+    @pytest.hookimpl(hookwrapper=True)
+    def pytest_runtest_teardown(self,item):
+        if not self.output_capture_enabled:
+            self.teamcity.blockOpened('teardown')
+            yield
+            self.teamcity.blockClosed('teardown')
+        else:
+            yield
 
     def _report_coverage(self):
         from coverage.misc import NotPython
