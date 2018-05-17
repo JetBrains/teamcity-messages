@@ -394,7 +394,7 @@ def test_params(venv):
         output,
         [
             ServiceMessage('testCount', {'count': "3"}),
-            ServiceMessage('testStarted', {'name': test1_name}),
+            ServiceMessage('testStarted', {'name': test1_name, 'metainfo': 'test_eval|[3+5-8|]'}),
             ServiceMessage('testFinished', {'name': test1_name}),
             ServiceMessage('testStarted', {'name': test2_name}),
             ServiceMessage('testFinished', {'name': test2_name}),
