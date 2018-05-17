@@ -177,15 +177,18 @@ class EchoTeamCityMessages(object):
         self.teamcity.testCount(len(items))
 
     def pytest_runtest_logstart(self, nodeid, location):
-        self.ensure_test_start_reported(self.format_test_id(nodeid, location))
+        # test name fetched from location passed as metainfo to PyCharm
+        # it will be used to run specific test using "-k"
+        # See IDEA-176950
+        self.ensure_test_start_reported(self.format_test_id(nodeid, location), location[2])
 
-    def ensure_test_start_reported(self, test_id):
+    def ensure_test_start_reported(self, test_id, metainfo=None):
         if test_id not in self.test_start_reported_mark:
             if self.output_capture_enabled:
                 capture_standard_output = "false"
             else:
                 capture_standard_output = "true"
-            self.teamcity.testStarted(test_id, flowId=test_id, captureStandardOutput=capture_standard_output)
+            self.teamcity.testStarted(test_id, flowId=test_id, captureStandardOutput=capture_standard_output, metainfo=metainfo)
             self.test_start_reported_mark.add(test_id)
 
     def report_has_output(self, report):
