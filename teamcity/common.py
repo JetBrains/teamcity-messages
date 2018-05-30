@@ -125,7 +125,14 @@ def get_class_fullname(something):
 
 def convert_error_to_string(err, frames_to_skip_from_tail=0):
     try:
-        exctype, value, tb = err
+        try:
+            from twisted.python.failure import Failure
+            if isinstance(err, Failure):
+                exctype, value, tb = err.type, err.value, err.tb
+            else:
+                exctype, value, tb = err
+        except ImportError:
+            exctype, value, tb = err
         trace = traceback.format_exception(exctype, value, tb)
         if frames_to_skip_from_tail:
             trace = trace[:-frames_to_skip_from_tail]
