@@ -4,6 +4,8 @@ environment:
   - PYTHON_HOME: C:\Python27
   - PYTHON_HOME: C:\Python34
   - PYTHON_HOME: C:\Python35
+  - PYTHON_HOME: C:\Python36
+  - PYTHON_HOME: C:\Python36-x64
 install:
 - IF [%PYTHON_HOME%]==[C:\Python26] appveyor DownloadFile https://www.python.org/ftp/python/2.6.6/python-2.6.6.msi
 - IF [%PYTHON_HOME%]==[C:\Python26] msiexec /i python-2.6.6.msi /qn
