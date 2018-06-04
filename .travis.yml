@@ -9,24 +9,10 @@ python:
   - "3.5"
   - "3.6"
   - "pypy"
-env:
-  - PYTEST="pytest" VIRTUALENV="virtualenv" FLAKE8="flake8"
-matrix:
-  include:
-    - python: 2.7
-      env: PY="pypy3" FLAKE8=""
+  - "pypy3.5"
 install:
-  - mkdir builds
-  - pushd builds
-  - case "${PY-}" in
-      pypy3)
-        /bin/sh ../.travis-pypy3-virtualenv.sh $PWD/ve;
-        ;;
-      esac
-  - if [ -d "$PWD/ve" ]; then source $PWD/ve/bin/activate; fi
-  - pip install ${PIP_OPT} ${FLAKE8} ${PYTEST} ${VIRTUALENV}
-  - popd
+  - pip install flake8 virtualenv pytest
 script:
   - python -V
-  - if [ -n "${FLAKE8}" -a $TRAVIS_PYTHON_VERSION != '2.6' ]; then echo "running flake"; flake8 --ignore=E501 --exclude=tests/guinea-pigs; fi
+  - if [ $TRAVIS_PYTHON_VERSION != '2.6' ]; then echo "running flake"; flake8 --ignore=E501 --exclude=tests/guinea-pigs; fi
   - python setup.py test
