@@ -17,7 +17,7 @@ def venv_flake8_v3(request):
     return virtual_environments.prepare_virtualenv([request.param])
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_smoke_flake8_v2(venv_flake8_v2):
     output = run(venv_flake8_v2, options="--teamcity", set_tc_version=False)
 
@@ -66,7 +66,7 @@ def test_flake8_v3_no_teamcity(venv_flake8_v3):
     assert_service_messages(output, [])
 
 
-@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.6+")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_flake8_v3_no_reporting_without_explicit_option_and_tc_env(venv_flake8_v3):
     output = run(venv_flake8_v3, options="", set_tc_version=False)
 
