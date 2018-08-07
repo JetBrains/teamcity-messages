@@ -19,11 +19,13 @@ def construct_fixture():
         params = [("py==1.4.34", "pytest==3.2.5")]
     else:
         # latest version
-        params = [("pytest",)]
+        params = [("pytest>=3",), ("pytest==2.7",)]
+
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
         return virtual_environments.prepare_virtualenv(request.param)
+
 
     return venv
 
@@ -68,6 +70,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
             ])
 
         assert ms[2].params["details"].find("E302 expected 2 blank lines, found 1") > 0
+
 
     def test_pytest_pylint(venv):
         venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint",))
@@ -327,6 +330,9 @@ def test_module_error(venv):
 
 
 def test_skip(venv):
+    if "pytest==2.7" in venv.packages:
+        pytest.skip("Diff is broken for ancient pytest")
+
     output = run(venv, 'skip_test.py')
     test_name = 'tests.guinea-pigs.pytest.skip_test.test_function'
     assert_service_messages(
@@ -400,7 +406,8 @@ def test_params(venv):
             ServiceMessage('testFinished', {'name': test2_name}),
             ServiceMessage('testStarted', {'name': test3_name}),
             ServiceMessage('testFailed', {'name': test3_name,
-                                          'message': fix_slashes('tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])|n42 != 54|n'}),
+                                          'message': fix_slashes(
+                                              'tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])|n42 != 54|n'}),
             ServiceMessage('testFinished', {'name': test3_name}),
         ])
 
@@ -474,6 +481,9 @@ def test_num_diff(venv):
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
 def test_diff(venv):
+    if "pytest==2.7" in venv.packages:
+        pytest.skip("Diff is broken for ancient pytest")
+
     output = run(venv, SCRIPT)
     assert_service_messages(
         output,
@@ -547,5 +557,5 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
         test_suffix = ""
 
     command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
-        os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
+              os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
     return run_command(command, set_tc_version=set_tc_version)
