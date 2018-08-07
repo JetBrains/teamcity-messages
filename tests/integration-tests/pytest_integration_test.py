@@ -3,6 +3,7 @@ import os
 import platform
 import contextlib
 import sys
+from distutils.version import LooseVersion
 
 import pytest
 
@@ -19,7 +20,7 @@ def construct_fixture():
         params = [("py==1.4.34", "pytest==3.2.5")]
     else:
         # latest version
-        params = [("pytest",)]
+        params = [("pytest",), ("pytest==2.7",)]
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
@@ -473,6 +474,7 @@ def test_num_diff(venv):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+@pytest.mark.skipif(LooseVersion(pytest.__version__) < LooseVersion("2.9"), reason="We do not support diff for ancient pytest")
 def test_diff(venv):
     output = run(venv, SCRIPT)
     assert_service_messages(
