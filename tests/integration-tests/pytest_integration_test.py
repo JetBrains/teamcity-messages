@@ -19,7 +19,7 @@ def construct_fixture():
         params = [("py==1.4.34", "pytest==3.2.5")]
     else:
         # latest version
-        params = [("pytest",)]
+        params = [("pytest", "pytest==2.7")]
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
