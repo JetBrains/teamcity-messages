@@ -30,7 +30,7 @@ def prepare_virtualenv(packages=()):
     :rtype : VirtualEnvDescription
     """
     vroot = get_vroot()
-    env_key = get_env_key(packages)
+    env_key = str(get_env_key(packages)).replace(">", "gt")
     vdir = os.path.join(vroot, env_key)
 
     vbin = os.path.join(vdir, ('bin', 'Scripts')[_windows])
