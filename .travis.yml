@@ -1,4 +1,4 @@
-sudo: false
+sudo: required
 language: python
 os:
   - linux
@@ -10,7 +10,10 @@ python:
   - "3.6"
   - "pypy"
   - "pypy3.5"
+before_install:
+  - sudo apt-get install -y python-dev libpython-dev pypy-dev
 install:
+  - sudo pip install --upgrade setuptools pip
   - pip install flake8 virtualenv pytest
 script:
   - python -V
