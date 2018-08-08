@@ -553,6 +553,6 @@ def run(venv, file_name, test=None, options='', set_tc_version=True):
     else:
         test_suffix = ""
 
-    command = os.path.join(venv.bin, 'py.test') + " " + options + " " + \
-              os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
+    command = os.path.join(venv.bin, 'py.test') + " " + options + " "
+    command += os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
     return run_command(command, set_tc_version=set_tc_version)
