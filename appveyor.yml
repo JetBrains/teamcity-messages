@@ -1,5 +1,8 @@
 version: '{build}'
 environment:
+  TMP: c:\tmp
+  TEMP: c:\tmp
+  TMPDIR: c:\tmp
   matrix:
   - PYTHON_HOME: C:\Python27
   - PYTHON_HOME: C:\Python34
@@ -9,6 +12,7 @@ environment:
 install:
 - appveyor DownloadFile https://bootstrap.pypa.io/get-pip.py
 - '%PYTHON_HOME%\python get-pip.py'
+- '%PYTHON_HOME%\python -m pip install --upgrade setuptools'
 build_script:
 - '%PYTHON_HOME%\python setup.py sdist'
 test_script:
