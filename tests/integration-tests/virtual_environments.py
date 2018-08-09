@@ -1,8 +1,10 @@
 import os
+import re
 import shutil
 import subprocess
 import sys
 import tempfile
+
 import virtualenv
 
 from test_util import get_teamcity_messages_root
@@ -19,9 +21,25 @@ class VirtualEnvDescription:
         self.pip = pip
         self.packages = packages
 
+    def __str__(self):
+        return "home:" + self.home + ",pip:" + self.pip + "python:" + self.python + "packs:" + str(self.packages)
+
+    def __unicode__(self):
+        return self.__str__()
+
+    def __repr__(self):
+        return self.__str__()
+
 
 def get_exe_suffix():
     return ("", ".exe")[_windows]
+
+
+def _call(commands, **kwargs):
+    print("Will call: " + str(commands))
+    rc = subprocess.call(commands, **kwargs)
+    if rc != 0:
+        raise Exception("Error " + str(rc) + " calling " + str(commands))
 
 
 def prepare_virtualenv(packages=()):
@@ -30,7 +48,7 @@ def prepare_virtualenv(packages=()):
     :rtype : VirtualEnvDescription
     """
     vroot = get_vroot()
-    env_key = str(get_env_key(packages)).replace(">", "gt")
+    env_key = get_env_key(packages)
     vdir = os.path.join(vroot, env_key)
 
     vbin = os.path.join(vdir, ('bin', 'Scripts')[_windows])
@@ -42,6 +60,8 @@ def prepare_virtualenv(packages=()):
         vpip_install.append("--insecure")
 
     venv_description = VirtualEnvDescription(home_dir=vdir, bin_dir=vbin, python=vpython, pip=vpip, packages=packages)
+    print("Will install now")
+    print(str(venv_description))
 
     env = get_clean_system_environment()
     env['PIP_DOWNLOAD_CACHE'] = os.path.abspath(os.path.join(vroot, "pip-download-cache"))
@@ -53,26 +73,33 @@ def prepare_virtualenv(packages=()):
             shutil.rmtree(vdir)
 
         virtualenv.create_environment(vdir)
+        # Update for newly created environment
+        if sys.version_info >= (2, 7):
+            _call([vpython, "-m", "pip", "install", "--upgrade", "pip", "setuptools"], env=env, cwd=get_teamcity_messages_root())
 
         for package_spec in packages:
-            rc = subprocess.call(vpip_install + [package_spec], env=env)
-            if rc != 0:
-                raise Exception("Unable to install " + package_spec + " to " + vroot)
+            _call(vpip_install + [package_spec], env=env)
 
         open(done_flag_file, 'a').close()
 
-    rc = subprocess.call([vpython, "setup.py", "install"], env=env, cwd=get_teamcity_messages_root())
-    if rc != 0:
-        raise Exception("Unable to setup.py install to " + vroot)
-
+    # Update for env.  that already exists: does not take long, but may save old envs.
+    if sys.version_info >= (2, 7):
+        _call([vpython, "-m", "pip", "install", "--upgrade", "pip", "setuptools"], env=env, cwd=get_teamcity_messages_root())
+    _call([vpython, "setup.py", "install"], env=env, cwd=get_teamcity_messages_root())
     return venv_description
 
 
 def get_env_key(packages):
-    key = "%d.%d.%d" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
-    key += "-" + os.name
+    # Method must return short but unique folder name for interpreter and packages
+    key = "%d%d" % (sys.version_info[0], sys.version_info[1])
     for package in packages:
-        key += "-" + package.replace('=', '-')
+        name_version = re.split("(==|<=|>=)", package)
+        name = name_version[0]
+        key += name if len(name) <= 4 else name[:2] + name[-2:]
+        if len(name_version) == 3:
+            key += re.sub("[^a-zA-Z0-9]+", "", name_version[2])
+        key = re.sub("[^a-zA-Z0-9]+", "", key)
+
     return key
 
 
