@@ -404,7 +404,7 @@ def test_params(venv):
             ServiceMessage('testStarted', {'name': test3_name}),
             ServiceMessage('testFailed', {'name': test3_name,
                                           'message': fix_slashes(
-                                              'tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])|n42 != 54|n'}),
+                                              'tests/guinea-pigs/pytest/params_test.py') + ':3 (test_eval|[6*9-42|])|n54 != 42|n'}),
             ServiceMessage('testFinished', {'name': test3_name}),
         ])
 
@@ -457,7 +457,7 @@ def test_long_diff(venv):
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name}),
             # "..." inserted by pytest that cuts long lines
-            ServiceMessage('testFailed', {'name': test_name, "expected": "foofoofoofoo...ofoofoofoofoo", "actual": "spamspamspams...mspamspamspam"}),
+            ServiceMessage('testFailed', {'name': test_name, "actual": "foofoofoofoo...ofoofoofoofoo", "expected": "spamspamspams...mspamspamspam"}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
 
@@ -471,7 +471,7 @@ def test_num_diff(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name}),
-            ServiceMessage('testFailed', {'name': test_name, "expected": "123", "actual": "456"}),
+            ServiceMessage('testFailed', {'name': test_name, "actual": "123", "expected": "456"}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
 
@@ -497,6 +497,20 @@ def test_diff_assert_error(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test"}),
+            ServiceMessage('testFailed', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test", "actual": "spam", "expected": "eggs"}),
+            ServiceMessage('testFinished', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test"}),
+        ])
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_swap_diff_assert_error(venv):
+    with make_ini('[pytest]\nswapdiff=true'):
+        output = run(venv, "../diff_assert_error.py")
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test"}),
             ServiceMessage('testFailed', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test", "expected": "spam", "actual": "eggs"}),
             ServiceMessage('testFinished', {'name': "tests.guinea-pigs.diff_assert_error.FooTest.test_test"}),
         ])
@@ -510,7 +524,7 @@ def test_diff_top_level_assert_error(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': "tests.guinea-pigs.diff_toplevel_assert_error.test_test"}),
-            ServiceMessage('testFailed', {'name': "tests.guinea-pigs.diff_toplevel_assert_error.test_test", "expected": "spam", "actual": "eggs"}),
+            ServiceMessage('testFailed', {'name': "tests.guinea-pigs.diff_toplevel_assert_error.test_test", "actual": "spam", "expected": "eggs"}),
             ServiceMessage('testFinished', {'name': "tests.guinea-pigs.diff_toplevel_assert_error.test_test"}),
         ])
 
