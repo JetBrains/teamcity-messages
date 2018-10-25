@@ -255,6 +255,17 @@ def test_output(venv):
         ])
 
 
+def test_class_with_method(venv):
+    output = run(venv, 'class_with_method.py')
+    assert_service_messages(
+        output,
+        [ServiceMessage('testCount', {'count': "1"})] +
+        [ServiceMessage('testStarted', {"metainfo": "test_method"})] +
+        [ServiceMessage('testFailed', {})] +
+        [ServiceMessage('testFinished', {})]
+    )
+
+
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_chunked_output(venv):
     output = run(venv, 'chunked_output_test.py')
