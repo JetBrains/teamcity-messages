@@ -20,6 +20,17 @@ def venv(request):
     return virtual_environments.prepare_virtualenv()
 
 
+def test_changes_name(venv):
+    output = run_directly(venv, 'test_changes_name.py')
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': "__main__.Foo.test_aa (1)", 'flowId': "__main__.Foo.test_aa (1)"}),
+            ServiceMessage('testFinished', {'name': "__main__.Foo.test_aa (11)", 'flowId': "__main__.Foo.test_aa (11)"}),
+        ])
+
+
 def test_nested_suits(venv):
     output = run_directly(venv, 'nested_suits.py')
     test_name = '__main__.TestXXX.runTest'
