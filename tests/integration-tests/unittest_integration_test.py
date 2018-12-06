@@ -497,15 +497,14 @@ def test_teardown_module_error(venv):
     assert failed_ms.params['details'].index("assert 1 == 0") > 0
 
 
-# As of twisted 15.2.1 trial is not available on Python 3
-@pytest.mark.skipif("sys.version_info < (2, 6) or sys.version_info >= (3, 0)", reason="requires Python 2.6 or 2.7")
+@pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_twisted_trial(venv):
     packages = list(*venv.packages)
-    packages.append("twisted==15.2.1")
+    packages.append("twisted")
     if os.name == 'nt':
         if sys.version_info < (2, 7):
             pytest.skip("pypiwin32 is available since Python 2.7")
-        packages.append("pypiwin32==219")
+        packages.append("pypiwin32")
     venv_with_twisted = virtual_environments.prepare_virtualenv(packages)
 
     env = virtual_environments.get_clean_system_environment()
@@ -535,6 +534,7 @@ def test_twisted_trial(venv):
 
     test1 = "twisted_trial.test_case.CalculationTestCase.test_fail (some desc)"
     test2 = "twisted_trial.test_case.CalculationTestCase.test_ok"
+    test3 = "twisted_trial.test_exception.TestFailure.testBadCode"
 
     ms = assert_service_messages(
         output,
@@ -544,6 +544,10 @@ def test_twisted_trial(venv):
             ServiceMessage('testFinished', {'name': test1}),
             ServiceMessage('testStarted', {'name': test2}),
             ServiceMessage('testFinished', {'name': test2}),
+            ServiceMessage('testStarted', {'name': test3}),
+            ServiceMessage('testFailed', {'name': test3}),
+            ServiceMessage('testFailed', {'name': test3}),
+            ServiceMessage('testFinished', {'name': test3}),
         ])
     failed_ms = match(ms, ServiceMessage('testFailed', {'name': test1}))
     assert failed_ms.params['details'].index("5 != 4") > 0
