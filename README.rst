@@ -19,6 +19,7 @@ following testing frameworks and tools:
 -  `Trial (Twisted) <http://twistedmatrix.com/trac/wiki/TwistedTrial>`__
 -  `Flake8 <https://flake8.readthedocs.org/>`__
 -  `Behave <https://behave.readthedocs.io/>`__
+-  `PyLint <https://www.pylint.org/>`__
 
 Installation
 ------------
@@ -99,6 +100,12 @@ flake8
 ~~~~~~
 
 Test status reporting is enabled automatically under TeamCity build.
+
+PyLint
+~~~~~~
+
+Add ``--output-format=teamcity.pylint_reporter.TeamCityReporter`` to
+the ``pylint`` command line.
 
 tox
 ~~~
