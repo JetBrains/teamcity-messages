@@ -70,7 +70,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         assert ms[2].params["details"].find("E302 expected 2 blank lines, found 1") > 0
 
     def test_pytest_pylint(venv):
-        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint",))
+        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint<0.14.0",))
 
         output = run(venv_with_pylint, 'pylint_test.py', options="--pylint")
         pylint_test_name = "tests.guinea-pigs.pytest.pylint_test.Pylint"
