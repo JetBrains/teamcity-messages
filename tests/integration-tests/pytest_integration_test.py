@@ -88,6 +88,37 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
 
         assert ms[2].params["details"].find("Unused import sys") > 0
 
+    def test_pytest_flake8(venv):
+        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8",))
+
+        file_pattern = './flake8_test*.py'
+        output = run(venv_with_pylint, file_pattern, options="--flake8")
+
+        import glob
+        file_names = sorted(glob.glob(os.path.realpath(os.path.join('tests', 'guinea-pigs', 'pytest', file_pattern))))
+        expected = [ServiceMessage('testCount', {'count': "4"})]
+        for file_name in file_names:
+            test_base, _ = os.path.splitext(os.path.basename(file_name))
+            flake8_test_name = "tests.guinea-pigs.pytest.{}.FLAKE8".format(test_base)
+            pytest_name = "tests.guinea-pigs.pytest.{}.test_ok".format(test_base)
+            expected.extend([
+                ServiceMessage('testStarted', {'name': flake8_test_name}),
+                ServiceMessage('testFailed', {'name': flake8_test_name}),
+                ServiceMessage('testFinished', {'name': flake8_test_name}),
+                ServiceMessage('testStarted', {'name': pytest_name}),
+                ServiceMessage('testFinished', {'name': pytest_name}),
+            ])
+        for file_name in file_names:
+            test_message = "F401 |'sys|' imported but unused"
+            test_name = "pep8: {}: {}".format(file_name, test_message)
+            expected.extend([
+                ServiceMessage('testStarted', {'name': test_name}),
+                ServiceMessage('testFailed', {'name': test_name, 'message': test_message}),
+                ServiceMessage('testFinished', {'name': test_name}),
+            ])
+        ms = assert_service_messages(output, expected)
+        assert ms[2].params["details"].find(test_message.replace('|', '|||')) > 0
+
 
 def test_hierarchy(venv):
     output = run(venv, 'namespace')
