@@ -22,7 +22,7 @@ class VirtualEnvDescription:
         self.packages = packages
 
     def __str__(self):
-        return "home:" + self.home + ",pip:" + self.pip + "python:" + self.python + "packs:" + str(self.packages)
+        return "home:" + self.home + " pip:" + self.pip + " python:" + self.python + " packages:" + str(self.packages)
 
     def __unicode__(self):
         return self.__str__()
