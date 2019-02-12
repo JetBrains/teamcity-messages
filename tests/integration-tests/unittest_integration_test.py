@@ -504,7 +504,10 @@ def test_twisted_trial(venv):
     if os.name == 'nt':
         if sys.version_info < (2, 7):
             pytest.skip("pypiwin32 is available since Python 2.7")
-        packages.append("pypiwin32")
+        elif sys.version_info[:2] == (3, 4):
+            packages.append("pypiwin32==219")
+        else:
+            packages.append("pypiwin32")
     venv_with_twisted = virtual_environments.prepare_virtualenv(packages)
 
     env = virtual_environments.get_clean_system_environment()
