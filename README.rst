@@ -18,6 +18,7 @@ following testing frameworks and tools:
    library) <https://docs.python.org/2/library/unittest.html>`__
 -  `Trial (Twisted) <http://twistedmatrix.com/trac/wiki/TwistedTrial>`__
 -  `Flake8 <https://flake8.readthedocs.org/>`__
+-  `Behave <https://behave.readthedocs.io/>`__
 
 Installation
 ------------
