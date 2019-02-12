@@ -104,7 +104,7 @@ tox
 ~~~
 
 Pass TEAMCITY_VERSION environment variable inside your test virtenv.
-TEAMCITY_VERSION environment variable exists during build on Teamcity.
+TEAMCITY_VERSION environment variable exists during build on TeamCity.
 teamcity-messages uses it in order to enable reporting to TeamCity.
 
 ::
