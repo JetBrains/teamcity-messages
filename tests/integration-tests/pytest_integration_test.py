@@ -91,14 +91,13 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
     def test_pytest_flake8(venv):
         venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8",))
 
-        file_pattern = './flake8_test*.py'
-        output = run(venv_with_pylint, file_pattern, options="--flake8")
-
-        import glob
-        file_names = sorted(glob.glob(os.path.realpath(os.path.join('tests', 'guinea-pigs', 'pytest', file_pattern))))
+        file_names = ['./flake8_test1.py', './flake8_test2.py']
+        output = run(venv_with_pylint, file_names, options="--flake8")
+        file_paths = [os.path.realpath(os.path.join('tests', 'guinea-pigs', 'pytest', file_name))
+                      for file_name in file_names]
         expected = [ServiceMessage('testCount', {'count': "4"})]
-        for file_name in file_names:
-            test_base, _ = os.path.splitext(os.path.basename(file_name))
+        for file_path in file_paths:
+            test_base, _ = os.path.splitext(os.path.basename(file_path))
             flake8_test_name = "tests.guinea-pigs.pytest.{}.FLAKE8".format(test_base)
             pytest_name = "tests.guinea-pigs.pytest.{}.test_ok".format(test_base)
             expected.extend([
@@ -108,9 +107,9 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
                 ServiceMessage('testStarted', {'name': pytest_name}),
                 ServiceMessage('testFinished', {'name': pytest_name}),
             ])
-        for file_name in file_names:
+        for file_path in file_paths:
             test_message = "F401 |'sys|' imported but unused"
-            test_name = "pep8: {}: {}".format(file_name, test_message)
+            test_name = "pep8: {}: {}".format(file_path.replace("\\", "/"), test_message)
             expected.extend([
                 ServiceMessage('testStarted', {'name': test_name}),
                 ServiceMessage('testFailed', {'name': test_name, 'message': test_message}),
@@ -583,12 +582,16 @@ def test_skip_passed_output(venv):
         ])
 
 
-def run(venv, file_name, test=None, options='', set_tc_version=True):
+def run(venv, file_names, test=None, options='', set_tc_version=True):
     if test is not None:
         test_suffix = "::" + test
     else:
         test_suffix = ""
 
+    if not isinstance(file_names, list):
+        file_names = [file_names]
+
     command = os.path.join(venv.bin, 'py.test') + " " + options + " "
-    command += os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
+    command += ' '.join(os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
+                        for file_name in file_names)
     return run_command(command, set_tc_version=set_tc_version)
