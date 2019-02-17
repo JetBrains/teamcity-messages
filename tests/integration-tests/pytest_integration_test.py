@@ -17,9 +17,12 @@ def construct_fixture():
     # https://docs.pytest.org/en/latest/changelog.html
     if ((2, 6) <= sys.version_info < (2, 7)) or ((3, 3) <= sys.version_info < (3, 4)):
         params = [("py==1.4.34", "pytest==3.2.5")]
-    else:
-        # latest version
+    elif sys.version_info < (3, 7):
+        # latest 3.x version
         params = [("pytest>=3,<4",), ("pytest==2.7",)]
+    else:
+        # pytest 2.7 is not compatible with 3.7
+        params = [("pytest>=3,<4",)]
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
