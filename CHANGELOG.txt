@@ -1,6 +1,19 @@
 Change Log
 ----------
 
+Version 1.22 Sun Mar 10 2019
+
+  - python: dropped Python 2.4, 2.5, 3.2, 3.3 support. Latest version to support them is 1.21
+  - python: supported Python 3.6, 3.7
+  - behave: initial support
+  - unittest: subtests support
+  - various unicode fixes
+  - nose, unittest: correctly capture stdout to provide better test output
+  - twisted: format twisted Failure objects by @jackrobison
+  - various test infrastructure fixes by @sambrightman
+  - flake8: correctly initialize options by @sambrightman
+  - various fixes to use teamcity-messages code in JetBrains PyCharm IDE
+
 Version 1.21 Mon Jan 2 2017
 
   - pytest: internal Error during test collection with pytest and teamcity-messages plugin #112
