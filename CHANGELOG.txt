@@ -1,6 +1,9 @@
 Change Log
 ----------
 
+Version 1.23 Sun Mar 10 2019
+  - Correct supported python versions, description, keywords
+
 Version 1.22 Sun Mar 10 2019
 
   - python: dropped Python 2.4, 2.5, 3.2, 3.3 support. Latest version to support them is 1.21

@@ -59,10 +59,10 @@ setup(
     author='JetBrains',
     author_email='teamcity-feedback@jetbrains.com',
     description='Send test results ' +
-                'to TeamCity continuous integration server from unittest, nose, py.test, twisted trial (Python 2.4+)',
+                'to TeamCity continuous integration server from unittest, nose, py.test, twisted trial, behave (Python 2.6+)',
     long_description=README + '\n\n' + CHANGES,
     license='Apache 2.0',
-    keywords='unittest teamcity test nose py.test pytest jetbrains',
+    keywords='unittest teamcity test nose behave flake8 py.test pytest jetbrains',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
