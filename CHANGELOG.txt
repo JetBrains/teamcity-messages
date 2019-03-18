@@ -1,6 +1,9 @@
 Change Log
 ----------
 
+Version 1.24 Mon Mar 18 2019
+  - pylint: initial support by @PetrWolf #171 #200
+
 Version 1.23 Sun Mar 10 2019
   - Correct supported python versions, description, keywords
 
