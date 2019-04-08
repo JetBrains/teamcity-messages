@@ -318,7 +318,7 @@ class EchoTeamCityMessages(object):
 
     def pytest_assertrepr_compare(self, config, op, left, right):
         if op in ('==', '!='):
-            return ['{} {} {}'.format(pprint.pformat(left), op, pprint.pformat(right))]
+            return ['{0} {1} {2}'.format(pprint.pformat(left), op, pprint.pformat(right))]
 
     def pytest_runtest_logreport(self, report):
         """
