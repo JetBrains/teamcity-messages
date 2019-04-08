@@ -11,11 +11,14 @@ python:
   - "pypy3.5"
 matrix:
   include:
+    - python: "3.5"
+      dist: xenial
+    - python: "pypy3.5"
+      dist: xenial
+    - python: "3.6"
+      dist: xenial
     - python: "3.7"
       dist: xenial
-before_install:
-  - sudo apt-get update
-  - sudo apt-get install -y sqlite3
 install:
   - pip install flake8 virtualenv pytest
 script:
