@@ -480,8 +480,7 @@ def test_long_diff(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name}),
-            # "..." inserted by pytest that cuts long lines
-            ServiceMessage('testFailed', {'name': test_name, "actual": "foofoofoofoo...ofoofoofoofoo", "expected": "spamspamspams...mspamspamspam"}),
+            ServiceMessage('testFailed', {'name': test_name, "actual": "foo" * 10000, "expected": "spam" * 10}),
             ServiceMessage('testFinished', {'name': test_name}),
         ])
 
