@@ -1,5 +1,6 @@
 from teamcity.messages import TeamcityServiceMessages, escape_value
 from datetime import datetime
+import errno
 import os
 import sys
 import time
@@ -19,10 +20,16 @@ else:
 
 
 class StreamStub(object):
-    def __init__(self):
+    def __init__(self, raise_ioerror=None):
         self.observed_output = ''.encode('utf-8')
+        self.raise_ioerror = raise_ioerror
 
     def write(self, msg):
+        if self.raise_ioerror:
+            # Raise the first time it's called, but not the second
+            errno = self.raise_ioerror
+            self.raise_ioerror = None
+            raise IOError(errno, 'io error!')
         self.observed_output += msg
 
     def flush(self):
@@ -367,3 +374,18 @@ def test_unicode_to_sys_stdout_with_no_encoding():
     finally:
         os.unlink(file_name)
         os.rmdir(tempdir)
+
+
+def test_handling_eagain_ioerror():
+    stream = StreamStub(raise_ioerror=errno.EAGAIN)
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    assert stream.raise_ioerror == errno.EAGAIN
+    messages.testStarted('only a test')
+    assert stream.raise_ioerror is None
+    assert stream.observed_output == b(
+        '##teamcity['
+        'testStarted'
+        ' timestamp=\'2000-11-02T10:23:01.556\''
+        ' name=\'only a test\''
+        ']\n'
+    )
