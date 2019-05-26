@@ -5,11 +5,11 @@ import virtual_environments
 from service_messages import ServiceMessage, assert_service_messages
 from test_util import run_command
 
-    
+
 if sys.version_info < (3, ):
-    pylint_versions = ['==1.8', '>=1.9']  
+    pylint_versions = ['==1.8', '>=1.9']
 else:
-    pylint_versions = ['==1.8', '==2.2', '>=2.3']  
+    pylint_versions = ['==1.8', '==2.2', '>=2.3']
 
 
 @pytest.fixture(scope='module', params=['pylint' + version for version in pylint_versions], ids=str)
@@ -19,7 +19,7 @@ def venv(request):
 
     * the minimal supported PyLint version is 1.8
     * Python 2.7 is supported up to PyLint 1.9
-    * Python 3.4+ is supported through to the latest 
+    * Python 3.4+ is supported through to the latest
     """
     if sys.version_info < (2, 7) or (3, ) <= sys.version_info < (3, 4):
         pytest.skip("PyLint integration requires Python 2.7 or 3.4+")
