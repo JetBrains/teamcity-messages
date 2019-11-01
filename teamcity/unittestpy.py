@@ -152,8 +152,10 @@ class TeamcityTestResult(TestResult):
         if hasattr(_super, "addSubTest"):
             _super.addSubTest(test, subtest, err)
 
-        test_id = self.get_test_id(test)
-        subtest_id = self.get_test_id(subtest)
+        # test_name may contain description which breaks process of fetching id from subtest
+        test_name = self.get_test_id(test)
+        test_id = test.id()
+        subtest_id = subtest.id()
 
         if subtest_id.startswith(test_id):
             # Replace "." -> "_" since '.' is a test hierarchy separator
@@ -165,19 +167,19 @@ class TeamcityTestResult(TestResult):
             block_id = subtest_id
 
         if err is not None:
-            self.add_subtest_failure(test_id, block_id)
+            self.add_subtest_failure(test_name, block_id)
 
             if issubclass(err[0], test.failureException):
-                self.messages.subTestBlockOpened(block_id, subTestResult="Failure", flowId=test_id)
-                self.messages.testStdErr(test_id, out="SubTest failure: %s\n" % convert_error_to_string(err), flowId=test_id)
-                self.messages.blockClosed(block_id, flowId=test_id)
+                self.messages.subTestBlockOpened(block_id, subTestResult="Failure", flowId=test_name)
+                self.messages.testStdErr(test_name, out="SubTest failure: %s\n" % convert_error_to_string(err), flowId=test_name)
+                self.messages.blockClosed(block_id, flowId=test_name)
             else:
-                self.messages.subTestBlockOpened(block_id, subTestResult="Error", flowId=test_id)
-                self.messages.testStdErr(test_id, out="SubTest error: %s\n" % convert_error_to_string(err), flowId=test_id)
-                self.messages.blockClosed(block_id, flowId=test_id)
+                self.messages.subTestBlockOpened(block_id, subTestResult="Error", flowId=test_name)
+                self.messages.testStdErr(test_name, out="SubTest error: %s\n" % convert_error_to_string(err), flowId=test_name)
+                self.messages.blockClosed(block_id, flowId=test_name)
         else:
-            self.messages.subTestBlockOpened(block_id, subTestResult="Success", flowId=test_id)
-            self.messages.blockClosed(block_id, flowId=test_id)
+            self.messages.subTestBlockOpened(block_id, subTestResult="Success", flowId=test_name)
+            self.messages.blockClosed(block_id, flowId=test_name)
 
     def add_subtest_failure(self, test_id, subtest_block_id):
         fail_array = self.subtest_failures.get(test_id, [])

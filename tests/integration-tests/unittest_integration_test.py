@@ -216,6 +216,29 @@ def test_subtest_ok(venv):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
+def test_subtest_named(venv):
+    if sys.version_info < (3, 4):
+        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
+
+    output = run_directly(venv, 'subtest_named.py')
+    test_id = '__main__.NumbersTest.test_even'
+    test_name = test_id + " (Test that numbers between 0 and 5 are all even_)"
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
+            ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name, 'subTestResult': 'Failure'}),
+            ServiceMessage('testStdErr', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('blockClosed', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFinished', {'flowId': test_name}),
+        ])
+
+
+@pytest.mark.skipif("sys.version_info < (2, 6)", reason="unittest2 requires Python 2.6+")
 def test_subtest_error(venv):
     if sys.version_info < (3, 4):
         venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
