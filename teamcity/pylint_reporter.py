@@ -20,9 +20,9 @@ TC_SEVERITY = {
 
 
 def get_message_description(linter, msgid):
-    if pylint_numversion <= (1, 9):
+    if pylint_numversion < (2, 0):
         return linter.msgs_store.check_message_id(msgid).descr
-    elif (2, 0) <= pylint_numversion < (2, 3):
+    elif pylint_numversion < (2, 3):
         return linter.msgs_store.get_message_definition(msgid).descr
     else:
         # >= 2.3
