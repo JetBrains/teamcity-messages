@@ -3,7 +3,8 @@ This allows PyLint messages to be processed by TeamCity and displayed on the Cod
 """
 
 import os
-from pylint import reporters, utils
+from pylint import reporters
+from pylint.__pkginfo__ import numversion as pylint_numversion
 from teamcity import messages
 
 
@@ -17,22 +18,15 @@ TC_SEVERITY = {
     'fatal': 'FATAL'
 }
 
-if hasattr(utils.MessagesStore, 'check_message_id'):
-    # pylint <= 1.9
-    def get_message_description(linter, msgid):
+
+def get_message_description(linter, msgid):
+    if pylint_numversion <= (1, 9):
         return linter.msgs_store.check_message_id(msgid).descr
-elif hasattr(utils.MessagesStore, 'get_message_definition'):
-    # 2.0 <= pylint < 2.3
-    def get_message_description(linter, msgid):
+    elif (2, 0) <= pylint_numversion < (2, 3):
         return linter.msgs_store.get_message_definition(msgid).descr
-elif hasattr(utils.MessagesStore, 'get_message_definitions'):
-    # 2.3 <= pylint
-    def get_message_description(linter, msgid):
-        return " ".join(definition.descr for definition in linter.msgs_store.get_message_definitions(msgid))
-else:
-    # unknown PyLint version
-    def get_message_description(linter, msgid):
-        return None
+    else:
+        # >= 2.3
+        return " ".join(definition.description for definition in linter.msgs_store.get_message_definitions(msgid))
 
 
 class TeamCityReporter(reporters.BaseReporter):
@@ -47,11 +41,7 @@ class TeamCityReporter(reporters.BaseReporter):
         """Issues an `inspectionType` service message to define generic properties of a given PyLint message type.
         :param utils.Message msg: a PyLint message
         """
-        try:
-            desc = get_message_description(self.linter, msg.msg_id)
-        except Exception:
-            desc = None
-
+        desc = get_message_description(self.linter, msg.msg_id)
         self.tc.message('inspectionType', id=msg.msg_id, name=msg.symbol, description=desc if desc else msg.symbol, category=msg.category)
 
     def handle_message(self, msg):
