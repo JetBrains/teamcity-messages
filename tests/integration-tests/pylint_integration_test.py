@@ -7,9 +7,9 @@ from test_util import run_command
 
 
 if sys.version_info < (3, ):
-    pylint_versions = ['==1.8', '==1.9.5']
+    pylint_versions = ['==1.8', '==1.9.4']
 else:
-    pylint_versions = ['==1.8', '==1.9.5', '==2.2', '>=2.3']
+    pylint_versions = ['==1.8', '==1.9.4', '==2.2', '>=2.3']
 
 
 @pytest.fixture(scope='module', params=['pylint' + version for version in pylint_versions], ids=str)
