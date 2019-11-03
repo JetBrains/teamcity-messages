@@ -1,6 +1,8 @@
 # coding=utf-8
 import os
 import re
+import sys
+
 from setuptools import setup
 from setuptools.command.test import test as TestCommand
 
@@ -53,6 +55,15 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
+if sys.version_info < (2, 7):
+    # pip will detect latest compatible version
+    tests_require = ['pytest', 'virtualenv']
+elif (3,) < sys.version_info < (3, 7):
+    # fix compatible version for slowly obsoleting versions
+    tests_require = ['pytest==4.6.6', 'virtualenv']
+else:
+    tests_require = ['pytest', 'virtualenv']
+
 setup(
     name="teamcity-messages",
     version=VERSION,
@@ -85,7 +96,7 @@ setup(
         'twisted': ['plugins/teamcity_plugin.py'],
     },
 
-    tests_require=['pytest', 'virtualenv'],
+    tests_require=tests_require,
     cmdclass={'test': PyTest},
 
     entry_points={
