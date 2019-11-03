@@ -147,10 +147,7 @@ For Behave 1.2.6:
 Python version compatibility
 ----------------------------
 
--  Python 2 - >= 2.6
--  Python 3 - >= 3.3
--  PyPy and PyPy 3
--  Jython
+See https://pypi.org/project/teamcity-messages for Python version compatibility
 
 Contact information
 -------------------
