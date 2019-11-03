@@ -7,8 +7,6 @@ matrix:
       dist: trusty
     - python: "2.7"
       dist: trusty
-    - python: "3.4"
-      dist: xenial
     - python: "3.5"
       dist: xenial
     - python: "3.6"

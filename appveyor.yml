@@ -5,7 +5,6 @@ environment:
   TMPDIR: c:\tmp
   matrix:
   - PYTHON_HOME: C:\Python27
-  - PYTHON_HOME: C:\Python34
   - PYTHON_HOME: C:\Python35
   - PYTHON_HOME: C:\Python36
   - PYTHON_HOME: C:\Python36-x64
