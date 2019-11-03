@@ -58,7 +58,7 @@ class PyTest(TestCommand):
 if sys.version_info < (2, 7):
     # pip will detect latest compatible version
     tests_require = ['pytest', 'virtualenv']
-elif (3,) < sys.version_info < (3, 7):
+elif sys.version_info < (3, 7):
     # fix compatible version for slowly obsoleting versions
     tests_require = ['pytest==4.6.6', 'virtualenv']
 else:
