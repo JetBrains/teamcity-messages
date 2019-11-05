@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+Version 1.26 Tue Nov 5 2019
+  - drop Python 3.4 support
+  - pylint: support pylint >= 2.3 by @PetrWolf #215
+  - unittest: fix test hierarchy for subtests in tests with doc comments by @throwable-one #221
+
 Version 1.25 Mon Apr 15 2019
   - pytest: fix comparing asserts by @ikonst #210
   - Retry writes to stream on a EAGAIN IOError by @morganwahl #213
