@@ -4,7 +4,9 @@ This allows PyLint messages to be processed by TeamCity and displayed on the Cod
 
 import os
 from pylint import reporters
-from pylint.__pkginfo__ import numversion as pylint_numversion
+from pylint.__pkginfo__ import version as pylint_version
+
+from teamcity.common import get_class_fullname
 from teamcity import messages
 
 
@@ -20,13 +22,29 @@ TC_SEVERITY = {
 
 
 def get_message_description(linter, msgid):
-    if pylint_numversion < (2, 0):
-        return linter.msgs_store.check_message_id(msgid).descr
-    elif pylint_numversion < (2, 3):
-        return linter.msgs_store.get_message_definition(msgid).descr
+    if hasattr(linter.msgs_store, "get_message_definitions"):
+        definitions = linter.msgs_store.get_message_definitions(msgid)
+    elif hasattr(linter.msgs_store, "get_message_definition"):
+        definitions = [linter.msgs_store.get_message_definition(msgid)]
+    elif hasattr(linter.msgs_store, "check_message_id"):
+        definitions = [linter.msgs_store.check_message_id(msgid)]
     else:
-        # >= 2.3
-        return " ".join(definition.description for definition in linter.msgs_store.get_message_definitions(msgid))
+        raise Exception("This version of linter.msgs_store is unsupported. "
+                        "pylint version: " + pylint_version + ". " +
+                        "linter.msgs_store type: " + get_class_fullname(linter.msgs_store))
+
+    descriptions = []
+    for definition in definitions:
+        if hasattr(definition, 'descr'):
+            descriptions.append(definition.descr)
+        elif hasattr(definition, "description"):
+            descriptions.append(definition.description)
+        else:
+            raise Exception("This version of message definition is unsupported. " +
+                            "pylint version: " + pylint_version + ". " +
+                            "definition type: " + get_class_fullname(definition))
+
+    return " ".join(descriptions)
 
 
 class TeamCityReporter(reporters.BaseReporter):
