@@ -1,6 +1,9 @@
 Change Log
 ----------
 
+Version 1.27 Fri Nov 8 2019
+  - pylint: more compatibility fixes #215
+
 Version 1.26 Tue Nov 5 2019
   - drop Python 3.4 support
   - pylint: support pylint >= 2.3 by @PetrWolf #215
