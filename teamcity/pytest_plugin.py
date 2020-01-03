@@ -375,14 +375,33 @@ class EchoTeamCityMessages(object):
 
     def _report_coverage(self):
         from coverage.misc import NotPython
-        from coverage.report import Reporter
         from coverage.results import Numbers
+        try:
+            from coverage.report import Reporter
+        except ImportError:
+            # Support for coverage >= 5.0.1.
+            from coverage.report import get_analysis_to_report
+
+            class Reporter(object):
+
+                def __init__(self, coverage, config):
+                    self.coverage = coverage
+                    self.config = config
+                    self._file_reporters = []
+
+                def find_file_reporters(self, morfs):
+                    self.file_reporters = [
+                        fr for fr, _ in get_analysis_to_report(self.coverage, morfs)
+                    ]
 
         class _CoverageReporter(Reporter):
             def __init__(self, coverage, config, messages):
                 super(_CoverageReporter, self).__init__(coverage, config)
 
-                self.branches = coverage.data.has_arcs()
+                if hasattr(coverage, 'data'):
+                    self.branches = coverage.data.has_arcs()
+                else:
+                    self.branches = coverage.get_data().has_arcs()
                 self.messages = messages
 
             def report(self, morfs, outfile=None):
