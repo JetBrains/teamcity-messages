@@ -208,8 +208,8 @@ class EchoTeamCityMessages(object):
             return "%s:%s (%s)" % (str(location[0]), str(location[1]), str(location[2]))
         return str(location)
 
-    def pytest_collection_modifyitems(self, session, config, items):
-        self.teamcity.testCount(len(items))
+    def pytest_collection_finish(self, session):
+        self.teamcity.testCount(len(session.items))
 
     def pytest_runtest_logstart(self, nodeid, location):
         # test name fetched from location passed as metainfo to PyCharm

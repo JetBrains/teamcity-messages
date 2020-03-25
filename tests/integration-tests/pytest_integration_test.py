@@ -402,6 +402,21 @@ def test_collect_exception(venv):
     assert ms[2].params["details"].find("runtime error") > 0
 
 
+@pytest.mark.skipif("sys.version_info < (3, 6)", reason="requires Python 3.6+")
+def test_rerun(venv):
+    run(venv, 'test_rerun.py')
+    output = run(venv, 'test_rerun.py', options='--last-failed')
+    test_name = "tests.guinea-pigs.pytest.test_rerun.TestPyTest.testTwo"
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
+            ServiceMessage('testFailed', {'flowId': test_name}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
+        ])
+
+
 @pytest.mark.skipif("sys.version_info < (2, 7)", reason="requires Python 2.7+")
 def test_collect_skip(venv):
     output = run(venv, 'collect_skip_test.py')
