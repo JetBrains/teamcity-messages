@@ -1,7 +1,7 @@
 # coding=utf-8
+import contextlib
 import os
 import platform
-import contextlib
 import sys
 
 import pytest
@@ -13,16 +13,9 @@ from test_util import run_command, get_teamcity_messages_root
 
 
 def construct_fixture():
-    # pytest 3.2.5 is the last version to support 2.6 or 3.3
-    # https://docs.pytest.org/en/latest/changelog.html
-    if ((2, 6) <= sys.version_info < (2, 7)) or ((3, 3) <= sys.version_info < (3, 4)):
-        params = [("py==1.4.34", "pytest==3.2.5")]
-    elif sys.version_info < (3, 7):
-        # latest 3.x version
-        params = [("pytest>=3,<4",), ("pytest==2.7",)]
-    else:
-        # pytest 2.7 is not compatible with 3.7
-        params = [("pytest>=3,<4",)]
+    params = [('pytest>=4,<5',)]
+    if sys.version_info > (3, 0):
+        params.append(('pytest>=5',))
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
@@ -169,15 +162,12 @@ def test_custom_test_items(venv):
 
 if sys.version_info >= (2, 6):
     @pytest.mark.parametrize("coverage_version, pytest_cov_version", [
-        ("==3.7.1", "==1.8.1"),
-        ("==4.0.1", "==2.2.0"),
-        # latest
-        ("", ""),
+        ("==4.4.2", "==2.7.1"),
+        ("==4.5.4", "==2.7.1"),
+        # latest, but coverage 5 changed API dramatically, and not supported yet
+        ("<5", ""),
     ])
     def test_coverage(venv, coverage_version, pytest_cov_version):
-        if coverage_version != "==3.7.1" and (3, 1) < sys.version_info < (3, 3):
-            pytest.skip("coverage >= 4.0 dropped support for Python 3.2")
-
         venv_with_coverage = virtual_environments.prepare_virtualenv(
             venv.packages + (
                 "coverage" + coverage_version,
@@ -262,7 +252,6 @@ def test_fixture_error(venv):
     assert ms[5].params["details"].find("oops") > 0
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_output(venv):
     output = run(venv, 'output_test.py')
 
@@ -299,7 +288,6 @@ def test_class_with_method(venv):
     )
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_chunked_output(venv):
     output = run(venv, 'chunked_output_test.py')
 

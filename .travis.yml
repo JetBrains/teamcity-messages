@@ -1,25 +1,18 @@
 language: python
 os:
   - linux
+dist: bionic
 matrix:
   include:
-    - python: "2.6"
-      dist: trusty
     - python: "2.7"
-      dist: trusty
-    - python: "3.5"
-      dist: xenial
     - python: "3.6"
-      dist: xenial
-    - python: "pypy"
-      dist: xenial
-    - python: "pypy3.5"
-      dist: xenial
     - python: "3.7"
-      dist: xenial
+    - python: "3.8"
+    - python: "pypy2"
+    - python: "pypy3"
 install:
   - pip install flake8 virtualenv pytest
 script:
   - python -V
-  - if [ $TRAVIS_PYTHON_VERSION != '2.6' ]; then echo "running flake"; flake8 --ignore=E501,W504 --exclude=tests/guinea-pigs; fi
+  - echo "running flake"; flake8 --ignore=E501,W504 --exclude=tests/guinea-pigs;
   - python setup.py test

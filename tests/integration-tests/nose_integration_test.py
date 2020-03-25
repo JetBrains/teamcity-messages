@@ -1,5 +1,7 @@
 # coding=utf-8
 import os
+import sys
+
 import pytest
 
 import virtual_environments
@@ -8,7 +10,7 @@ from service_messages import ServiceMessage, assert_service_messages, match
 from test_util import run_command, get_teamcity_messages_root
 
 
-@pytest.fixture(scope='module', params=["nose", "nose==1.2.1", "nose==1.3.1", "nose==1.3.4"])
+@pytest.fixture(scope='module', params=["nose==1.3.7"])  # Nose is dead, support only latest version
 def venv(request):
     """
     Prepares a virtual environment for nose.
@@ -77,7 +79,7 @@ def test_skip(venv):
 
 
 def test_coverage(venv):
-    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ["coverage==3.7.1"])
+    venv_with_coverage = virtual_environments.prepare_virtualenv(venv.packages + ["coverage==4.5.4"])
 
     coverage_file = os.path.join(virtual_environments.get_vroot(), "coverage-temp.xml")
 
@@ -98,7 +100,7 @@ def test_coverage(venv):
 
 
 def test_flask_test_incomplete(venv):
-    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["flask_testing==0.6.2"])
+    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["Flask-Testing==0.8.0"])
 
     output = run(venv_with_flask, 'flask_testing_incomplete')
     test_name = 'test_foo.TestIncompleteFoo.test_add'
@@ -115,7 +117,7 @@ def test_flask_test_incomplete(venv):
 
 
 def test_flask_test_ok(venv):
-    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["flask_testing==0.6.2"])
+    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["Flask-Testing==0.8.0"])
 
     output = run(venv_with_flask, 'flask_testing_ok')
     test_name = 'test_foo.TestFoo.test_add'
@@ -464,7 +466,6 @@ def test_issue_98(venv):
     )
 
 
-@pytest.mark.skipif("sys.version_info < (2, 6)", reason="requires Python 2.6+")
 def test_nose_parameterized(venv):
     venv_with_params = virtual_environments.prepare_virtualenv(venv.packages + ["nose-parameterized"])
 
@@ -483,6 +484,8 @@ def test_nose_parameterized(venv):
 
 
 def run(venv, file, clazz=None, test=None, print_output=True, options=""):
+    if sys.version_info > (3, 8):
+        pytest.skip("nose is outdated and doesn't support 3.8")
     if clazz:
         clazz_arg = ":" + clazz
     else:
