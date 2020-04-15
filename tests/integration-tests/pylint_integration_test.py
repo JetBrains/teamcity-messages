@@ -7,9 +7,9 @@ from test_util import run_command
 
 
 if sys.version_info < (3, ):
-    pylint_versions = ['==1.8', '==1.9.4']
+    pylint_versions = ['==1.9.5']
 else:
-    pylint_versions = ['==1.8', '==1.9.4', '==2.2', '==2.3.1', '==2.4.0', '>2.4']
+    pylint_versions = ['==2.2.3', '==2.4.4', '']
 
 
 @pytest.fixture(scope='module', params=['pylint' + version for version in pylint_versions], ids=str)
@@ -17,9 +17,9 @@ def venv(request):
     """Virtual environment fixture with PyLint of the minimal and maximal supported version
     for a given python version.
 
-    * the minimal supported PyLint version is 1.8
+    * the minimal supported PyLint version is 1.9
     * Python 2.7 is supported up to PyLint 1.9
-    * Python 3.4+ is supported through to the latest
+    * Python 3.4+ is supported through to the latest, but 1.9 is not supported by python 3
     """
     if sys.version_info < (2, 7) or (3, ) <= sys.version_info < (3, 4):
         pytest.skip("PyLint integration requires Python 2.7 or 3.4+")

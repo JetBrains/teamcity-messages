@@ -55,14 +55,13 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-if sys.version_info < (2, 7):
-    # pip will detect latest compatible version
-    tests_require = ['pytest', 'virtualenv']
-elif sys.version_info < (3, 7):
+# Virtual env changed API since 20.0, so we'll use 16 for a while
+virtualenv_version = 'virtualenv==16.7.10'
+if sys.version_info < (3, 7):
     # fix compatible version for slowly obsoleting versions
-    tests_require = ['pytest==4.6.6', 'virtualenv']
+    tests_require = ['pytest==4.6.9', virtualenv_version]
 else:
-    tests_require = ['pytest', 'virtualenv']
+    tests_require = ['pytest', virtualenv_version]
 
 setup(
     name="teamcity-messages",
@@ -80,11 +79,10 @@ setup(
         'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Software Development :: Testing'
     ],
     url="https://github.com/JetBrains/teamcity-messages",
