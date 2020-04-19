@@ -376,25 +376,34 @@ class EchoTeamCityMessages(object):
     def _report_coverage(self):
         from coverage.misc import NotPython
         from coverage.results import Numbers
-        try:
-            from coverage.report import Reporter
-        except ImportError:
-            # Support for coverage >= 5.0.1.
-            from coverage.report import get_analysis_to_report
 
-            class Reporter(object):
+        class _Reporter(object):
+            def __init__(self, coverage, config):
+                try:
+                    from coverage.report import Reporter
+                except ImportError:
+                    # Support for coverage >= 5.0.1.
+                    from coverage.report import get_analysis_to_report
 
-                def __init__(self, coverage, config):
-                    self.coverage = coverage
-                    self.config = config
-                    self._file_reporters = []
+                    class Reporter(object):
 
-                def find_file_reporters(self, morfs):
-                    self.file_reporters = [
-                        fr for fr, _ in get_analysis_to_report(self.coverage, morfs)
-                    ]
+                        def __init__(self, coverage, config):
+                            self.coverage = coverage
+                            self.config = config
+                            self._file_reporters = []
 
-        class _CoverageReporter(Reporter):
+                        def find_file_reporters(self, morfs):
+                            return [fr for fr, _ in get_analysis_to_report(self.coverage, morfs)]
+
+                self._reporter = Reporter(coverage, config)
+
+            def find_file_reporters(self, morfs):
+                self.file_reporters = self._reporter.find_file_reporters(morfs)
+
+            def __getattr__(self, name):
+                return getattr(self._reporter, name)
+
+        class _CoverageReporter(_Reporter):
             def __init__(self, coverage, config, messages):
                 super(_CoverageReporter, self).__init__(coverage, config)
 
