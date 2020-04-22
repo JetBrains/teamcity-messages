@@ -81,6 +81,7 @@ def pytest_addoption(parser):
                      dest="teamcity", default=0, help="force output of JetBrains TeamCity service messages")
     group._addoption('--no-teamcity', action="count",
                      dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
+    group._addoption('--teamcity-no-auto-block', action="store_true", dest="no_auto_block", help="does not generate message block automatically")
 
     kwargs = {"help": "skip output of passed tests for JetBrains TeamCity service messages"}
     if _is_bool_supported():
@@ -108,6 +109,7 @@ def pytest_configure(config):
             output_capture_enabled,
             coverage_controller,
             skip_passed_output,
+            config.option.no_auto_block,
             bool(config.getini('swapdiff'))
         )
         config.pluginmanager.register(config._teamcityReporting)
@@ -129,10 +131,11 @@ def _get_coverage_controller(config):
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, output_capture_enabled, coverage_controller, skip_passed_output, swap_diff):
+    def __init__(self, output_capture_enabled, coverage_controller, skip_passed_output, no_auto_block, swap_diff):
         self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
         self.skip_passed_output = skip_passed_output
+        self.no_auto_block = no_auto_block
 
         self.teamcity = TeamcityServiceMessages()
         self.test_start_reported_mark = set()
@@ -338,17 +341,21 @@ class EchoTeamCityMessages(object):
             else:
                 if self.report_has_output(report) and not self.skip_passed_output:
                     block_name = "test " + report.when
-                    self.teamcity.blockOpened(block_name, flowId=test_id)
+                    if not self.no_auto_block:
+                        self.teamcity.blockOpened(block_name, flowId=test_id)
                     self.report_test_output(report, test_id)
-                    self.teamcity.blockClosed(block_name, flowId=test_id)
+                    if not self.no_auto_block:
+                        self.teamcity.blockClosed(block_name, flowId=test_id)
         elif report.failed:
             if report.when == 'call':
                 self.report_test_failure(test_id, report)
             elif report.when == 'setup':
                 if self.report_has_output(report):
-                    self.teamcity.blockOpened("test setup", flowId=test_id)
+                    if not self.no_auto_block:
+                        self.teamcity.blockOpened("test setup", flowId=test_id)
                     self.report_test_output(report, test_id)
-                    self.teamcity.blockClosed("test setup", flowId=test_id)
+                    if not self.no_auto_block:
+                        self.teamcity.blockClosed("test setup", flowId=test_id)
 
                 self.report_test_failure(test_id, report, message="test setup failed", report_output=False)
             elif report.when == 'teardown':
