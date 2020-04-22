@@ -164,8 +164,9 @@ if sys.version_info >= (2, 6):
     @pytest.mark.parametrize("coverage_version, pytest_cov_version", [
         ("==4.4.2", "==2.7.1"),
         ("==4.5.4", "==2.7.1"),
-        # latest, but coverage 5 changed API dramatically, and not supported yet
-        ("<5", ""),
+        ("==5.0.1", "==2.7.1"),
+        # latest
+        ("", ""),
     ])
     def test_coverage(venv, coverage_version, pytest_cov_version):
         venv_with_coverage = virtual_environments.prepare_virtualenv(
