@@ -2,14 +2,13 @@ import pytest
 
 def pytest_collect_file(parent, path):
     if path.ext == ".yml" and path.basename.startswith("test"):
-        return YamlFile.from_parent(parent, fspath=path)
-
+        return YamlFile(path, parent)
 
 class YamlFile(pytest.File):
     def collect(self):
         f = self.fspath.open()
         for line in f.readlines():
-            yield YamlItem.from_parent(self, name=line.strip(), spec="xxx")
+            yield YamlItem(line.strip(), self, "xxx")
         f.close()
 
 class YamlItem(pytest.Item):

@@ -15,7 +15,8 @@ from test_util import run_command, get_teamcity_messages_root
 def construct_fixture():
     params = [('pytest>=4,<5',)]
     if sys.version_info > (3, 0):
-        params.append(('pytest>=5',))
+        params.append(('pytest>=5,<6',))
+        params.append(('pytest>=6',))
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
@@ -47,6 +48,8 @@ def make_ini(content):
 # see https://bugs.funtoo.org/browse/FL-3596
 if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_info[0] == 3 and sys.version_info >= (3, 5)):
     def test_pytest_pep8(venv):
+        if 'pytest>=4,<5' not in venv.packages and 'pytest>=5,<6' not in venv.packages:
+            pytest.skip("pytest-pep8 not working for pytest>=6")
         venv_with_pep8 = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pep8",))
 
         output = run(venv_with_pep8, 'pep8_test.py', options="--pep8")
@@ -66,7 +69,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         assert ms[2].params["details"].find("E302 expected 2 blank lines, found 1") > 0
 
     def test_pytest_pylint(venv):
-        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint<0.14.0",))
+        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-pylint",))
 
         output = run(venv_with_pylint, 'pylint_test.py', options="--pylint")
         pylint_test_name = "tests.guinea-pigs.pytest.pylint_test.Pylint"
@@ -148,15 +151,18 @@ def test_reporting_disabled(venv):
 
 
 def test_custom_test_items(venv):
-    output = run(venv, 'custom')
+    custom = 'custom'
+    if 'pytest>=4,<5' in venv.packages:
+        custom = 'old_custom'
+    output = run(venv, custom)
     assert_service_messages(
         output,
         [
             ServiceMessage('testCount', {'count': "2"}),
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line1'}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line1'}),
-            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line2'}),
-            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.custom.test_simple_yml.line2'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.{}.test_simple_yml.line1'.format(custom)}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.{}.test_simple_yml.line1'.format(custom)}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.{}.test_simple_yml.line2'.format(custom)}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.{}.test_simple_yml.line2'.format(custom)}),
         ])
 
 
