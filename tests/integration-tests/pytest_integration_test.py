@@ -217,17 +217,20 @@ def test_unittest_error(venv):
     ms = assert_service_messages(
         output,
         [
-            ServiceMessage('testCount', {'count': "2"}),
+            ServiceMessage('testCount', {'count': "3"}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_error'}),
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_error'}),
             ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_fail'}),
             ServiceMessage('testFailed', {}),
             ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_fail'}),
+            ServiceMessage('testStarted', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_fail_diff'}),
+            ServiceMessage('testFailed', {}),
+            ServiceMessage('testFinished', {'name': 'tests.guinea-pigs.pytest.unittest_error_test.TestErrorFail.test_fail_diff'}),
         ])
     assert ms[2].params["details"].find("raise Exception") > 0
     assert ms[2].params["details"].find("oops") > 0
-    assert ms[5].params["details"].find("AssertionError") > 0
+    assert ms[8].params["details"].find("unittest_error_test.py:13: AssertionError") > 0
 
 
 def test_fixture_error(venv):
