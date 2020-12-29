@@ -1,7 +1,5 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.ScriptBuildStep
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.gradle
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.*
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -29,181 +27,170 @@ version = "2020.2"
 
 project {
 
-    buildType(Python27linux)
-    buildType(Python36linux)
-    buildType(Python37linux)
+    buildType(Build)
+    buildType(Python27windows)
     buildType(Python37windows)
     buildType(Python38windows)
-    buildType(Test)
-    buildType(PyPy3linux)
+    buildType(Python27linux)
+    buildType(Python37linux)
     buildType(Python38linux)
-    buildType(PyPy2linux)
+    buildType(Pypy2linux)
+    buildType(Pypy3linux)
 
-    template(LinuxTeamcityMessages)
-    template(WindowsTeamcityMessages)
+    template(LinuxTeamcityMessagesTemplate)
+    template(WindowsTeamcityMessagesTemplate)
 }
 
-object PyPy2linux : BuildType({
-    templates(LinuxTeamcityMessages)
-    name = "pypy2_linux"
+object LinuxTeamcityMessagesTemplate : Template({
+    name = "LinuxTeamcityMessagesTemplate"
 
-    params {
-        param("PYTHON_IMAGE", "pypy:2")
+    vcs {
+        root(DslContext.settingsRoot)
     }
+
+    steps {
+        python {
+            name = "Test"
+            pythonVersion = customPython {
+                executable = "%PYTHON_EXECUTABLE%"
+            }
+            command = file {
+                filename = "setup.py"
+                scriptArguments = "test"
+            }
+            dockerImage = "%PYTHON_DOCKER_IMAGE%"
+            dockerImagePlatform = PythonBuildStep.ImagePlatform.Linux
+        }
+    }
+
 })
 
-object PyPy3linux : BuildType({
-    templates(LinuxTeamcityMessages)
-    name = "pypy3_linux"
 
-    params {
-        param("PYTHON_IMAGE", "pypy:3")
+object WindowsTeamcityMessagesTemplate : Template({
+    name = "WindowsTeamcityMessagesTemplate"
+
+    vcs {
+        root(DslContext.settingsRoot)
     }
+
+    steps {
+        python {
+            name = "Test"
+            command = file {
+                filename = "setup.py"
+                scriptArguments = "test"
+            }
+            dockerImage = "%PYTHON_DOCKER_IMAGE%"
+            dockerImagePlatform = PythonBuildStep.ImagePlatform.Windows
+        }
+    }
+
 })
 
-object Python27linux : BuildType({
-    templates(LinuxTeamcityMessages)
-    name = "python_27_linux"
 
-    params {
-        param("PYTHON_IMAGE", "python:2.7")
-    }
-})
+object Build : BuildType({
+    name = "Build"
 
-object Python36linux : BuildType({
-    templates(LinuxTeamcityMessages)
-    name = "python_36_linux"
-
-    params {
-        param("PYTHON_IMAGE", "python:3.6")
-    }
-})
-
-object Python37linux : BuildType({
-    templates(LinuxTeamcityMessages)
-    name = "python_37_linux"
-
-    params {
-        param("PYTHON_IMAGE", "python:3.7")
-    }
-})
-
-object Python37windows : BuildType({
-    templates(WindowsTeamcityMessages)
-    name = "python_37_windows"
-
-    params {
-        param("system.PYTHON_VERSION", "3.7.7")
-    }
-})
-
-object Python38linux : BuildType({
-    templates(LinuxTeamcityMessages)
-    name = "python_38_linux"
-
-    params {
-        param("PYTHON_IMAGE", "python:3.8")
-    }
-})
-
-object Python38windows : BuildType({
-    templates(WindowsTeamcityMessages)
-    name = "python_38_windows"
-
-    params {
-        param("system.PYTHON_VERSION", "3.8.2")
-    }
-})
-
-object Test : BuildType({
-    name = "Test"
-
-    type = BuildTypeSettings.Type.COMPOSITE
+    type = Type.COMPOSITE
 
     vcs {
         showDependenciesChanges = true
     }
 
     dependencies {
-        snapshot(PyPy2linux) {
-        }
-        snapshot(PyPy3linux) {
-        }
-        snapshot(Python27linux) {
-        }
-        snapshot(Python36linux) {
-        }
-        snapshot(Python37linux) {
-        }
-        snapshot(Python37windows) {
-        }
-        snapshot(Python38linux) {
-        }
-        snapshot(Python38windows) {
-        }
+        snapshot(Python27windows) {}
+        snapshot(Python37windows) {}
+        snapshot(Python38windows) {}
+        snapshot(Python27linux) {}
+        snapshot(Python37linux) {}
+        snapshot(Python38linux) {}
+        snapshot(Pypy2linux) {}
+        snapshot(Pypy3linux) {}
     }
+
 })
 
-object LinuxTeamcityMessages : Template({
-    name = "linux-teamcity-messages"
 
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        script {
-            name = "Test"
-            id = "RUNNER_TEST"
-            scriptContent = """
-                python -V
-                echo "Install"
-                pip install flake8 virtualenv pytest
-                echo "Running flake"
-                flake8 --ignore=E501,W504 --exclude=tests/guinea-pigs;
-                echo "Test"
-                python setup.py test
-            """.trimIndent()
-            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Linux
-            dockerImage = "%PYTHON_IMAGE%"
-        }
-    }
-})
-
-object WindowsTeamcityMessages : Template({
-    name = "windows-teamcity-messages"
+object Python27windows : BuildType({
+    templates(WindowsTeamcityMessagesTemplate)
+    name = "Python 2.7 (Windows)"
 
     params {
-        param("env.PYTHON_HOME", "???")
+        param("PYTHON_DOCKER_IMAGE", "python:2.7")
+    }
+})
+
+
+object Python37windows : BuildType({
+    templates(WindowsTeamcityMessagesTemplate)
+    name = "Python 3.7 (Windows)"
+
+    params {
+        param("PYTHON_DOCKER_IMAGE", "python:3.7")
+    }
+})
+
+
+object Python38windows : BuildType({
+    templates(WindowsTeamcityMessagesTemplate)
+    name = "Python 3.8 (Windows)"
+
+    params {
+        param("PYTHON_DOCKER_IMAGE", "python:3.8")
+    }
+})
+
+
+object Python27linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Python 2.7 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "python")
+        param("PYTHON_DOCKER_IMAGE", "python:2.7")
+    }
+})
+
+
+object Python37linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Python 3.7 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "python")
+        param("PYTHON_DOCKER_IMAGE", "python:3.7")
+    }
+})
+
+
+object Python38linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Python 3.8 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "python")
+        param("PYTHON_DOCKER_IMAGE", "python:3.8")
+    }
+})
+
+object Pypy2linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Pypy 2 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "pypy")
+        param("PYTHON_DOCKER_IMAGE", "pypy:2")
     }
 
-    vcs {
-        root(DslContext.settingsRoot)
+})
+
+object Pypy3linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Pypy 3 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "pypy")
+        param("PYTHON_DOCKER_IMAGE", "pypy:3")
     }
 
-    steps {
-        gradle {
-            name = "Setup python"
-            id = "TEMPLATE_RUNNER_1"
-            tasks = "buildBinaries"
-            buildFile = "build.gradle"
-            workingDir = "distributive"
-        }
-        script {
-            name = "Test"
-            id = "TEMPLATE_RUNNER_2"
-            scriptContent = """
-                echo "Install"
-                %env.PYTHON_HOME%\python.exe -m pip install --upgrade setuptools
-                echo "Build"
-                %env.PYTHON_HOME%\python.exe setup.py sdist
-                echo "Test"
-                %env.PYTHON_HOME%\python.exe setup.py test
-            """.trimIndent()
-        }
-    }
-
-    requirements {
-        contains("teamcity.agent.jvm.os.name", "Windows", "RQ_1")
-    }
 })
