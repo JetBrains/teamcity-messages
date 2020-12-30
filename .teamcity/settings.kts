@@ -87,13 +87,11 @@ object WindowsTeamcityMessagesTemplate : Template({
                 """.trimIndent()
             }
         }
-        python {
+        script {
             name = "Test"
-            command = custom {
-                arguments = """%RESOLVED_DIR%\setup.py test"""
-            }
+            scriptContent = """python %RESOLVED_DIR%\setup.py test"""
             dockerImage = "%PYTHON_DOCKER_IMAGE%"
-            dockerImagePlatform = PythonBuildStep.ImagePlatform.Windows
+            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
         }
     }
 
