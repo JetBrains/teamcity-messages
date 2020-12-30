@@ -13,10 +13,11 @@ from test_util import run_command, get_teamcity_messages_root
 
 
 def construct_fixture():
-    params = [('pytest>=4,<5',)]
+    params = []
     if sys.version_info > (3, 0):
-        params.append(('pytest>=5,<6',))
         params.append(('pytest>=6',))
+    else:
+        params.append(('pytest>=4,<5',))
 
     @pytest.fixture(scope='module', params=params)
     def venv(request):
