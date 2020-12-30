@@ -73,12 +73,24 @@ object WindowsTeamcityMessagesTemplate : Template({
         root(DslContext.settingsRoot)
     }
 
+    params {
+        param("RESOLVED_DIR", "RESOLVED_DIR_DEFAULT")
+    }
+
     steps {
         python {
+            name = "Resolving working dir for Docker"
+            command = script {
+                content = """
+                    resolved = r"%teamcity.build.workingDir%"
+                    print("##teamcity[setParameter name='RESOLVED_DIR' value='{}']".format(resolved.replace("Z:\\", "C:\\")))
+                """.trimIndent()
+            }
+        }
+        python {
             name = "Test"
-            command = file {
-                filename = "setup.py"
-                scriptArguments = "test"
+            command = custom {
+                arguments = """%RESOLVED_DIR%\setup.py test"""
             }
             dockerImage = "%PYTHON_DOCKER_IMAGE%"
             dockerImagePlatform = PythonBuildStep.ImagePlatform.Windows
