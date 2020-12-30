@@ -1,5 +1,9 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.PullRequests
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.commitStatusPublisher
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.*
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 
 /*
 The settings script is an entry point for defining a TeamCity
@@ -48,6 +52,16 @@ object LinuxTeamcityMessagesTemplate : Template({
         root(DslContext.settingsRoot)
     }
 
+    features {
+        pullRequests {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            provider = github {
+                authType = vcsRoot()
+                filterAuthorRole = PullRequests.GitHubRoleFilter.EVERYBODY
+            }
+        }
+    }
+
     steps {
         python {
             name = "Test"
@@ -77,6 +91,16 @@ object WindowsTeamcityMessagesTemplate : Template({
         param("RESOLVED_DIR", "RESOLVED_DIR_DEFAULT")
     }
 
+    features {
+        pullRequests {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            provider = github {
+                authType = vcsRoot()
+                filterAuthorRole = PullRequests.GitHubRoleFilter.EVERYBODY
+            }
+        }
+    }
+
     steps {
         python {
             name = "Resolving working dir for Docker"
@@ -104,8 +128,38 @@ object Build : BuildType({
     type = Type.COMPOSITE
 
     vcs {
+        root(DslContext.settingsRoot)
+
         showDependenciesChanges = true
     }
+
+    triggers {
+        vcs {
+
+        }
+    }
+
+    features {
+        pullRequests {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            provider = github {
+                authType = vcsRoot()
+                filterAuthorRole = PullRequests.GitHubRoleFilter.EVERYBODY
+            }
+        }
+
+        commitStatusPublisher {
+            vcsRootExtId = "${DslContext.settingsRoot.id}"
+            publisher = github {
+                githubUrl = "https://api.github.com"
+                authType = personalToken {
+                    token = "credentialsJSON:b0d86dfa-b8ea-4d81-86dc-efdb0868a31a"
+                }
+            }
+        }
+    }
+
+
 
     dependencies {
         snapshot(Python27windows) {}
