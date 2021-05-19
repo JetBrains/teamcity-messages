@@ -543,6 +543,16 @@ def test_diff_assert_error(venv):
 def test_swap_diff_assert_error(venv):
     with make_ini('[pytest]\nswapdiff=true'):
         output = run(venv, "../diff_assert_error.py")
+    check_swap_diff_result(output)
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_swap_diff_argument_assert_error(venv):
+    output = run(venv, "../diff_assert_error.py", additional_arguments="--jb-swapdiff=True")
+    check_swap_diff_result(output)
+
+
+def check_swap_diff_result(output):
     assert_service_messages(
         output,
         [
@@ -598,7 +608,7 @@ def test_skip_passed_output(venv):
         ])
 
 
-def run(venv, file_names, test=None, options='', set_tc_version=True):
+def run(venv, file_names, test=None, options='', set_tc_version=True, additional_arguments=None):
     if test is not None:
         test_suffix = "::" + test
     else:
@@ -610,4 +620,6 @@ def run(venv, file_names, test=None, options='', set_tc_version=True):
     command = os.path.join(venv.bin, 'py.test') + " " + options + " "
     command += ' '.join(os.path.join('tests', 'guinea-pigs', 'pytest', file_name) + test_suffix
                         for file_name in file_names)
+    if additional_arguments:
+        command += " " + additional_arguments
     return run_command(command, set_tc_version=set_tc_version)
