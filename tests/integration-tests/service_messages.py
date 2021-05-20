@@ -25,7 +25,7 @@ class ServiceMessage:
             if p in self.params:
                 v1 = self.params[p]
                 v2 = other.params[p]
-                if to_unicode(v1) != to_unicode(v2):
+                if to_unicode(v1).lower() != to_unicode(v2).lower():
                     return False
             else:
                 return False

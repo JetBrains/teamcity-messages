@@ -100,7 +100,7 @@ def test_coverage(venv):
 
 
 def test_flask_test_incomplete(venv):
-    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["Flask-Testing==0.8.0"])
+    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["Flask-Testing==0.8.1"])
 
     output = run(venv_with_flask, 'flask_testing_incomplete')
     test_name = 'test_foo.TestIncompleteFoo.test_add'
@@ -117,7 +117,7 @@ def test_flask_test_incomplete(venv):
 
 
 def test_flask_test_ok(venv):
-    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["Flask-Testing==0.8.0"])
+    venv_with_flask = virtual_environments.prepare_virtualenv(venv.packages + ["Flask-Testing==0.8.1"])
 
     output = run(venv_with_flask, 'flask_testing_ok')
     test_name = 'test_foo.TestFoo.test_add'
