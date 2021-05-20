@@ -32,8 +32,6 @@ version = "2020.2"
 project {
 
     buildType(Build)
-    buildType(Python27windows)
-    buildType(Python37windows)
     buildType(Python38windows)
     buildType(Python27linux)
     buildType(Python37linux)
@@ -162,8 +160,6 @@ object Build : BuildType({
 
 
     dependencies {
-        snapshot(Python27windows) {}
-        snapshot(Python37windows) {}
         snapshot(Python38windows) {}
         snapshot(Python27linux) {}
         snapshot(Python37linux) {}
@@ -172,26 +168,6 @@ object Build : BuildType({
         snapshot(Pypy3linux) {}
     }
 
-})
-
-
-object Python27windows : BuildType({
-    templates(WindowsTeamcityMessagesTemplate)
-    name = "Python 2.7 (Windows)"
-
-    params {
-        param("PYTHON_DOCKER_IMAGE", "python:2.7")
-    }
-})
-
-
-object Python37windows : BuildType({
-    templates(WindowsTeamcityMessagesTemplate)
-    name = "Python 3.7 (Windows)"
-
-    params {
-        param("PYTHON_DOCKER_IMAGE", "python:3.7")
-    }
 })
 
 
