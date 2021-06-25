@@ -36,6 +36,7 @@ project {
     buildType(Python27linux)
     buildType(Python37linux)
     buildType(Python38linux)
+    buildType(Python39linux)
     buildType(Pypy2linux)
     buildType(Pypy3linux)
 
