@@ -164,6 +164,7 @@ object Build : BuildType({
         snapshot(Python27linux) {}
         snapshot(Python37linux) {}
         snapshot(Python38linux) {}
+        snapshot(Python39linux) {}
         snapshot(Pypy2linux) {}
         snapshot(Pypy3linux) {}
     }
@@ -210,6 +211,16 @@ object Python38linux : BuildType({
     params {
         param("PYTHON_EXECUTABLE", "python")
         param("PYTHON_DOCKER_IMAGE", "python:3.8")
+    }
+})
+
+object Python39linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Python 3.9 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "python")
+        param("PYTHON_DOCKER_IMAGE", "python:3.9")
     }
 })
 
