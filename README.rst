@@ -2,7 +2,7 @@ Python Unit Test Reporting to TeamCity
 ======================================
 
 |  |jb_project| |license| |pypi_version|
-|  |versions| |appveyor_ci| |travis_ci| |teamcity_ci|
+|  |versions| |teamcity_ci|
 
 This package integrates Python with the
 `TeamCity <http://www.jetbrains.com/teamcity/>`__ Continuous Integration
@@ -170,12 +170,6 @@ Apache, version 2.0 http://www.apache.org/licenses/LICENSE-2.0
 .. |versions| image:: https://img.shields.io/pypi/pyversions/teamcity-messages.svg
    :target: https://pypi.python.org/pypi/teamcity-messages
    :alt: Python versions supported
-.. |appveyor_ci| image:: https://ci.appveyor.com/api/projects/status/vt08bybn8k60a77s/branch/master?svg=true
-   :target: https://ci.appveyor.com/project/shalupov/teamcity-python/branch/master
-   :alt: AppVeyor Build Status
-.. |travis_ci| image:: https://travis-ci.org/JetBrains/teamcity-messages.svg?branch=master
-   :target: https://travis-ci.org/JetBrains/teamcity-messages
-   :alt: Travis Build Status
 .. |pypi_version| image:: https://badge.fury.io/py/teamcity-messages.svg
    :target: https://pypi.python.org/pypi/teamcity-messages
    :alt: PyPI version

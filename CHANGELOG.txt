@@ -1,6 +1,11 @@
 Change Log
 ----------
 
+Version 1.29 Fri Jun 25 2021
+  - python: supported Python 3.9
+  - support pylint >= 2.8 by @Tirzono #242
+  - pytest: add an option to swap actual/expected in diff
+
 Version 1.28 Thu Apr 30 2020
   - support coverage >= 5.0.1 by @enkelli #225 #218
   - python: dropped Python 2.6, 3.5 support. Latest version to support them is 1.27
