@@ -24,6 +24,8 @@ from teamcity import diff_tools
 
 diff_tools.patch_unittest_diff()
 _ASSERTION_FAILURE_KEY = '_teamcity_assertion_failure'
+# unitest.mock's assertions
+mock_call_failure_pattern = re.compile(r'expected (call|await) not found.\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+)', re.DOTALL)
 
 
 def _is_bool_supported():
@@ -224,6 +226,32 @@ class EchoTeamCityMessages(object):
         self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
         self.test_start_reported_mark.remove(test_id)
 
+    def _get_diff(self, report):
+        try:
+            err_message = str(report.longrepr.reprcrash.message)
+            diff_name = diff_tools.EqualsAssertionError.__name__
+            # There is a string like "foo.bar.DiffError: [serialized_data]"
+            if diff_name in err_message:
+                serialized_data = err_message[err_message.index(diff_name) + len(diff_name) + 1:]
+                return diff_tools.deserialize_error(serialized_data)
+
+            m = mock_call_failure_pattern.search(err_message)
+            if m:
+                expected, actual = m.group('expected'), m.group('actual')
+                if self.swap_diff:
+                    expected, actual = actual, expected
+                return diff_tools.EqualsAssertionError(expected=expected, actual=actual)
+
+            assertion_tuple = getattr(self.current_test_item, _ASSERTION_FAILURE_KEY, None)
+            if assertion_tuple:
+                op, left, right = assertion_tuple
+                if op in ('==', '!='):
+                    if self.swap_diff:
+                        left, right = right, left
+                    return diff_tools.EqualsAssertionError(expected=right, actual=left)
+        except Exception:
+            return None
+
     def report_test_failure(self, test_id, report, message=None, report_output=True):
         if hasattr(report, 'duration'):
             duration = timedelta(seconds=report.duration)
@@ -237,24 +265,7 @@ class EchoTeamCityMessages(object):
         if report_output:
             self.report_test_output(report, test_id)
 
-        diff_error = None
-        try:
-            err_message = str(report.longrepr.reprcrash.message)
-            diff_name = diff_tools.EqualsAssertionError.__name__
-            # There is a string like "foo.bar.DiffError: [serialized_data]"
-            if diff_name in err_message:
-                serialized_data = err_message[err_message.index(diff_name) + len(diff_name) + 1:]
-                diff_error = diff_tools.deserialize_error(serialized_data)
-
-            assertion_tuple = getattr(self.current_test_item, _ASSERTION_FAILURE_KEY, None)
-            if assertion_tuple:
-                op, left, right = assertion_tuple
-                if self.swap_diff:
-                    left, right = right, left
-                diff_error = diff_tools.EqualsAssertionError(expected=right, actual=left)
-        except Exception:
-            pass
-
+        diff_error = self._get_diff(report)
         if not diff_error:
             from .jb_local_exc_store import get_exception
             diff_error = get_exception()
