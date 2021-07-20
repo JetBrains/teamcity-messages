@@ -32,7 +32,7 @@ version = "2020.2"
 project {
 
     buildType(Build)
-    buildType(Python38windows)
+    buildType(Python39windows)
     buildType(Python27linux)
     buildType(Python37linux)
     buildType(Python38linux)
@@ -161,7 +161,7 @@ object Build : BuildType({
 
 
     dependencies {
-        snapshot(Python38windows) {}
+        snapshot(Python39windows) {}
         snapshot(Python27linux) {}
         snapshot(Python37linux) {}
         snapshot(Python38linux) {}
@@ -173,12 +173,12 @@ object Build : BuildType({
 })
 
 
-object Python38windows : BuildType({
+object Python39windows : BuildType({
     templates(WindowsTeamcityMessagesTemplate)
-    name = "Python 3.8 (Windows)"
+    name = "Python 3.9 (Windows)"
 
     params {
-        param("PYTHON_DOCKER_IMAGE", "python:3.8")
+        param("PYTHON_DOCKER_IMAGE", "python:3.9")
     }
 })
 
