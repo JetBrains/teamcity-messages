@@ -548,7 +548,7 @@ def test_swap_diff_assert_error(venv):
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
 def test_swap_diff_argument_assert_error(venv):
-    output = run(venv, "../diff_assert_error.py", additional_arguments="--jb-swapdiff=True")
+    output = run(venv, "../diff_assert_error.py", additional_arguments="--jb-swapdiff")
     check_swap_diff_result(output)
 
 
