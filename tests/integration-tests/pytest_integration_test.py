@@ -608,6 +608,52 @@ def test_skip_passed_output(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_test_suite(venv):
+    with make_ini('[pytest]\ngeneratetestsuites=true'):
+        output = run(venv, ['params_test.py', 'class_with_method.py'])
+
+    test_names1 = (
+        "tests.guinea-pigs.pytest.params_test.test_eval(3+5-8)",
+        "tests.guinea-pigs.pytest.params_test.test_eval(|'1_5|' + |'2|'-1_52)",
+        "tests.guinea-pigs.pytest.params_test.test_eval(6*9-42)",
+    )
+    test_suite1 = 'tests.guinea-pigs.pytest.params_test.py'
+
+    test_name2 = 'tests.guinea-pigs.pytest.class_with_method.MyTest.test_method'
+    test_suite2 = 'tests.guinea-pigs.pytest.class_with_method.py'
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "4"}),
+
+            ServiceMessage('testSuiteStarted', {'name': test_suite1}),
+            ServiceMessage('testStarted', {'name': test_names1[0]}),
+            ServiceMessage('testFinished', {'name': test_names1[0]}),
+            ServiceMessage('testStarted', {'name': test_names1[1]}),
+            ServiceMessage('testFinished', {'name': test_names1[1]}),
+            ServiceMessage('testStarted', {'name': test_names1[2]}),
+            ServiceMessage('testFailed', {'name': test_names1[2]}),
+            ServiceMessage('testFinished', {'name': test_names1[2]}),
+            ServiceMessage('testSuiteFinished', {'name': test_suite1}),
+
+            ServiceMessage('testSuiteStarted', {'name': test_suite2}),
+            ServiceMessage('testStarted', {'name': test_name2}),
+            ServiceMessage('testFailed', {'name': test_name2}),
+            ServiceMessage('testFinished', {'name': test_name2}),
+            ServiceMessage('testSuiteFinished', {'name': test_suite2})
+        ])
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_unmodified_verbosity(venv):
+    with make_ini('[pytest]\nunmodifiedverbosity=true'):
+        output = run(venv, 'output_test.py', additional_arguments='--quiet')
+
+    assert 'PASSED' not in output, 'Unexpected verbose output for quiet mode'
+
+
 def run(venv, file_names, test=None, options='', set_tc_version=True, additional_arguments=None):
     if test is not None:
         test_suffix = "::" + test

@@ -88,6 +88,8 @@ def pytest_addoption(parser):
         kwargs.update({"type": "bool"})
 
     parser.addini("skippassedoutput", **kwargs)
+    parser.addini("generatetestsuites", **kwargs)
+    parser.addini("unmodifiedverbosity", **kwargs)
     parser.addini("swapdiff", **kwargs)
 
 
@@ -103,13 +105,17 @@ def pytest_configure(config):
         output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
         coverage_controller = _get_coverage_controller(config)
         skip_passed_output = bool(config.getini('skippassedoutput'))
+        generate_test_suites = bool(config.getini('generatetestsuites'))
+        unmodified_verbosity = bool(config.getini('unmodifiedverbosity'))
 
-        config.option.verbose = 2  # don't truncate assert explanations
+        if not unmodified_verbosity:
+            config.option.verbose = 2  # don't truncate assert explanations
         config._teamcityReporting = EchoTeamCityMessages(
             output_capture_enabled,
             coverage_controller,
             skip_passed_output,
-            bool(config.getini('swapdiff') or config.option.swapdiff)
+            bool(config.getini('swapdiff') or config.option.swapdiff),
+            generate_test_suites
         )
         config.pluginmanager.register(config._teamcityReporting)
 
@@ -130,12 +136,14 @@ def _get_coverage_controller(config):
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, output_capture_enabled, coverage_controller, skip_passed_output, swap_diff):
+    def __init__(self, output_capture_enabled, coverage_controller, skip_passed_output, swap_diff, generate_test_suites):
         self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
         self.skip_passed_output = skip_passed_output
+        self.generate_test_suites = generate_test_suites
 
         self.teamcity = TeamcityServiceMessages()
+        self.current_test_suite = None
         self.test_start_reported_mark = set()
 
         self.max_reported_output_size = 1 * 1024 * 1024
@@ -149,13 +157,6 @@ class EchoTeamCityMessages(object):
         def convert_file_to_id(filename):
             filename = re.sub(r"\.pyc?$", "", filename)
             return filename.replace(os.sep, ".").replace("/", ".")
-
-        def add_prefix_to_filename_id(filename_id, prefix):
-            dot_location = filename_id.rfind('.')
-            if dot_location <= 0 or dot_location >= len(filename_id) - 1:
-                return None
-
-            return filename_id[:dot_location + 1] + prefix + filename_id[dot_location + 1:]
 
         pylint_prefix = '[pylint] '
         if location[2].startswith(pylint_prefix):
@@ -209,6 +210,9 @@ class EchoTeamCityMessages(object):
             return "%s:%s (%s)" % (str(location[0]), str(location[1]), str(location[2]))
         return str(location)
 
+    def format_flow_id(self, test_id):
+        return None if self.generate_test_suites else test_id
+
     def pytest_collection_finish(self, session):
         self.teamcity.testCount(len(session.items))
 
@@ -219,7 +223,27 @@ class EchoTeamCityMessages(object):
         test_name = location[2]
         if test_name:
             test_name = str(test_name).split(".")[-1]
+        self.ensure_test_suite_start_reported(nodeid)
         self.ensure_test_start_reported(self.format_test_id(nodeid, location), test_name)
+
+    def ensure_test_suite_start_reported(self, node_id):
+        if not self.generate_test_suites:
+            return
+
+        if self.test_start_reported_mark:
+            problem = 'Detected multiple started tests:\n{}\n' \
+                      '"generatetestsuites" option is yet not available for parallel tests.'.format('\n'.join(self.test_start_reported_mark))
+            self.teamcity.buildProblem(description=problem, identity=None)
+
+        parts = node_id.split('::')
+        suite_name = parts[0].replace("/", ".")
+
+        if suite_name != self.current_test_suite:
+            if self.current_test_suite:
+                self.teamcity.testSuiteFinished(suiteName=self.current_test_suite)
+            self.teamcity.testSuiteStarted(suite_name)
+            self.current_test_suite = suite_name
+
 
     def ensure_test_start_reported(self, test_id, metainfo=None):
         if test_id not in self.test_start_reported_mark:
@@ -227,7 +251,7 @@ class EchoTeamCityMessages(object):
                 capture_standard_output = "false"
             else:
                 capture_standard_output = "true"
-            self.teamcity.testStarted(test_id, flowId=test_id, captureStandardOutput=capture_standard_output, metainfo=metainfo)
+            self.teamcity.testStarted(test_id, flowId=self.format_flow_id(test_id), captureStandardOutput=capture_standard_output, metainfo=metainfo)
             self.test_start_reported_mark.add(test_id)
 
     def report_has_output(self, report):
@@ -252,7 +276,7 @@ class EchoTeamCityMessages(object):
                 dump_test_stderr(self.teamcity, test_id, test_id, data)
 
     def report_test_finished(self, test_id, duration=None):
-        self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
+        self.teamcity.testFinished(test_id, testDuration=duration, flowId=self.format_flow_id(test_id))
         self.test_start_reported_mark.remove(test_id)
 
     def report_test_failure(self, test_id, report, message=None, report_output=True):
@@ -303,11 +327,11 @@ class EchoTeamCityMessages(object):
                 if strace.endswith(":") and diff_error.real_exception:
                     strace += " " + type(diff_error.real_exception).__name__
             self.teamcity.testFailed(test_id, diff_error.msg if diff_error.msg else message, strace,
-                                     flowId=test_id,
+                                     flowId=self.format_flow_id(test_id),
                                      comparison_failure=diff_error
                                      )
         else:
-            self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
+            self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=self.format_flow_id(test_id))
         self.report_test_finished(test_id, duration)
 
     def report_test_skip(self, test_id, report):
@@ -323,7 +347,7 @@ class EchoTeamCityMessages(object):
 
         self.ensure_test_start_reported(test_id)
         self.report_test_output(report, test_id)
-        self.teamcity.testIgnored(test_id, reason, flowId=test_id)
+        self.teamcity.testIgnored(test_id, reason, flowId=self.format_flow_id(test_id))
         self.report_test_finished(test_id, duration)
 
     def pytest_assertrepr_compare(self, config, op, left, right):
@@ -348,17 +372,17 @@ class EchoTeamCityMessages(object):
             else:
                 if self.report_has_output(report) and not self.skip_passed_output:
                     block_name = "test " + report.when
-                    self.teamcity.blockOpened(block_name, flowId=test_id)
+                    self.teamcity.blockOpened(block_name, flowId=self.format_flow_id(test_id))
                     self.report_test_output(report, test_id)
-                    self.teamcity.blockClosed(block_name, flowId=test_id)
+                    self.teamcity.blockClosed(block_name, flowId=self.format_flow_id(test_id))
         elif report.failed:
             if report.when == 'call':
                 self.report_test_failure(test_id, report)
             elif report.when == 'setup':
                 if self.report_has_output(report):
-                    self.teamcity.blockOpened("test setup", flowId=test_id)
+                    self.teamcity.blockOpened("test setup", flowId=self.format_flow_id(test_id))
                     self.report_test_output(report, test_id)
-                    self.teamcity.blockClosed("test setup", flowId=test_id)
+                    self.teamcity.blockClosed("test setup", flowId=self.format_flow_id(test_id))
 
                 self.report_test_failure(test_id, report, message="test setup failed", report_output=False)
             elif report.when == 'teardown':
@@ -374,6 +398,10 @@ class EchoTeamCityMessages(object):
             self.report_test_failure(test_id, report)
         elif report.skipped:
             self.report_test_skip(test_id, report)
+
+    def pytest_sessionfinish(self, *_):
+        if self.generate_test_suites and self.current_test_suite:
+            self.teamcity.testSuiteFinished(suiteName=self.current_test_suite)
 
     def pytest_terminal_summary(self):
         if self.coverage_controller is not None:
