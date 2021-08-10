@@ -352,7 +352,8 @@ class EchoTeamCityMessages(object):
                     self.report_test_output(report, test_id)
                     self.teamcity.blockClosed(block_name, flowId=test_id)
         elif report.failed:
-            if report.when == 'call':
+            if report.when == 'call' or report.when == '???':
+                # ??? indicates the test crashed when run in a subprocess (due to --forked, --boxed or -n)
                 self.report_test_failure(test_id, report)
             elif report.when == 'setup':
                 if self.report_has_output(report):
