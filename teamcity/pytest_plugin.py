@@ -25,7 +25,12 @@ from teamcity import diff_tools
 diff_tools.patch_unittest_diff()
 _ASSERTION_FAILURE_KEY = '_teamcity_assertion_failure'
 # unitest.mock's assertions
-mock_call_failure_pattern = re.compile(r'expected (call|await) not found.\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+)', re.DOTALL)
+mock_call_failure_pattern = re.compile(
+    r'^AssertionError: expected (call|await) not found.\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+?)'
+    # compensate for https://github.com/pytest-dev/pytest-mock#improved-reporting-of-mock-call-assertion-errors
+    r'(\n\npytest introspection follows:\n.*)?$',
+    re.DOTALL,
+)
 
 
 def _is_bool_supported():
