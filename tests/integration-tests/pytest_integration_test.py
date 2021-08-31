@@ -500,6 +500,20 @@ def test_long_diff(venv):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
+def test_multiline_diff(venv):
+    output = run(venv, "../diff_assert_error_multiline.py")
+    test_name = 'tests.guinea-pigs.diff_assert_error_multiline.test_test'
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name}),
+            ServiceMessage('testFailed', {'name': test_name, "actual": "a|n" * 30, "expected": "b|n" * 30}),
+            ServiceMessage('testFinished', {'name': test_name}),
+        ])
+
+
+@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
 def test_num_diff(venv):
     output = run(venv, "../diff_assert_error_nums.py")
     test_name = 'tests.guinea-pigs.diff_assert_error_nums.FooTest.test_test'
