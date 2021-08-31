@@ -72,7 +72,7 @@ def prepare_virtualenv(packages=()):
         if os.path.exists(vdir):
             shutil.rmtree(vdir)
 
-        virtualenv.create_environment(vdir)
+        virtualenv.cli_run([vdir])
         # Update for newly created environment
         if sys.version_info >= (2, 7):
             _call([vpython, "-m", "pip", "install", "--upgrade", "pip", "setuptools"], env=env, cwd=get_teamcity_messages_root())
