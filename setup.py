@@ -55,8 +55,7 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-# Virtual env changed API since 20.0, so we'll use 16 for a while
-virtualenv_version = 'virtualenv==16.7.10'
+virtualenv_version = 'virtualenv==20.7.2'
 if sys.version_info < (3, 7):
     # fix compatible version for slowly obsoleting versions
     tests_require = ['pytest==4.6.9', virtualenv_version]
