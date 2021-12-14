@@ -541,31 +541,6 @@ def test_diff(venv):
 
 
 @pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
-def test_diff_repr(venv):
-    if "pytest==2.7" in venv.packages:
-        pytest.skip("Diff is broken for ancient pytest")
-
-    env = virtual_environments.get_clean_system_environment()
-    env.update({'_JB_REPR_DIFF': '1'})
-    output = run(venv, "../diff_assert_repr.py", env=env)
-    package_name = "tests.guinea-pigs.diff_assert_repr"
-    assert_service_messages(
-        output,
-        [
-            ServiceMessage('testCount', {'count': "2"}),
-            ServiceMessage('testStarted', {'name': package_name + ".test_test"}),
-            ServiceMessage('testFailed', {'name': package_name + ".test_test",
-                                          "actual": "123", "expected": "|'123|'"}),
-            ServiceMessage('testFinished', {'name': package_name + ".test_test"}),
-
-            ServiceMessage('testStarted', {'name': package_name + ".test_test_2"}),
-            ServiceMessage('testFailed', {'name': package_name + ".test_test_2",
-                                          "actual": "|[|]", "expected": "|'|[|]|'"}),
-            ServiceMessage('testFinished', {'name': package_name + ".test_test_2"}),
-        ])
-
-
-@pytest.mark.skipif("sys.version_info < (2, 7) ", reason="requires Python 2.7")
 def test_diff_assert_error(venv):
     output = run(venv, "../diff_assert_error.py")
     assert_service_messages(
