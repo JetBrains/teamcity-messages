@@ -27,7 +27,7 @@ To debug in IntelliJ Idea, open the 'Maven Projects' tool window (View
 'Debug' option is available in the context menu for the task.
 */
 
-version = "2020.2"
+version = "2021.2"
 
 project {
 
@@ -152,7 +152,7 @@ object Build : BuildType({
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
-                    token = "credentialsJSON:b0d86dfa-b8ea-4d81-86dc-efdb0868a31a"
+                    token = "credentialsJSON:d376fdcd-064c-4098-92c0-1c4afab57d88"
                 }
             }
         }
