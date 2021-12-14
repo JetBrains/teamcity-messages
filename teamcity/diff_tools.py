@@ -45,7 +45,7 @@ def patch_unittest_diff(test_filter=None):
 
 def _format_and_convert(val):
     if "_JB_PPRINT_PRIMITIVES" in os.environ:
-        return val
+        return pprint.pformat(val)
     # No need to pretty-print primitives
     return val if any(x for x in _PRIMITIVES if isinstance(val, x)) else pprint.pformat(val)
 
