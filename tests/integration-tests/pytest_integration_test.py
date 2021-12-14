@@ -89,7 +89,9 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         assert ms[2].params["details"].find("Unused import sys") > 0
 
     def test_pytest_flake8(venv):
-        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8",))
+        # Use flake8 < 4 as there is an issue in pytest-flake8 package:
+        # https://github.com/tholo/pytest-flake8/issues/81
+        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8",) + ("flake8==3.9.2",))
 
         file_names = ['./flake8_test1.py', './flake8_test2.py']
         output = run(venv_with_pylint, file_names, options="--flake8")
