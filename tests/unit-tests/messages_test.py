@@ -1,15 +1,23 @@
 from teamcity.messages import TeamcityServiceMessages, escape_value
+
 from datetime import datetime
 import errno
+import io
 import os
 import sys
 import time
 import tempfile
 import textwrap
 import subprocess
+import unicodedata
+
+import pytest
 
 
-if sys.version_info < (3, ):
+_PY2 = sys.version_info < (3, )
+
+
+if _PY2:
     # Python 2
     def b(s):
         return s
@@ -68,7 +76,7 @@ def test_progress_message():
 def test_progress_message_unicode():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
-    if sys.version_info < (3, ):
+    if _PY2:
         bjork = 'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir'.decode('utf-8')
     else:
         bjork = b('Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir').decode('utf-8')
@@ -334,7 +342,7 @@ def test_three_properties():
 def test_unicode():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
-    if sys.version_info < (3, ):
+    if _PY2:
         bjork = 'Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir'.decode('utf-8')
     else:
         bjork = b('Bj\xc3\xb6rk Gu\xc3\xb0mundsd\xc3\xb3ttir').decode('utf-8')
@@ -389,3 +397,46 @@ def test_handling_eagain_ioerror():
         ' name=\'only a test\''
         ']\n'
     )
+
+
+class CustomEncodingStream(object):
+    def __init__(self, encoding):
+        self._buffer = io.BytesIO()
+        self._encoding = encoding
+        self._stream = io.TextIOWrapper(self._buffer, encoding=self._encoding, newline='\n')
+
+    @property
+    def encoding(self):
+        return self._encoding
+
+    def write(self, msg):
+        if _PY2 and isinstance(msg, str):
+            msg = msg.decode(self.encoding)
+        self._stream.write(msg)
+
+    def flush(self):
+        self._stream.flush()
+
+    def getvalue(self):
+        return self._buffer.getvalue().decode(self.encoding)
+
+    if not _PY2:
+        @property
+        def buffer(self):
+            return self._buffer
+
+
+@pytest.mark.parametrize(('encoding', 'is_message_encodable'),
+                         [('cp1251', True), ('cp1252', False)])
+def test_mismatched_encoding(encoding, is_message_encodable):
+    stream = CustomEncodingStream(encoding)
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    value = unicodedata.lookup('CYRILLIC CAPITAL LETTER IO')
+    messages.message(value)
+
+    if is_message_encodable:
+        expected_value = value
+    else:
+        expected_value = value.encode('unicode-escape').decode('latin-1')
+
+    assert stream.getvalue() == "##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % expected_value
