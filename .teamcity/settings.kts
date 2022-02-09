@@ -33,10 +33,12 @@ project {
 
     buildType(Build)
     buildType(Python39windows)
+    buildType(Python310windows)
     buildType(Python27linux)
     buildType(Python37linux)
     buildType(Python38linux)
     buildType(Python39linux)
+    buildType(Python310linux)
     buildType(Pypy2linux)
     buildType(Pypy3linux)
 
@@ -162,10 +164,12 @@ object Build : BuildType({
 
     dependencies {
         snapshot(Python39windows) {}
+        snapshot(Python310windows) {}
         snapshot(Python27linux) {}
         snapshot(Python37linux) {}
         snapshot(Python38linux) {}
         snapshot(Python39linux) {}
+        snapshot(Python310linux) {}
         snapshot(Pypy2linux) {}
         snapshot(Pypy3linux) {}
     }
@@ -179,6 +183,15 @@ object Python39windows : BuildType({
 
     params {
         param("PYTHON_DOCKER_IMAGE", "python:3.9")
+    }
+})
+
+object Python310windows : BuildType({
+    templates(WindowsTeamcityMessagesTemplate)
+    name = "Python 3.10 (Windows)"
+
+    params {
+        param("PYTHON_DOCKER_IMAGE", "python:3.10")
     }
 })
 
@@ -222,6 +235,16 @@ object Python39linux : BuildType({
     params {
         param("PYTHON_EXECUTABLE", "python")
         param("PYTHON_DOCKER_IMAGE", "python:3.9")
+    }
+})
+
+object Python310linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Python 3.10 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "python")
+        param("PYTHON_DOCKER_IMAGE", "python:3.10")
     }
 })
 
