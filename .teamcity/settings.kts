@@ -40,6 +40,7 @@ project {
     buildType(Python39linux)
     buildType(Python310linux)
     buildType(Pypy2linux)
+    buildType(Pypy37linux)
     buildType(Pypy3linux)
 
     template(LinuxTeamcityMessagesTemplate)
@@ -171,6 +172,7 @@ object Build : BuildType({
         snapshot(Python39linux) {}
         snapshot(Python310linux) {}
         snapshot(Pypy2linux) {}
+        snapshot(Pypy37linux) {}
         snapshot(Pypy3linux) {}
     }
 
@@ -266,6 +268,17 @@ object Pypy3linux : BuildType({
     params {
         param("PYTHON_EXECUTABLE", "pypy")
         param("PYTHON_DOCKER_IMAGE", "pypy:3")
+    }
+
+})
+
+object Pypy37linux : BuildType({
+    templates(LinuxTeamcityMessagesTemplate)
+    name = "Pypy 3.7 (Linux)"
+
+    params {
+        param("PYTHON_EXECUTABLE", "pypy")
+        param("PYTHON_DOCKER_IMAGE", "pypy:3.7")
     }
 
 })
