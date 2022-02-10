@@ -12,6 +12,8 @@ from test_util import run_command, get_teamcity_messages_root
 
 @pytest.fixture(scope='module', params=["nose==1.3.7"])  # Nose is dead, support only latest version
 def venv(request):
+    if sys.version_info >= (3, 10):
+        pytest.skip("Nose is not working with Python 3.10+")
     """
     Prepares a virtual environment for nose.
     :rtype : virtual_environments.VirtualEnvDescription

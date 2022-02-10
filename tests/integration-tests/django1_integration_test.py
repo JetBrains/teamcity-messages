@@ -14,6 +14,8 @@ def venv(request):
         pytest.skip("Django 1.11.17 requires Python 2.7 or 3.4+")
     if (3, 0) <= sys.version_info < (3, 4):
         pytest.skip("Django 1.11.17 requires Python 2.7 or 3.4+")
+    if sys.version_info >= (3, 10):
+        pytest.skip("Django 1.11.17 requires Python < 3.10")
     return virtual_environments.prepare_virtualenv([request.param])
 
 
