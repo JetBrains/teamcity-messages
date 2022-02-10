@@ -55,7 +55,7 @@ def prepare_virtualenv(packages=()):
     vpython = os.path.join(vbin, 'python' + get_exe_suffix())
     vpip = os.path.join(vbin, 'pip' + get_exe_suffix())
 
-    vpip_install = [vpip, "install", "--force-reinstall"]
+    vpip_install = [vpython, "-m", "pip", "install", "--force-reinstall"]
     if (2, 5) <= sys.version_info < (2, 6):
         vpip_install.append("--insecure")
 
