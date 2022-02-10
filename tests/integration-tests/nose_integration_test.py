@@ -12,12 +12,12 @@ from test_util import run_command, get_teamcity_messages_root
 
 @pytest.fixture(scope='module', params=["nose==1.3.7"])  # Nose is dead, support only latest version
 def venv(request):
-    if sys.version_info >= (3, 10):
-        pytest.skip("Nose is not working with Python 3.10+")
     """
     Prepares a virtual environment for nose.
     :rtype : virtual_environments.VirtualEnvDescription
     """
+    if sys.version_info >= (3, 8):
+        pytest.skip("nose is outdated and doesn't support 3.8")
     return virtual_environments.prepare_virtualenv([request.param])
 
 
@@ -486,8 +486,6 @@ def test_nose_parameterized(venv):
 
 
 def run(venv, file, clazz=None, test=None, print_output=True, options=""):
-    if sys.version_info > (3, 8):
-        pytest.skip("nose is outdated and doesn't support 3.8")
     if clazz:
         clazz_arg = ":" + clazz
     else:
