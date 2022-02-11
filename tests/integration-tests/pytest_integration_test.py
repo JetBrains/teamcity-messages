@@ -171,9 +171,9 @@ def test_custom_test_items(venv):
 
 if sys.version_info >= (2, 6):
     @pytest.mark.parametrize("coverage_version, pytest_cov_version", [
-        ("==4.4.2", "==2.7.1"),
-        ("==4.5.4", "==2.7.1"),
-        ("==5.0.1", "==2.7.1"),
+        ("==4.4.2", "==2.11.1"),
+        ("==4.5.4", "==2.11.1"),
+        ("==5.0.1", "==2.11.1"),
         # latest
         ("", ""),
     ])
