@@ -110,9 +110,6 @@ setup(
             'pytest-teamcity = teamcity.pytest_plugin',
         ],
 
-        'flake8.extension': [
-            'teamcity-messages = teamcity.flake8_plugin:TeamcityReport',
-        ],
         'flake8.report': [
             'teamcity-messages = teamcity.flake8_plugin:TeamcityReport',
         ]
