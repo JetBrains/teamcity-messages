@@ -32,7 +32,6 @@ version = "2021.2"
 project {
 
     buildType(Build)
-    buildType(Python39windows)
     buildType(Python310windows)
     buildType(Python27linux)
     buildType(Python37linux)
@@ -164,7 +163,6 @@ object Build : BuildType({
 
 
     dependencies {
-        snapshot(Python39windows) {}
         snapshot(Python310windows) {}
         snapshot(Python27linux) {}
         snapshot(Python37linux) {}
@@ -178,15 +176,6 @@ object Build : BuildType({
 
 })
 
-
-object Python39windows : BuildType({
-    templates(WindowsTeamcityMessagesTemplate)
-    name = "Python 3.9 (Windows)"
-
-    params {
-        param("PYTHON_DOCKER_IMAGE", "python:3.9")
-    }
-})
 
 object Python310windows : BuildType({
     templates(WindowsTeamcityMessagesTemplate)
