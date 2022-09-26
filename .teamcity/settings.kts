@@ -155,7 +155,7 @@ object Build : BuildType({
             publisher = github {
                 githubUrl = "https://api.github.com"
                 authType = personalToken {
-                    token = "credentialsJSON:d376fdcd-064c-4098-92c0-1c4afab57d88"
+                    token = "credentialsJSON:629f6262-fd6d-4ee3-845d-5ac1be62d64e"
                 }
             }
         }
