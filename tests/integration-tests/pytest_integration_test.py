@@ -88,11 +88,21 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
 
         assert ms[2].params["details"].find("Unused import sys") > 0
 
-    def test_pytest_flake8(venv):
+    def test_pytest_flake8_v1_0(venv):
         # Use flake8 < 4 as there is an issue in pytest-flake8 package:
         # https://github.com/tholo/pytest-flake8/issues/81
-        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8",) + ("flake8==3.9.2",))
+        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8==1.0.7",) + ("flake8==3.9.2",))
+        internal_test_pytest_flake8(venv_with_pylint, "tests.guinea-pigs.pytest.{}.FLAKE8")
 
+
+    def test_pytest_flake8_v1_1(venv):
+        # Use flake8 < 4 as there is an issue in pytest-flake8 package:
+        # https://github.com/tholo/pytest-flake8/issues/87
+        venv_with_pylint = virtual_environments.prepare_virtualenv(venv.packages + ("pytest-flake8",) + ("flake8==4.0.1",))
+        internal_test_pytest_flake8(venv_with_pylint, "tests.guinea-pigs.pytest.{}.flake-8.FLAKE8")
+
+
+    def internal_test_pytest_flake8(venv_with_pylint, flake8_test_name_format):
         file_names = ['./flake8_test1.py', './flake8_test2.py']
         output = run(venv_with_pylint, file_names, options="--flake8")
         file_paths = [os.path.realpath(os.path.join('tests', 'guinea-pigs', 'pytest', file_name))
@@ -100,7 +110,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         expected = [ServiceMessage('testCount', {'count': "4"})]
         for file_path in file_paths:
             test_base, _ = os.path.splitext(os.path.basename(file_path))
-            flake8_test_name = "tests.guinea-pigs.pytest.{}.FLAKE8".format(test_base)
+            flake8_test_name = flake8_test_name_format.format(test_base)
             pytest_name = "tests.guinea-pigs.pytest.{}.test_ok".format(test_base)
             expected.extend([
                 ServiceMessage('testStarted', {'name': flake8_test_name}),
@@ -119,6 +129,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
             ])
         ms = assert_service_messages(output, expected)
         assert ms[2].params["details"].find(test_message.replace('|', '|||')) > 0
+
 
 
 def test_hierarchy(venv):
