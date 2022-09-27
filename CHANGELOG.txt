@@ -1,6 +1,9 @@
 Change Log
 ----------
 
+Version 1.32 Tue Sep 27 2022
+  - flake8: fix flake8 >= 5 by @itsb #266 #264
+
 Version 1.31 Tue Feb 22 2022
   - python: supported Python 3.10
   - escape unencodable messages by @kri-k #261
