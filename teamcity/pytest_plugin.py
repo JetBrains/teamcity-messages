@@ -27,7 +27,7 @@ _ASSERTION_FAILURE_KEY = '_teamcity_assertion_failure'
 # unitest.mock's assertions
 mock_call_failure_pattern = re.compile(
     r'^AssertionError: expected (call|await) not found.\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+?)'
-    # compensate for https://github.com/pytest-dev/pytest-mock#improved-reporting-of-mock-call-assertion-errors
+    # "undo" https://github.com/pytest-dev/pytest-mock#improved-reporting-of-mock-call-assertion-errors
     r'(\n\npytest introspection follows:\n.*)?$',
     re.DOTALL,
 )
@@ -232,7 +232,7 @@ class EchoTeamCityMessages(object):
                 expected, actual = m.group('expected'), m.group('actual')
                 if self.swap_diff:
                     expected, actual = actual, expected
-                return diff_tools.EqualsAssertionError(expected=expected, actual=actual)
+                return diff_tools.EqualsAssertionError(expected=expected, actual=actual, preformated=True)
 
             assertion_tuple = getattr(self.current_test_item, _ASSERTION_FAILURE_KEY, None)
             if assertion_tuple:
