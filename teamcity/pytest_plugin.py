@@ -12,15 +12,15 @@ tests under TeamCity build.
 """
 
 import os
-import sys
 import re
+import sys
 import traceback
 from datetime import timedelta
 
-from teamcity.messages import TeamcityServiceMessages
-from teamcity.common import convert_error_to_string, dump_test_stderr, dump_test_stdout
-from teamcity import is_running_under_teamcity
 from teamcity import diff_tools
+from teamcity import is_running_under_teamcity
+from teamcity.common import convert_error_to_string, dump_test_stderr, dump_test_stdout
+from teamcity.messages import TeamcityServiceMessages
 
 diff_tools.patch_unittest_diff()
 _ASSERTION_FAILURE_KEY = '_teamcity_assertion_failure'
@@ -33,18 +33,6 @@ mock_call_failure_pattern = re.compile(
 )
 
 
-def _is_bool_supported():
-    """
-    Type "bool" is not supported before 2.9
-    """
-    try:
-        from pytest import __version__
-        from distutils import version
-        return version.LooseVersion(str(__version__)) >= version.LooseVersion("2.9")
-    except ImportError:
-        return False
-
-
 def pytest_addoption(parser):
     group = parser.getgroup("terminal reporting", "reporting", after="general")
 
@@ -55,8 +43,7 @@ def pytest_addoption(parser):
     parser.addoption('--jb-swapdiff', action="store_true", dest="swapdiff", default=False, help="Swap actual/expected in diff")
 
     kwargs = {"help": "skip output of passed tests for JetBrains TeamCity service messages"}
-    if _is_bool_supported():
-        kwargs.update({"type": "bool"})
+    kwargs.update({"type": "bool"})
 
     parser.addini("skippassedoutput", **kwargs)
     parser.addini("swapdiff", **kwargs)
