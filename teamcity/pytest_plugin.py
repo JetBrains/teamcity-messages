@@ -25,8 +25,8 @@ from teamcity.messages import TeamcityServiceMessages
 diff_tools.patch_unittest_diff()
 _ASSERTION_FAILURE_KEY = '_teamcity_assertion_failure'
 # unitest.mock's assertions
-mock_call_failure_pattern = re.compile(
-    r'^AssertionError: expected (call|await) not found.\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+?)'
+_MOCK_CALL_FAILURE_RE = re.compile(
+    r'^AssertionError: (?P<msg>expected (call|await) not found).\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+?)'
     # "undo" https://github.com/pytest-dev/pytest-mock#improved-reporting-of-mock-call-assertion-errors
     r'(\n\npytest introspection follows:\n.*)?$',
     re.DOTALL,
@@ -227,12 +227,12 @@ class EchoTeamCityMessages(object):
                 serialized_data = err_message[err_message.index(diff_name) + len(diff_name) + 1:]
                 return diff_tools.deserialize_error(serialized_data)
 
-            m = mock_call_failure_pattern.search(err_message)
-            if m:
-                expected, actual = m.group('expected'), m.group('actual')
+            match = _MOCK_CALL_FAILURE_RE.search(err_message)
+            if match:
+                expected, actual = match.group('expected'), match.group('actual')
                 if self.swap_diff:
                     expected, actual = actual, expected
-                return diff_tools.EqualsAssertionError(expected=expected, actual=actual, preformated=True)
+                return diff_tools.EqualsAssertionError(expected=expected, actual=actual, msg=match.group('msg'), preformated=True)
 
             assertion_tuple = getattr(self.current_test_item, _ASSERTION_FAILURE_KEY, None)
             if assertion_tuple:
@@ -240,7 +240,7 @@ class EchoTeamCityMessages(object):
                 if op in ('==', '!='):
                     if self.swap_diff:
                         left, right = right, left
-                    return diff_tools.EqualsAssertionError(expected=right, actual=left)
+                    return diff_tools.EqualsAssertionError(expected=right, actual=left, msg='op', preformated=True)
         except Exception:
             return None
 
