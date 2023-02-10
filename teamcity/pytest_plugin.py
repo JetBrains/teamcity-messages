@@ -345,6 +345,8 @@ class EchoTeamCityMessages(object):
             def __init__(self, coverage, config):
                 try:
                     from coverage.report import Reporter
+                    if not hasattr(Reporter, "find_file_reporters"):
+                        raise ImportError("Wrong Reporter class, probably the Protocol version from coverage >= 7.0.2")
                 except ImportError:
                     # Support for coverage >= 5.0.1.
                     from coverage.report import get_analysis_to_report
