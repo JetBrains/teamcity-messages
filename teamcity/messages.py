@@ -183,6 +183,10 @@ class TeamcityServiceMessages(object):
                          actual=comparison_failure.actual,
                          expected=comparison_failure.expected)
 
+    def testMetadata(self, testName, name, value='', type='', flowId=None):
+        # https://www.jetbrains.com/help/teamcity/reporting-test-metadata.html#Reporting+Additional+Test+Data
+        self.message('testMetadata', name=name, testName=testName, value=value, type=type, flowId=flowId)
+
     def testStdOut(self, testName, out, flowId=None):
         self.message('testStdOut', name=testName, out=out, flowId=flowId)
 
