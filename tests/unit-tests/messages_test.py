@@ -183,6 +183,16 @@ def test_test_ignored():
         """).strip().encode('utf-8')
 
 
+def test_test_metadata():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    messages.testMetadata(testName='only a test', name='my attachment', type='link', value='https://github.com/JetBrains/teamcity-messages')
+    # 'testMetadata', name=name, testName=testName, value=value, type=type, flowId=flowId)
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[testMetadata timestamp='2000-11-02T10:23:01.556' name='my attachment' testName='only a test' type='link' value='https://github.com/JetBrains/teamcity-messages']
+        """).strip().encode('utf-8')
+
+
 def test_test_failed():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
