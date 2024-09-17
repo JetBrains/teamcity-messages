@@ -83,7 +83,9 @@ def prepare_virtualenv(packages=()):
         open(done_flag_file, 'a').close()
 
     # Update for env.  that already exists: does not take long, but may save old envs.
-    _call([vpython, "-m", "pip", "install", "--upgrade", "pip", "setuptools"], env=env, cwd=get_teamcity_messages_root())
+    if sys.version_info >= (2, 7):
+        _call([vpython, "-m", "pip", "install", "--upgrade", "pip", "setuptools"], env=env, cwd=get_teamcity_messages_root())
+    _call([vpython, "setup.py", "install"], env=env, cwd=get_teamcity_messages_root())
     return venv_description
 
 
