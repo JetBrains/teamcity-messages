@@ -69,10 +69,7 @@ object LinuxTeamcityMessagesTemplate : Template({
             pythonVersion = customPython {
                 executable = "%PYTHON_EXECUTABLE%"
             }
-            command = file {
-                filename = "setup.py"
-                scriptArguments = "test"
-            }
+            command = pytest()
             dockerImage = "%PYTHON_DOCKER_IMAGE%"
             dockerImagePlatform = PythonBuildStep.ImagePlatform.Linux
         }
@@ -112,11 +109,12 @@ object WindowsTeamcityMessagesTemplate : Template({
                 """.trimIndent()
             }
         }
-        script {
+        python {
             name = "Test"
-            scriptContent = """python %RESOLVED_DIR%\setup.py test"""
+            workingDir = "%RESOLVED_DIR%"
+            command = pytest()
             dockerImage = "%PYTHON_DOCKER_IMAGE%"
-            dockerImagePlatform = ScriptBuildStep.ImagePlatform.Windows
+            dockerImagePlatform = PythonBuildStep.ImagePlatform.Windows
         }
     }
 
