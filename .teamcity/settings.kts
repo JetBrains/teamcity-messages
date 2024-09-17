@@ -33,12 +33,10 @@ project {
 
     buildType(Build)
     buildType(Python310windows)
-    buildType(Python27linux)
     buildType(Python37linux)
     buildType(Python38linux)
     buildType(Python39linux)
     buildType(Python310linux)
-    buildType(Pypy2linux)
     buildType(Pypy37linux)
     buildType(Pypy3linux)
 
@@ -168,12 +166,10 @@ object Build : BuildType({
 
     dependencies {
         snapshot(Python310windows) {}
-        snapshot(Python27linux) {}
         snapshot(Python37linux) {}
         snapshot(Python38linux) {}
         snapshot(Python39linux) {}
         snapshot(Python310linux) {}
-        snapshot(Pypy2linux) {}
         snapshot(Pypy37linux) {}
         snapshot(Pypy3linux) {}
     }
@@ -190,18 +186,6 @@ object Python310windows : BuildType({
     }
 })
 
-
-object Python27linux : BuildType({
-    templates(LinuxTeamcityMessagesTemplate)
-    name = "Python 2.7 (Linux)"
-
-    params {
-        param("PYTHON_EXECUTABLE", "python")
-        param("PYTHON_DOCKER_IMAGE", "python:2.7")
-    }
-})
-
-
 object Python37linux : BuildType({
     templates(LinuxTeamcityMessagesTemplate)
     name = "Python 3.7 (Linux)"
@@ -211,7 +195,6 @@ object Python37linux : BuildType({
         param("PYTHON_DOCKER_IMAGE", "python:3.7")
     }
 })
-
 
 object Python38linux : BuildType({
     templates(LinuxTeamcityMessagesTemplate)
@@ -241,17 +224,6 @@ object Python310linux : BuildType({
         param("PYTHON_EXECUTABLE", "python")
         param("PYTHON_DOCKER_IMAGE", "python:3.10")
     }
-})
-
-object Pypy2linux : BuildType({
-    templates(LinuxTeamcityMessagesTemplate)
-    name = "Pypy 2 (Linux)"
-
-    params {
-        param("PYTHON_EXECUTABLE", "pypy")
-        param("PYTHON_DOCKER_IMAGE", "pypy:2")
-    }
-
 })
 
 object Pypy3linux : BuildType({
