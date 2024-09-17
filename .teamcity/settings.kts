@@ -70,6 +70,9 @@ object LinuxTeamcityMessagesTemplate : Template({
                 executable = "%PYTHON_EXECUTABLE%"
             }
             command = pytest()
+            environment = venv {
+                requirementsFile = "requirements.txt"
+            }
             dockerImage = "%PYTHON_DOCKER_IMAGE%"
             dockerImagePlatform = PythonBuildStep.ImagePlatform.Linux
         }
@@ -113,6 +116,9 @@ object WindowsTeamcityMessagesTemplate : Template({
             name = "Test"
             workingDir = "%RESOLVED_DIR%"
             command = pytest()
+            environment = venv {
+                requirementsFile = "requirements.txt"
+            }
             dockerImage = "%PYTHON_DOCKER_IMAGE%"
             dockerImagePlatform = PythonBuildStep.ImagePlatform.Windows
         }
