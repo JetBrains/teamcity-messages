@@ -9,7 +9,7 @@ from test_util import run_command
 if sys.version_info < (3, ):
     pylint_versions = ['==1.9.5']
 else:
-    pylint_versions = ['==2.4.4', '==2.5.3', '==2.12.2', '==2.14.5', '']
+    pylint_versions = ['==2.14.5', '==2.17.7', '==3.2.7']
 
 
 @pytest.fixture(scope='module', params=['pylint' + version for version in pylint_versions], ids=str)
@@ -30,7 +30,7 @@ def venv(request):
 def test_sample(venv):
     filename = 'tests/guinea-pigs/pylint/sample.py'
     output = run(venv, filename)
-    negative_score_possible = ['==1.9.5', '==2.4.4', '==2.5.3', '==2.12.2']
+    negative_score_possible = ['==2.12.2']
     expected_score = '0'
     for negative_score_possible_version in negative_score_possible:
         if 'pylint' + negative_score_possible_version in venv.packages:
