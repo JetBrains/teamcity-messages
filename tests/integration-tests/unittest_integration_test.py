@@ -311,10 +311,8 @@ def test_subtest_nested(venv):
         ])
 
 
+@pytest.mark.skipif("sys.version_info < (3, 11)", reason="Wrong reporting order for older Python versions")
 def test_subtest_skip(venv):
-    if sys.version_info < (3, 4):
-        venv = virtual_environments.prepare_virtualenv(list(venv.packages) + ["unittest2"])
-
     output = run_directly(venv, 'subtest_skip.py')
     test_name = '__main__.TestXXX.testSubtestSkip'
     assert_service_messages(
