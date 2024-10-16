@@ -322,13 +322,13 @@ def test_subtest_skip(venv):
         [
             ServiceMessage('testCount', {'count': "1"}),
             ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name}),
-            ServiceMessage('blockOpened', {'name': '(i=2)', 'flowId': test_name, 'subTestResult': 'Skip'}),
-            ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'SubTest skipped: skip reason|n'}),
-            ServiceMessage('blockClosed', {'name': '(i=2)', 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=0)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=0)', 'flowId': test_name}),
             ServiceMessage('blockOpened', {'name': '(i=1)', 'flowId': test_name, 'subTestResult': 'Success'}),
             ServiceMessage('blockClosed', {'name': '(i=1)', 'flowId': test_name}),
+            ServiceMessage('blockOpened', {'name': '(i=2)', 'flowId': test_name, 'subTestResult': 'Skip'}),
+            ServiceMessage('testStdOut', {'name': test_name, 'flowId': test_name, 'out': 'SubTest skipped: skip reason|n'}),
+            ServiceMessage('blockClosed', {'name': '(i=2)', 'flowId': test_name}),
             ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name}),
         ])
 
