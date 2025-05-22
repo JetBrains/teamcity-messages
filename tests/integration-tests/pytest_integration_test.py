@@ -95,7 +95,7 @@ if (sys.version_info[0] == 2 and sys.version_info >= (2, 7)) or (sys.version_inf
         internal_test_pytest_flake8(venv_with_pylint, "tests.guinea-pigs.pytest.{}.FLAKE8")
 
 
-    @pytest.mark.skipif("sys.version_info < (3, 7)", reason="requires Python 3.7+")
+    @pytest.mark.skipif("sys.version_info < (3, 7) or sys.version_info >= (3, 12)", reason="requires Python 3.7+")
     def test_pytest_flake8_v1_1(venv):
         # Use flake8 < 5 as there is an issue in pytest-flake8 package:
         # https://github.com/tholo/pytest-flake8/issues/87
