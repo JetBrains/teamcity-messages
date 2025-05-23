@@ -1,4 +1,5 @@
 from teamcity.messages import TeamcityServiceMessages, escape_value
+from teamcity.output import TeamCityMessagesPrinter
 
 from datetime import datetime
 import errno
@@ -449,3 +450,16 @@ def test_test_stopped():
     assert stream.observed_output.strip() == textwrap.dedent("""\
         ##teamcity[testIgnored timestamp='2000-11-02T10:23:01.556' message='some message' name='only a test' stopped='true']
         """).strip().encode('utf-8')
+
+
+class CustomOutputHandler(TeamCityMessagesPrinter):
+    def send_message(self, message):
+        self._output(b'Fake!')
+
+
+def test_custom_output_handler():
+    stream = StreamStub()
+    output_handler = CustomOutputHandler(output=stream)
+    messages = TeamcityServiceMessages(now=lambda: fixed_date, output_handler=output_handler)
+    messages.testStarted('only a test')
+    assert stream.observed_output.strip() == 'Fake!'.encode('utf-8')
