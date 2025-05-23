@@ -17,6 +17,8 @@ import sys
 import traceback
 from datetime import timedelta
 
+import pytest
+
 from teamcity import diff_tools
 from teamcity import is_running_under_teamcity
 from teamcity.common import convert_error_to_string, dump_test_stderr, dump_test_stdout
@@ -160,6 +162,16 @@ class EchoTeamCityMessages(object):
         if type(location) is tuple and len(location) == 3:
             return "%s:%s (%s)" % (str(location[0]), str(location[1]), str(location[2]))
         return str(location)
+
+    def pytest_sessionfinish(self, session, exitstatus):
+        if exitstatus > pytest.ExitCode.TESTS_FAILED and self.current_test_item:
+            test_id = self.format_test_id(self.current_test_item.nodeid, self.current_test_item.location)
+            self.teamcity.testStopped(
+                test_id,
+                message=exitstatus.name if hasattr(exitstatus, 'name') else str(exitstatus),
+                flowId=test_id
+            )
+            self.report_test_finished(test_id)
 
     def pytest_collection_finish(self, session):
         self.teamcity.testCount(len(session.items))

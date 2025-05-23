@@ -634,6 +634,21 @@ def test_skip_passed_output(venv):
         ])
 
 
+def test_keyboard_interrupt(venv):
+    output = run(venv, 'keyboard_interrupt_test.py')
+
+    test_name = 'tests.guinea-pigs.pytest.keyboard_interrupt_test.test_with_interrupt'
+
+    assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': test_name, 'flowId': test_name, 'captureStandardOutput': 'false'}),
+            ServiceMessage('testIgnored', {'name': test_name, 'flowId': test_name, 'stopped': 'true'}),
+            ServiceMessage('testFinished', {'name': test_name, 'flowId': test_name})
+        ])
+
+
 def run(venv, file_names, test=None, options='', set_tc_version=True, additional_arguments=None, env=None):
     if test is not None:
         test_suffix = "::" + test

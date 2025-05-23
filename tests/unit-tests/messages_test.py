@@ -440,3 +440,12 @@ def test_mismatched_encoding(encoding, is_message_encodable):
         expected_value = value.encode('unicode-escape').decode('latin-1')
 
     assert stream.getvalue() == "##teamcity[%s timestamp='2000-11-02T10:23:01.556']\n" % expected_value
+
+
+def test_test_stopped():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    messages.testStopped(testName='only a test', message='some message')
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[testIgnored timestamp='2000-11-02T10:23:01.556' message='some message' name='only a test' stopped='true']
+        """).strip().encode('utf-8')
