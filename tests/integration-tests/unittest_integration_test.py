@@ -589,6 +589,13 @@ def test_equals_processed_correctly(venv):
     assert output and "testFailed" not in output
 
 
+def test_verbose_output(venv):
+    command = os.path.join(venv.bin, 'python') + " -m unittest --quiet --verbose " + os.path.join('tests', 'guinea-pigs', 'unittest', 'assert.py')
+    output = run_command(command)
+
+    assert "... FAIL" in output
+
+
 def run_directly(venv, file):
     command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'unittest', file)
     return run_command(command)
