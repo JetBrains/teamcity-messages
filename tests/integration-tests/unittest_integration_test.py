@@ -589,6 +589,25 @@ def test_equals_processed_correctly(venv):
     assert output and "testFailed" not in output
 
 
+def test_verbose_output(venv):
+    command = os.path.join(venv.bin, 'python') + " -m unittest --quiet --verbose " + os.path.join('tests', 'guinea-pigs', 'unittest', 'assert.py')
+    output = run_command(command)
+
+    assert "... FAIL" in output
+
+
+def test_keyboard_interrupt(venv):
+    output = run_directly(venv, 'keyboard_interrupt.py')
+    ms = assert_service_messages(
+        output,
+        [
+            ServiceMessage('testCount', {'count': "1"}),
+            ServiceMessage('testStarted', {'name': '__main__.TestKeyboardInterrupt.runTest'}),
+            ServiceMessage('testIgnored', {'name': '__main__.TestKeyboardInterrupt.runTest', 'stopped': 'true'}),
+            ServiceMessage('testFinished', {'name': '__main__.TestKeyboardInterrupt.runTest'}),
+        ])
+
+
 def run_directly(venv, file):
     command = os.path.join(venv.bin, 'python') + " " + os.path.join('tests', 'guinea-pigs', 'unittest', file)
     return run_command(command)
