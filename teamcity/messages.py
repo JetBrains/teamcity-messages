@@ -188,6 +188,9 @@ class TeamcityServiceMessages(object):
     def buildStatus(self, status, text):
         self.message('buildStatus', status=status, text=text)
 
+    def buildNumber(self, value):
+        self._single_value_message('buildNumber', value)
+
     def setParameter(self, name, value):
         self.message('setParameter', name=name, value=value)
 
