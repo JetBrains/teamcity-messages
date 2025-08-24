@@ -27,6 +27,13 @@ from teamcity.output import TeamCityMessagesPrinter
 
 diff_tools.patch_unittest_diff()
 _ASSERTION_FAILURE_KEY = '_teamcity_assertion_failure'
+# unitest.mock's assertions
+_MOCK_CALL_FAILURE_RE = re.compile(
+    r'^AssertionError: (?P<msg>expected (call|await) not found).\nExpected: (?P<expected>.+)\nActual: (?P<actual>.+?)'
+    # "undo" https://github.com/pytest-dev/pytest-mock#improved-reporting-of-mock-call-assertion-errors
+    r'(\n\npytest introspection follows:\n.*)?$',
+    re.DOTALL,
+)
 
 
 def pytest_addoption(parser):
@@ -227,6 +234,32 @@ class EchoTeamCityMessages(object):
         self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
         self.test_start_reported_mark.remove(test_id)
 
+    def _get_diff(self, report):
+        try:
+            err_message = str(report.longrepr.reprcrash.message)
+            diff_name = diff_tools.EqualsAssertionError.__name__
+            # There is a string like "foo.bar.DiffError: [serialized_data]"
+            if diff_name in err_message:
+                serialized_data = err_message[err_message.index(diff_name) + len(diff_name) + 1:]
+                return diff_tools.deserialize_error(serialized_data)
+
+            match = _MOCK_CALL_FAILURE_RE.search(err_message)
+            if match:
+                expected, actual = match.group('expected'), match.group('actual')
+                if self.swap_diff:
+                    expected, actual = actual, expected
+                return diff_tools.EqualsAssertionError(expected=expected, actual=actual, msg=match.group('msg'), preformated=True)
+
+            assertion_tuple = getattr(self.current_test_item, _ASSERTION_FAILURE_KEY, None)
+            if assertion_tuple:
+                op, left, right = assertion_tuple
+                if op in ('==', '!='):
+                    if self.swap_diff:
+                        left, right = right, left
+                    return diff_tools.EqualsAssertionError(expected=right, actual=left, msg='op', preformated=True)
+        except Exception:
+            return None
+
     def report_test_failure(self, test_id, report, message=None, report_output=True):
         if hasattr(report, 'duration'):
             duration = timedelta(seconds=report.duration)
@@ -240,24 +273,7 @@ class EchoTeamCityMessages(object):
         if report_output:
             self.report_test_output(report, test_id)
 
-        diff_error = None
-        try:
-            err_message = str(report.longrepr.reprcrash.message)
-            diff_name = diff_tools.EqualsAssertionError.__name__
-            # There is a string like "foo.bar.DiffError: [serialized_data]"
-            if diff_name in err_message:
-                serialized_data = err_message[err_message.index(diff_name) + len(diff_name) + 1:]
-                diff_error = diff_tools.deserialize_error(serialized_data)
-
-            assertion_tuple = getattr(self.current_test_item, _ASSERTION_FAILURE_KEY, None)
-            if assertion_tuple:
-                op, left, right = assertion_tuple
-                if self.swap_diff:
-                    left, right = right, left
-                diff_error = diff_tools.EqualsAssertionError(expected=right, actual=left)
-        except Exception:
-            pass
-
+        diff_error = self._get_diff(report)
         if not diff_error:
             from .jb_local_exc_store import get_exception
             diff_error = get_exception()
