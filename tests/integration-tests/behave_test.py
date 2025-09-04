@@ -11,7 +11,7 @@ from test_util import run_command, get_teamcity_messages_root
 @pytest.fixture(scope='module', params=["behave"])
 def venv(request):
     """
-    Prepares a virtual environment for nose.
+    Prepares a virtual environment for behave.
     :rtype : virtual_environments.VirtualEnvDescription
     """
     return virtual_environments.prepare_virtualenv([request.param])
@@ -340,6 +340,7 @@ def test_tags(venv):
 
 
 def run(venv, options="", arguments="", lang_dir="eng"):
-    cwd = os.path.join(get_teamcity_messages_root(), "tests", "guinea-pigs", "behave", lang_dir)
-    behave = " ".join([os.path.join(venv.bin, "python"), os.path.join(os.path.dirname(cwd), "_behave_runner.py"), options, arguments])
+    behave_wd = os.path.join(get_teamcity_messages_root(), "tests", "guinea-pigs", "behave")
+    cwd = os.path.join(behave_wd, "common", lang_dir)
+    behave = " ".join([os.path.join(venv.bin, "python"), os.path.join(behave_wd, "_behave_runner.py"), options, arguments])
     return run_command(behave, cwd=cwd)
