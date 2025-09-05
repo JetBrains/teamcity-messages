@@ -28,6 +28,8 @@ def venv(request):
 
 
 def test_sample(venv):
+    if sys.implementation.name == 'pypy' and sys.version_info > (3, 8) and 'pylint==2.14.5' in venv.packages:
+        pytest.skip("PyLint 2.14.5 integration with custom output format is not working with PyPy 3.9+")
     filename = 'tests/guinea-pigs/pylint/sample.py'
     output = run(venv, filename)
     negative_score_possible = ['==2.12.2']
