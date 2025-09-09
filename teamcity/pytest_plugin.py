@@ -312,7 +312,8 @@ class EchoTeamCityMessages(object):
         self.report_test_finished(test_id, duration)
 
     def pytest_assertrepr_compare(self, config, op, left, right):
-        setattr(self.current_test_item, _ASSERTION_FAILURE_KEY, (op, left, right))
+        if hasattr(self.current_test_item, _ASSERTION_FAILURE_KEY):
+            setattr(self.current_test_item, _ASSERTION_FAILURE_KEY, (op, left, right))
 
     def pytest_runtest_logreport(self, report):
         """
