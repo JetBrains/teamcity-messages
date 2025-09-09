@@ -247,6 +247,15 @@ def test_build_status():
         """).strip().encode('utf-8')
 
 
+def test_build_number():
+    stream = StreamStub()
+    messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
+    messages.buildNumber("1.2.3_{build.number}-ent")
+    assert stream.observed_output.strip() == textwrap.dedent("""\
+        ##teamcity[buildNumber '1.2.3_{build.number}-ent']
+        """).strip().encode('utf-8')
+
+
 def test_set_parameter():
     stream = StreamStub()
     messages = TeamcityServiceMessages(output=stream, now=lambda: fixed_date)
