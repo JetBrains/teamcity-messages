@@ -49,12 +49,17 @@ def pytest_addoption(parser):
     group._addoption('--no-teamcity', action="count",
                      dest="no_teamcity", default=0, help="disable output of JetBrains TeamCity service messages")
     parser.addoption('--jb-swapdiff', action="store_true", dest="swapdiff", default=False, help="Swap actual/expected in diff")
+    parser.addoption('--jb-full-duration', action="store_true", dest="full_duration", default=False,
+                     help="report test duration including fixtures setup/teardown time, like pytest does for junitxml")
 
     skip_passed_output = {"type": "bool"}
     if _skip_passed_output_default is not None:
         skip_passed_output["default"] = _skip_passed_output_default
     parser.addini("skippassedoutput", help="skip output of passed tests for JetBrains TeamCity service messages", **skip_passed_output)
     parser.addini("swapdiff", help="Swap actual/expected in diff", type="bool")
+    parser.addini("fullduration",
+                  help="report test duration including fixtures setup/teardown time, like pytest does for junitxml",
+                  type="bool")
 
 
 def pytest_configure(config):
@@ -78,7 +83,8 @@ def pytest_configure(config):
             coverage_controller,
             skip_passed_output,
             bool(config.getini('swapdiff') or config.option.swapdiff),
-            _report_logs_as_test_log
+            _report_logs_as_test_log,
+            bool(config.getini('fullduration') or config.option.full_duration)
         )
         config.pluginmanager.register(config._teamcityReporting)
 
@@ -100,17 +106,24 @@ def _get_coverage_controller(config):
 
 class EchoTeamCityMessages(object):
     def __init__(self, output_capture_enabled, context_manager, coverage_controller, skip_passed_output, swap_diff,
-                 report_logs_as_test_log):
+                 report_logs_as_test_log, full_duration=False):
         self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
         self.skip_passed_output = skip_passed_output
         self.report_logs_as_test_log = report_logs_as_test_log
+        self.full_duration = full_duration
 
         output_handler = TeamCityMessagesPrinter(context_manager=context_manager)
         self.teamcity = TeamcityServiceMessages(output_handler=output_handler)
         self.test_start_reported_mark = set()
         self.rootdir = None
         self.current_test_item = None
+
+        # used only when full_duration is enabled: accumulate setup/call/teardown
+        # durations per test and defer the final report until teardown completes,
+        # mirroring how pytest computes "time" for junitxml
+        self.test_phase_durations = {}
+        self.pending_report = {}
 
         self.max_reported_output_size = 1 * 1024 * 1024
         self.reported_output_chunk_size = 50000
@@ -265,11 +278,12 @@ class EchoTeamCityMessages(object):
         self.teamcity.testFinished(test_id, testDuration=duration, flowId=test_id)
         self.test_start_reported_mark.remove(test_id)
 
-    def report_test_failure(self, test_id, report, message=None, report_output=True):
-        if hasattr(report, 'duration'):
-            duration = timedelta(seconds=report.duration)
-        else:
-            duration = None
+    def report_test_failure(self, test_id, report, message=None, report_output=True, duration=None):
+        if duration is None:
+            if hasattr(report, 'duration'):
+                duration = timedelta(seconds=report.duration)
+            else:
+                duration = None
 
         if message is None:
             message = self.format_location(report.location)
@@ -325,16 +339,17 @@ class EchoTeamCityMessages(object):
             self.teamcity.testFailed(test_id, message, str(report.longrepr), flowId=test_id)
         self.report_test_finished(test_id, duration)
 
-    def report_test_skip(self, test_id, report):
+    def report_test_skip(self, test_id, report, duration=None):
         if type(report.longrepr) is tuple and len(report.longrepr) == 3:
             reason = report.longrepr[2]
         else:
             reason = str(report.longrepr)
 
-        if hasattr(report, 'duration'):
-            duration = timedelta(seconds=report.duration)
-        else:
-            duration = None
+        if duration is None:
+            if hasattr(report, 'duration'):
+                duration = timedelta(seconds=report.duration)
+            else:
+                duration = None
 
         self.ensure_test_start_reported(test_id)
         self.report_test_output(report, test_id)
@@ -351,6 +366,12 @@ class EchoTeamCityMessages(object):
         """
         test_id = self.format_test_id(report.nodeid, report.location)
 
+        if self.full_duration:
+            self._pytest_runtest_logreport_full_duration(test_id, report)
+        else:
+            self._pytest_runtest_logreport_call_duration(test_id, report)
+
+    def _pytest_runtest_logreport_call_duration(self, test_id, report):
         duration = timedelta(seconds=report.duration)
 
         if report.passed:
@@ -361,11 +382,7 @@ class EchoTeamCityMessages(object):
                     self.report_test_output(report, test_id)
                 self.report_test_finished(test_id, duration)
             else:
-                if self.report_has_output(report) and not self.skip_passed_output:
-                    block_name = "test " + report.when
-                    self.teamcity.blockOpened(block_name, flowId=test_id)
-                    self.report_test_output(report, test_id)
-                    self.teamcity.blockClosed(block_name, flowId=test_id)
+                self._report_phase_output_block(report, test_id)
         elif report.failed:
             if report.when == 'call':
                 self.report_test_failure(test_id, report)
@@ -381,6 +398,65 @@ class EchoTeamCityMessages(object):
                 self.report_test_failure(test_id + "_teardown", report)
         elif report.skipped:
             self.report_test_skip(test_id, report)
+
+    def _report_phase_output_block(self, report, test_id):
+        if self.report_has_output(report) and not self.skip_passed_output:
+            block_name = "test " + report.when
+            self.teamcity.blockOpened(block_name, flowId=test_id)
+            self.report_test_output(report, test_id)
+            self.teamcity.blockClosed(block_name, flowId=test_id)
+
+    def _pytest_runtest_logreport_full_duration(self, test_id, report):
+        """
+        Accumulates setup/call/teardown durations for a test and only sends
+        the final TeamCity message once teardown completes, so the reported
+        duration matches what pytest computes for junitxml's "time" attribute.
+        """
+        self.test_phase_durations[test_id] = self.test_phase_durations.get(test_id, 0.0) + report.duration
+
+        if report.passed:
+            if report.when == 'call':
+                self.ensure_test_start_reported(test_id)
+                if not self.skip_passed_output:
+                    self.report_test_output(report, test_id)
+                self.pending_report.setdefault(test_id, ('pass', None, None, True))
+            else:
+                self._report_phase_output_block(report, test_id)
+                if report.when == 'setup':
+                    self.pending_report.setdefault(test_id, ('pass', None, None, True))
+                elif report.when == 'teardown':
+                    self._finalize_pending_report(test_id)
+        elif report.failed:
+            if report.when == 'call':
+                self.pending_report[test_id] = ('fail', report, None, True)
+            elif report.when == 'setup':
+                if self.report_has_output(report):
+                    self.teamcity.blockOpened("test setup", flowId=test_id)
+                    self.report_test_output(report, test_id)
+                    self.teamcity.blockClosed("test setup", flowId=test_id)
+                self.pending_report[test_id] = ('fail', report, "test setup failed", False)
+            elif report.when == 'teardown':
+                if test_id in self.pending_report:
+                    self._finalize_pending_report(test_id)
+                else:
+                    self.test_phase_durations.pop(test_id, None)
+                # Report failed teardown as a separate test as original test is already finished
+                self.report_test_failure(test_id + "_teardown", report)
+        elif report.skipped:
+            self.pending_report[test_id] = ('skip', report, None, True)
+            if report.when == 'teardown':
+                self._finalize_pending_report(test_id)
+
+    def _finalize_pending_report(self, test_id):
+        kind, report, message, report_output = self.pending_report.pop(test_id, (None, None, None, True))
+        duration = timedelta(seconds=self.test_phase_durations.pop(test_id, 0.0))
+
+        if kind == 'fail':
+            self.report_test_failure(test_id, report, message=message, report_output=report_output, duration=duration)
+        elif kind == 'skip':
+            self.report_test_skip(test_id, report, duration=duration)
+        elif kind == 'pass':
+            self.report_test_finished(test_id, duration)
 
     def pytest_collectreport(self, report):
         test_id = self.format_test_id(report.nodeid, report.location) + "_collect"
