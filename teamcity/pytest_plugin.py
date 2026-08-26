@@ -66,6 +66,7 @@ def pytest_configure(config):
         enabled = is_running_under_teamcity()
 
     if enabled:
+        subtests_enabled = _patch_add_sub_test(config)
         output_capture_enabled = getattr(config.option, 'capture', 'fd') != 'no'
         coverage_controller = _get_coverage_controller(config)
         skip_passed_output = bool(config.getini('skippassedoutput'))
@@ -78,7 +79,8 @@ def pytest_configure(config):
             coverage_controller,
             skip_passed_output,
             bool(config.getini('swapdiff') or config.option.swapdiff),
-            _report_logs_as_test_log
+            _report_logs_as_test_log,
+            subtests_enabled=subtests_enabled,
         )
         config.pluginmanager.register(config._teamcityReporting)
 
@@ -90,6 +92,68 @@ def pytest_unconfigure(config):
         config.pluginmanager.unregister(teamcity_reporting)
 
 
+def _patch_add_sub_test(config):
+    from _pytest.unittest import TestCaseFunction
+
+    try:
+        # pytest >= 9.0
+        from _pytest.subtests import ExceptionInfo, SubtestReport, SubtestContext
+        from _pytest.runner import check_interactive_exception
+
+        def make_call_info(exc_info, *, start, stop, duration, when):
+            from _pytest.runner import CallInfo
+            return CallInfo(
+                    None,
+                    exc_info,
+                    start=start,
+                    stop=stop,
+                    duration=duration,
+                    when=when,
+                    _ispytest=True,
+            )
+    except ImportError:
+        try:
+            # pytest-subtests >= 0.12
+            from pytest_subtests.plugin import check_interactive_exception, make_call_info
+            from pytest_subtests.plugin import ExceptionInfo, SubTestReport as SubtestReport, SubTestContext as SubtestContext
+        except ImportError:
+            try:
+                # pytest-subtests < 0.12
+                from pytest_subtests import check_interactive_exception, make_call_info
+                from pytest_subtests import ExceptionInfo, SubTestReport as SubtestReport, SubTestContext as SubtestContext
+            except ImportError:
+                return False
+
+    capmam = config.pluginmanager.get_plugin("capturemanager")
+    if capmam is not None:
+        suspend_capture_ctx = capmam.global_and_fixture_disabled
+    else:
+        from contextlib import nullcontext
+        suspend_capture_ctx = nullcontext
+
+    def addSubTest(self, test_case, test, exc_info):
+        msg = str(test._message)
+        call_info = make_call_info(
+            ExceptionInfo(exc_info, _ispytest=True) if exc_info is not None else None,
+            start=0,
+            stop=0,
+            duration=0,
+            when="call",
+        )
+        report = self.ihook.pytest_runtest_makereport(item=self, call=call_info)
+        sub_report = super(SubtestReport, SubtestReport)._from_json(report._to_json())
+        sub_report.context = SubtestContext(msg=msg, kwargs=dict(test.params))
+        with suspend_capture_ctx():
+            self.ihook.pytest_runtest_logreport(report=sub_report)
+        if exc_info is not None and check_interactive_exception(call_info, sub_report):
+            self.ihook.pytest_exception_interact(
+                node=self, call=call_info, report=sub_report
+            )
+
+    TestCaseFunction.addSubTest = addSubTest
+    return True
+
+
 def _get_coverage_controller(config):
     cov_plugin = config.pluginmanager.getplugin('_cov')
     if not cov_plugin:
@@ -99,8 +163,16 @@ def _get_coverage_controller(config):
 
 
 class EchoTeamCityMessages(object):
-    def __init__(self, output_capture_enabled, context_manager, coverage_controller, skip_passed_output, swap_diff,
-                 report_logs_as_test_log):
+    def __init__(
+        self,
+        output_capture_enabled,
+        context_manager,
+        coverage_controller,
+        skip_passed_output,
+        swap_diff,
+        report_logs_as_test_log,
+        subtests_enabled,
+    ):
         self.coverage_controller = coverage_controller
         self.output_capture_enabled = output_capture_enabled
         self.skip_passed_output = skip_passed_output
@@ -115,6 +187,8 @@ class EchoTeamCityMessages(object):
         self.max_reported_output_size = 1 * 1024 * 1024
         self.reported_output_chunk_size = 50000
         self.swap_diff = swap_diff
+        self.subtests_enabled = subtests_enabled
+        self.subtest_failures = {}
 
     def get_id_from_location(self, location):
         if type(location) is not tuple or len(location) != 3 or not hasattr(location[2], "startswith"):
@@ -353,12 +427,52 @@ class EchoTeamCityMessages(object):
 
         duration = timedelta(seconds=report.duration)
 
+        if self.subtests_enabled:
+            try:
+                # pytest >= 9.0
+                from _pytest.subtests import SubtestReport
+            except ImportError:
+                try:
+                    # pytest-subtests >= 0.12
+                    from pytest_subtests.plugin import SubTestReport as SubtestReport
+                except ImportError:
+                    # pytest-subtests < 0.12
+                    from pytest_subtests import SubTestReport as SubtestReport
+            if isinstance(report, SubtestReport):
+                # Replace "." -> "_" since '.' is a test hierarchy separator
+                # See i.e. https://github.com/JetBrains/teamcity-messages/issues/134 (https://youtrack.jetbrains.com/issue/PY-23846)
+                block_id = "[%s]" % report.context.msg.strip().replace(".", "_")
+                if report.failed:
+                    self._add_subtest_failure(test_id, block_id)
+                    self.teamcity.subTestBlockOpened(
+                        block_id, subTestResult="Failure", flowId=test_id
+                    )
+                    self.teamcity.testStdErr(
+                        test_id,
+                        out="SubTest failure: %s\n" % report.longreprtext,
+                        flowId=test_id,
+                    )
+                    self.teamcity.blockClosed(block_id, flowId=test_id)
+                else:
+                    self.teamcity.subTestBlockOpened(
+                        block_id, subTestResult="Success", flowId=test_id
+                    )
+                    self.teamcity.blockClosed(block_id, flowId=test_id)
+                return
+
         if report.passed:
             # Do not report passed setup/teardown if no output
             if report.when == 'call':
                 self.ensure_test_start_reported(test_id)
                 if not self.skip_passed_output:
                     self.report_test_output(report, test_id)
+                if self.subtest_failures.get(test_id):
+                    self.teamcity.testFailed(
+                        test_id,
+                        'One or more subtests failed',
+                        'Failed subtests list: %s' % ', '.join(self.subtest_failures[test_id]),
+                        flowId=test_id,
+                    )
                 self.report_test_finished(test_id, duration)
             else:
                 if self.report_has_output(report) and not self.skip_passed_output:
@@ -397,6 +511,11 @@ class EchoTeamCityMessages(object):
             except Exception:
                 tb = traceback.format_exc()
                 self.teamcity.customMessage("Coverage statistics reporting failed", "ERROR", errorDetails=tb)
+
+    def _add_subtest_failure(self, test_id, subtest_block_id):
+        fail_array = self.subtest_failures.get(test_id, [])
+        fail_array.append(subtest_block_id)
+        self.subtest_failures[test_id] = fail_array
 
     def _report_coverage(self):
         from coverage.misc import NotPython
