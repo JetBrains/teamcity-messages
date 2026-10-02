@@ -1,3 +1,5 @@
 include *.txt
 include *.md
 include examples/*.py
+include tox.ini
+recursive-include tests *.py *.feature *.yml
